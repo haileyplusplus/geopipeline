@@ -10,6 +10,9 @@ import sanitize_filename
 
 from opendatabrowser import Browser
 
+"""
+Next: extract automatically and give better names
+"""
 
 DESTINATION_DIR = '/Users/hailey/Documents/ArcGIS/data/chicago'
 db = SqliteDatabase(os.path.join(DESTINATION_DIR, 'fetchermetadata.sqlite3'))
@@ -36,13 +39,17 @@ class Fetcher:
         item = self.browser.get(key)
         if not item:
             print(f'Error fetching {key}')
-            return
+            return False
         name = item.name
         print(f'Fetching "{name}" / key {key}')
         type_ = item.type_
         if type_ != 'map':
             print(f'  Error attempting to fetch non-map')
-            return
+            return False
+        self.inner_fetch(key, name)
+        return True
+
+    def inner_fetch(self, key, name):
         url = self.URL_TEMPLATE % key
         fetch_time = datetime.datetime.now()
         filename = sanitize_filename.sanitize(f'{name}.zip')
@@ -63,9 +70,12 @@ if __name__ == "__main__":
         description='Fetch chicago open data and track metadata',
     )
     parser.add_argument('key', nargs='*')
+    parser.add_argument('--force', action='store_true')
     args = parser.parse_args()
     db.connect()
     db.create_tables([DataSource])
     f = Fetcher(args)
     for k in args.key:
-        f.fetch(k)
+        fetched = f.fetch(k)
+        if not fetched and args.force:
+            f.inner_fetch(k, k)
