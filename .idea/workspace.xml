@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Filter out deprecated stuff">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Implement fetcher">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/opendatabrowser.py" beforeDir="false" afterPath="$PROJECT_DIR$/opendatabrowser.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/opendatafetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/opendatafetcher.py" afterDir="false" />
@@ -99,7 +99,15 @@
       <option name="project" value="LOCAL" />
       <updated>1710192244514</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Implement fetcher">
+      <option name="closed" value="true" />
+      <created>1710192840810</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1710192840810</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -108,6 +116,7 @@
     <MESSAGE value="Minor refactor" />
     <MESSAGE value="Add browser and fetcher" />
     <MESSAGE value="Filter out deprecated stuff" />
-    <option name="LAST_COMMIT_MESSAGE" value="Filter out deprecated stuff" />
+    <MESSAGE value="Implement fetcher" />
+    <option name="LAST_COMMIT_MESSAGE" value="Implement fetcher" />
   </component>
 </project>

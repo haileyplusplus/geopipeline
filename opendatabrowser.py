@@ -18,6 +18,13 @@ class DataFeed:
         self.domain_tags = frozenset(d['classification'].get('domain_tags', []))
         self.deprecated = 'deprecated' in self.domain_tags
         self.type_ = self.r['type']
+        self.category = d['classification'].get('domain_category', '')
+
+    def __str__(self):
+        return f'{self.id_:10} {self.name}'
+
+    def __lt__(self, o):
+        return self.name < o.name
 
 
 class Browser:
@@ -33,8 +40,16 @@ class Browser:
 
     def get(self, key):
         result = self.datasets.get(key)
-        if not self.options.show_deprecated and result.deprecated:
-            return None
+        if not result:
+            return result
+        if result.deprecated:
+            if self.options and not self.options.show_deprecated:
+                return None
+        if self.options:
+            if self.options.category and self.options.category[0] != result.category:
+                return None
+            if self.options.map and result.type_ != 'map':
+                return None
         return result
 
     def pretty_print(self, key):
@@ -44,21 +59,27 @@ class Browser:
             return
         print(json.dumps(z.d, sort_keys=True, indent=4))
 
-    def print_summary(self, key):
+    def get_summary(self, key):
         z = self.get(key)
         if not z:
             return
-        print(f'{key:10} {z.name}')
+        return f'{key:10} {z.name}'
 
     def search(self, arglist):
         text = arglist.s[0]
-        for k, v in self.datasets.items():
+        summaries = []
+        for k, v in sorted(self.datasets.items()):
             name = v.name
-            if name.find(text) != -1:
+            if text == '*' or name.find(text) != -1:
                 if arglist.summary:
-                    self.print_summary(k)
+                    summaries.append(v)
                 else:
                     self.pretty_print(k)
+        if summaries:
+            summaries.sort()
+            for x in summaries:
+                if self.get(x.id_):
+                    print(x)
 
 
 if __name__ == "__main__":
@@ -70,12 +91,14 @@ if __name__ == "__main__":
     parser.add_argument('-s', nargs=1, required=False)
     parser.add_argument('--summary', action='store_true')
     parser.add_argument('--show-deprecated', action='store_true')
+    parser.add_argument('--category', nargs=1, required=False)
+    parser.add_argument('--map', action='store_true')
     args = parser.parse_args()
     b = Browser(args)
     print(args)
     for k in args.key:
         if args.summary:
-            b.print_summary(k)
+            print(b.get_summary(k))
         else:
             b.pretty_print(k)
     if args.s:

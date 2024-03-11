@@ -30,7 +30,7 @@ class Fetcher:
     URL_TEMPLATE = 'https://data.cityofchicago.org/api/geospatial/%s?method=export&format=Shapefile'
 
     def __init__(self, args):
-        self.browser = Browser(args)
+        self.browser = Browser(None)
 
     def fetch(self, key):
         item = self.browser.get(key)
@@ -48,6 +48,9 @@ class Fetcher:
         filename = sanitize_filename.sanitize(f'{name}.zip')
         fullpath = os.path.join(DESTINATION_DIR, filename)
         print(f'fetch url {url}')
+        if os.path.exists(fullpath):
+            print(f'Skipping because {fullpath} exists')
+            return
         cp = subprocess.run(['curl', '-o', fullpath, url])
         success = cp.returncode == 0
         src = DataSource(id_=key, name=name, retrieved=fetch_time, fullpath=fullpath, success=success)
@@ -60,8 +63,6 @@ if __name__ == "__main__":
         description='Fetch chicago open data and track metadata',
     )
     parser.add_argument('key', nargs='*')
-    parser.add_argument('--summary', action='store_true')
-    parser.add_argument('--show-deprecated', action='store_true')
     args = parser.parse_args()
     db.connect()
     db.create_tables([DataSource])
