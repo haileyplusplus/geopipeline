@@ -17,6 +17,7 @@ class DataFeed:
         self.description = self.r['description']
         self.domain_tags = frozenset(d['classification'].get('domain_tags', []))
         self.deprecated = 'deprecated' in self.domain_tags
+        self.type_ = self.r['type']
 
 
 class Browser:
