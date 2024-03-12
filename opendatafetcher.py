@@ -2,7 +2,9 @@
 
 import argparse
 import datetime
+import glob
 import os
+import shutil
 import subprocess
 import tempfile
 import zipfile
@@ -38,6 +40,8 @@ class DataSetInstance:
 
     def __init__(self, key):
         self.key = key
+        self.fullpath = None
+        self.name = None
 
     def fetch(self, browser):
         key = self.key
@@ -55,13 +59,15 @@ class DataSetInstance:
         return True
 
     def inner_fetch(self, name):
+        self.name = name
         url = self.URL_TEMPLATE % self.key
         fetch_time = datetime.datetime.now()
         filename = sanitize_filename.sanitize(f'{name}.zip')
         fullpath = os.path.join(DESTINATION_DIR, filename)
         print(f'fetch url {url}')
+        self.fullpath = fullpath
         if os.path.exists(fullpath):
-            print(f'Skipping because {fullpath} exists')
+            print(f'Skipping fetch because {fullpath} exists')
             return
         cp = subprocess.run(['curl', '-o', fullpath, url])
         success = cp.returncode == 0
@@ -69,7 +75,30 @@ class DataSetInstance:
         src.save()
 
     def extract(self):
-        pass
+        if not self.fullpath:
+            return
+        zf = zipfile.ZipFile(self.fullpath)
+        with tempfile.TemporaryDirectory() as tempdir:
+            zf.extractall(tempdir)
+            files = glob.glob(os.path.join(tempdir, '*'))
+            filenames = set([os.path.splitext(fn)[0] for fn in files])
+            if len(filenames) != 1:
+                print(f'Archive {self.name} did not have the expected contents.')
+                return
+            fullfilename = next(iter(filenames))
+            _, filename = os.path.split(fullfilename)
+            safename = sanitize_filename.sanitize(self.name)
+            for f in files:
+                path, name = os.path.split(f)
+                newname = name.replace(filename, safename)
+                if newname == name:
+                    print(f'Failure replacing {name}: {filename}, {safename}')
+                    continue
+                destfullpath = os.path.join(DESTINATION_DIR, newname)
+                if os.path.exists(destfullpath):
+                    print(f'Skipping copy to {destfullpath}')
+                    continue
+                shutil.move(f, destfullpath)
 
 
 class Fetcher:
@@ -85,6 +114,7 @@ class Fetcher:
             fetched = d.fetch(self.browser)
             if not fetched and force:
                 d.inner_fetch(k)
+            d.extract()
 
 
 if __name__ == "__main__":
