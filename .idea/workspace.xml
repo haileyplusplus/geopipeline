@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Implement fetcher">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Add force option">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/opendatabrowser.py" beforeDir="false" afterPath="$PROJECT_DIR$/opendatabrowser.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/opendatafetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/opendatafetcher.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -107,7 +106,23 @@
       <option name="project" value="LOCAL" />
       <updated>1710192840810</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Refinements">
+      <option name="closed" value="true" />
+      <created>1710194760681</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1710194760681</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Add force option">
+      <option name="closed" value="true" />
+      <created>1710195445297</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1710195445297</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -117,6 +132,8 @@
     <MESSAGE value="Add browser and fetcher" />
     <MESSAGE value="Filter out deprecated stuff" />
     <MESSAGE value="Implement fetcher" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implement fetcher" />
+    <MESSAGE value="Refinements" />
+    <MESSAGE value="Add force option" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add force option" />
   </component>
 </project>
