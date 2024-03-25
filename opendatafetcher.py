@@ -114,7 +114,10 @@ class Fetcher:
             fetched = d.fetch(self.browser)
             if not fetched and force:
                 d.inner_fetch(k)
-            d.extract()
+            try:
+                d.extract()
+            except (zipfile.BadZipfile, FileNotFoundError):
+                print(f'Couldn\'t extract {d.name}')
 
 
 if __name__ == "__main__":
