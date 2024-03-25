@@ -105,7 +105,7 @@ if __name__ == "__main__":
     if args.input_file:
         lines = [x.strip() for x in open(args.input_file[0]).readlines() if x.strip()]
         for line in lines:
-            f.add(line)
+            f.add(line.split()[0])
     for k in args.key:
         f.add(k)
     f.process_all(force=args.force)
