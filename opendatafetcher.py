@@ -20,7 +20,7 @@ Next:
  explore arcgis db tables in sqlite
 """
 
-DESTINATION_DIR = '/Users/hailey/Documents/ArcGIS/data/chicago'
+DESTINATION_DIR = '/Users/hailey/datasets/chicago'
 db = SqliteDatabase(os.path.join(DESTINATION_DIR, 'fetchermetadata.sqlite3'))
 
 
@@ -36,7 +36,7 @@ class DataSet(Model):
 
 
 class DataSetInstance:
-    URL_TEMPLATE = 'https://data.cityofchicago.org/api/geospatial/%s?method=export&format=Shapefile'
+    URL_TEMPLATE = 'https://data.cityofchicago.org/api/geospatial/%s?method=export&format=GeoJSON'
 
     def __init__(self, key):
         self.key = key
@@ -62,7 +62,7 @@ class DataSetInstance:
         self.name = name
         url = self.URL_TEMPLATE % self.key
         fetch_time = datetime.datetime.now()
-        filename = sanitize_filename.sanitize(f'{name}.zip')
+        filename = sanitize_filename.sanitize(f'{name}.geojson')
         fullpath = os.path.join(DESTINATION_DIR, filename)
         print(f'fetch url {url}')
         self.fullpath = fullpath
@@ -73,32 +73,6 @@ class DataSetInstance:
         success = cp.returncode == 0
         src = DataSet(id_=self.key, name=name, retrieved=fetch_time, fullpath=fullpath, success=success)
         src.save()
-
-    def extract(self):
-        if not self.fullpath:
-            return
-        zf = zipfile.ZipFile(self.fullpath)
-        with tempfile.TemporaryDirectory() as tempdir:
-            zf.extractall(tempdir)
-            files = glob.glob(os.path.join(tempdir, '*'))
-            filenames = set([os.path.splitext(fn)[0] for fn in files])
-            if len(filenames) != 1:
-                print(f'Archive {self.name} did not have the expected contents.')
-                return
-            fullfilename = next(iter(filenames))
-            _, filename = os.path.split(fullfilename)
-            safename = sanitize_filename.sanitize(self.name)
-            for f in files:
-                path, name = os.path.split(f)
-                newname = name.replace(filename, safename)
-                if newname == name:
-                    print(f'Failure replacing {name}: {filename}, {safename}')
-                    continue
-                destfullpath = os.path.join(DESTINATION_DIR, newname)
-                if os.path.exists(destfullpath):
-                    print(f'Skipping copy to {destfullpath}')
-                    continue
-                shutil.move(f, destfullpath)
 
 
 class Fetcher:
@@ -114,10 +88,6 @@ class Fetcher:
             fetched = d.fetch(self.browser)
             if not fetched and force:
                 d.inner_fetch(k)
-            try:
-                d.extract()
-            except (zipfile.BadZipfile, FileNotFoundError):
-                print(f'Couldn\'t extract {d.name}')
 
 
 if __name__ == "__main__":
@@ -127,10 +97,15 @@ if __name__ == "__main__":
     )
     parser.add_argument('key', nargs='*')
     parser.add_argument('--force', action='store_true')
+    parser.add_argument('--input_file', nargs=1, required=False)
     args = parser.parse_args()
     db.connect()
     db.create_tables([DataSet])
     f = Fetcher()
+    if args.input_file:
+        lines = [x.strip() for x in open(args.input_file[0]).readlines() if x.strip()]
+        for line in lines:
+            f.add(line)
     for k in args.key:
         f.add(k)
     f.process_all(force=args.force)
