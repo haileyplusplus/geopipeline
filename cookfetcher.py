@@ -40,6 +40,7 @@ class Keyword(BaseModel):
 
 class DataSet(BaseModel):
     identifier = CharField(primary_key=True)
+    sublayer = BooleanField()
     title = CharField()
     description = CharField()
     modified = DateTimeField()
@@ -59,7 +60,13 @@ class Catalog:
 
     def parse_dataset(self, dataset):
         filtered = {k: v for k, v in dataset.items() if k in {'identifier', 'title', 'description', 'modified'}}
-        if DataSet.get_or_none(DataSet.identifier == dataset['identifier']) is not None:
+        fi = filtered['identifier'].split('=')[1]
+        s2 = fi.split('&')
+        sublayer = False
+        if len(s2) > 1 and s2[1] == 'sublayer':
+            sublayer = True
+        filtered['sublayer'] = 'sublayer'
+        if DataSet.get_or_none(DataSet.identifier == filtered['identifier']) is not None:
             return
         ds = DataSet.create(**filtered)
         for keyword in dataset['keyword']:

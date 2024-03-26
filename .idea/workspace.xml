@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Add Cook County fetcher">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Keyword filtering">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cookfetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/cookfetcher.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -204,7 +205,15 @@
       <option name="project" value="LOCAL" />
       <updated>1711427686904</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="Keyword filtering">
+      <option name="closed" value="true" />
+      <created>1711427877948</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1711427877948</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -226,6 +235,7 @@
     <MESSAGE value="Clean up a messy column" />
     <MESSAGE value="Document tomorrow work" />
     <MESSAGE value="Add Cook County fetcher" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add Cook County fetcher" />
+    <MESSAGE value="Keyword filtering" />
+    <option name="LAST_COMMIT_MESSAGE" value="Keyword filtering" />
   </component>
 </project>
