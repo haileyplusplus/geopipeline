@@ -95,5 +95,10 @@ if __name__ == "__main__":
     if args.summary:
         for item in DataSet.select().order_by(DataSet.title):
             print(item.title)
+    if args.category:
+        cat = args.category[0]
+        query = DataSet.select().join(DataSetKeyword).join(Keyword).where(Keyword.keyword == cat).order_by(DataSet.title)
+        for item in query:
+            print(item.title)
 
 
