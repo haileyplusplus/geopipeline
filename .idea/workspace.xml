@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Add map filter">
-      <change afterPath="$PROJECT_DIR$/explore.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/kmz_to_geojson.py" afterDir="false" />
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Add kmz converter">
+      <change afterPath="$PROJECT_DIR$/map_processor.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -238,7 +237,15 @@
       <option name="project" value="LOCAL" />
       <updated>1711478916087</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="Add kmz converter">
+      <option name="closed" value="true" />
+      <created>1711481203251</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1711481203251</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -275,6 +282,7 @@
     <MESSAGE value="Store more precise identifiers" />
     <MESSAGE value="Basic retrieval works" />
     <MESSAGE value="Add map filter" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add map filter" />
+    <MESSAGE value="Add kmz converter" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add kmz converter" />
   </component>
 </project>
