@@ -49,6 +49,7 @@ import readline;
 
 class Wrapper:
     DATA_DIR = '/Users/hailey/datasets/chicago'
+    DESTINATION_DIR = '/Users/hailey/Documents/ArcGIS/data/chicago'
 
     def __init__(self, filename):
         self.orig = geopandas.read_file(os.path.join(self.DATA_DIR, filename))
@@ -64,28 +65,65 @@ class Wrapper:
             colname = 'street_nam'
         return self.layer[self.layer[colname] == name]
 
+    def get_streets(self):
+        colname = 'st_name'
+        if colname not in self.layer.columns:
+            colname = 'street_nam'
+        return set(self.layer[colname].unique())
+
+
+class BikeMerge:
+    def __init__(self):
+        self.streets = Wrapper('Street Center Lines.geojson')
+        self.bike_routes = Wrapper('Bike Routes.geojson')
+        self.output = geopandas.GeoDataFrame()
+        self.bike_streets = self.bike_routes.get_streets() & self.streets.get_streets()
+
+    def merge_street(self, street_name):
+        print(f'Processing {street_name}')
+        street = self.streets.get_street(street_name)
+        bike_route = self.bike_routes.get_street(street_name)
+        cumulative = geopandas.GeoDataFrame()
+        for ri, route in bike_route.iterrows():
+            matching = []
+            rgbuffer = route.geometry.buffer(3)
+            for si, seg in street.iterrows():
+                match = rgbuffer.contains(seg.geometry)
+                if match:
+                    matching.append(seg.drop(['create_tim', 'update_tim', 'status_dat']))
+            matched_frame = geopandas.GeoDataFrame(matching)
+            route_frame = pd.DataFrame([route.drop('geometry')])
+            if matched_frame.empty or route_frame.empty:
+                print(f'  Empty frame: {matched_frame}, {route_frame}')
+                continue
+            m = matched_frame.merge(route_frame, left_on='street_nam', right_on='st_name')
+            cumulative = pd.concat([cumulative, m])
+        if not cumulative.empty:
+            self.output = pd.concat([self.output, cumulative])
+
+    def merge_all(self):
+        for streetname in self.bike_streets:
+            self.merge_street(streetname)
+
+    def normalize(self):
+        if self.output.empty:
+            return None
+        self.output.crs = 26916
+        return self.output.to_crs(epsg=4326)
+
+    def output_file(self, filename):
+        self.normalize().to_file(filename, driver='GeoJSON')
+
 
 if __name__ == "__main__":
-    streets = Wrapper('Street Center Lines.geojson')
-    bike_routes = Wrapper('Bike Routes.geojson')
-    halsted1 = streets.get_street('HALSTED')
-    print(bike_routes.layer)
-    halsted2 = bike_routes.get_street('HALSTED')
-    matched = None
-    cumulative = geopandas.GeoDataFrame()
-    for j, route in halsted2.iterrows():
-        #print(route)
-        r = route
-        matching = []
-        for i, seg in halsted1.iterrows():
-            if route.geometry.buffer(2).contains(seg.geometry):
-                matching.append(seg)
-                s = seg
-        if not matching:
-            continue
-        df = geopandas.GeoDataFrame(matching)
-        rdf = pd.DataFrame([route.drop('geometry')])
-        m = df.merge(rdf)
-        cumulative = pd.concat([cumulative, m])
-        #matched = df
-    print(cumulative)
+    bm = BikeMerge()
+    #bm.merge_street('HALSTED')
+    #bm.merge_street('MARQUETTE')
+    #bm.merge_street('CLYBOURN')
+    bm.merge_all()
+    df = bm.normalize()
+    print(df)
+    #print(df.iloc[0])
+    #print(df)
+    bm.output_file('bikes.geojson')
+    df.to_file(os.path.join(Wrapper.DESTINATION_DIR, 'bikes.shp'))

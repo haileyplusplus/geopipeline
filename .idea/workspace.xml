@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Add conversion utility">
-      <change afterPath="$PROJECT_DIR$/geomanipulation.py" afterDir="false" />
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Manipulation proof of concept works">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/geomanipulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/geomanipulation.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -165,7 +165,15 @@
       <option name="project" value="LOCAL" />
       <updated>1711400798007</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Manipulation proof of concept works">
+      <option name="closed" value="true" />
+      <created>1711415010673</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1711415010673</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -182,6 +190,7 @@
     <MESSAGE value="Handle bad and non-zipfiles" />
     <MESSAGE value="Rewrite fetcher to fetch geojson" />
     <MESSAGE value="Add conversion utility" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add conversion utility" />
+    <MESSAGE value="Manipulation proof of concept works" />
+    <option name="LAST_COMMIT_MESSAGE" value="Manipulation proof of concept works" />
   </component>
 </project>
