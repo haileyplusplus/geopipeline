@@ -5,6 +5,8 @@ import sys
 
 import geopandas
 import pandas as pd
+pd.set_option("mode.copy_on_write", True)
+
 
 """
 Cheap Jupyter notebook
@@ -73,9 +75,17 @@ class Wrapper:
 
 
 class BikeMerge:
+    """
+    Fixes needed:
+     - King Dr
+     - Keeler
+     - Elston
+     - Plymouth
+    """
     def __init__(self):
         self.streets = Wrapper('Street Center Lines.geojson')
         self.bike_routes = Wrapper('Bike Routes.geojson')
+        self.bike_routes.layer.contraflow = self.bike_routes.layer.contraflow.replace(to_replace={None: 'N', '-': 'N'})
         self.output = geopandas.GeoDataFrame()
         self.bike_streets = self.bike_routes.get_streets() & self.streets.get_streets()
 
