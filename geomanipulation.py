@@ -81,6 +81,13 @@ class BikeMerge:
      - Keeler
      - Elston
      - Plymouth
+
+     Add processing to clean up messy booleans
+
+     brl['contraflow'] = brl.contraflow.apply(repy)
+     derive
+       brl['street_bike_oneway'] = brl.apply(lambda x: f'{x.oneway_dir}-{x.br_ow_dir}', axis=1)
+    br.layer['contraflow'] = br.layer.contraflow.apply(lambda x: {True: 'Y', False: 'N'}[x == 'Y'])
     """
     def __init__(self):
         self.streets = Wrapper('Street Center Lines.geojson')
