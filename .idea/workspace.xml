@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Rewrite fetcher to fetch geojson">
-      <change afterPath="$PROJECT_DIR$/to_shapefile.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/validate_and_clean.py" afterDir="false" />
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Add conversion utility">
+      <change afterPath="$PROJECT_DIR$/geomanipulation.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/opendatafetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/opendatafetcher.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -159,7 +157,15 @@
       <option name="project" value="LOCAL" />
       <updated>1711397183222</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Add conversion utility">
+      <option name="closed" value="true" />
+      <created>1711400798007</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1711400798007</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -175,6 +181,7 @@
     <MESSAGE value="Extract archives with sensible names" />
     <MESSAGE value="Handle bad and non-zipfiles" />
     <MESSAGE value="Rewrite fetcher to fetch geojson" />
-    <option name="LAST_COMMIT_MESSAGE" value="Rewrite fetcher to fetch geojson" />
+    <MESSAGE value="Add conversion utility" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add conversion utility" />
   </component>
 </project>
