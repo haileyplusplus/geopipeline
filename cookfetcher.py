@@ -7,6 +7,7 @@ import os
 import json
 import shutil
 import subprocess
+import sys
 import tempfile
 import zipfile
 
@@ -169,11 +170,17 @@ if __name__ == "__main__":
     if args.summary:
         for item in DataSet.select().order_by(DataSet.title):
             print(item.title)
+    if args.map:
+        query = DataSet.select().where(DataSet.geojson_url is not None)
+        for item in query:
+            print(f'{item.identifier:20} {item.title}')
+        sys.exit(0)
     if args.category:
         cat = args.category[0]
         query = DataSet.select().join(DataSetKeyword).join(Keyword).where(Keyword.keyword == cat).order_by(DataSet.title)
         for item in query:
             print(f'{item.identifier:20} {item.title}')
+        sys.exit(0)
     for k in args.key:
         if args.clear:
             result = c.clear(k)

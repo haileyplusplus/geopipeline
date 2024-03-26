@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Store more precise identifiers">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Basic retrieval works">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cookfetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/cookfetcher.py" afterDir="false" />
     </list>
@@ -221,7 +221,15 @@
       <option name="project" value="LOCAL" />
       <updated>1711465363401</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="Basic retrieval works">
+      <option name="closed" value="true" />
+      <created>1711478382656</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1711478382656</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -245,6 +253,7 @@
     <MESSAGE value="Add Cook County fetcher" />
     <MESSAGE value="Keyword filtering" />
     <MESSAGE value="Store more precise identifiers" />
-    <option name="LAST_COMMIT_MESSAGE" value="Store more precise identifiers" />
+    <MESSAGE value="Basic retrieval works" />
+    <option name="LAST_COMMIT_MESSAGE" value="Basic retrieval works" />
   </component>
 </project>
