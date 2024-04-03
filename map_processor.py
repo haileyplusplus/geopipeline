@@ -8,6 +8,10 @@ from abc import abstractmethod, ABC
 
 import geopandas
 
+"""
+ Todo:
+  - fix output name to not be .geojson.shp
+"""
 
 DESTINATION_DIR = '/Users/hailey/Documents/ArcGIS/data/chicago'
 MAP_CACHE = '/Users/hailey/tmp/mapcache'
@@ -62,6 +66,52 @@ class BikeRouteProcessor(ProcessorInterface):
         return df
 
 
+class StreetProcessor(ProcessorInterface):
+    """
+    ewns_coord, ewns_dir: SEDGWICK is 400W
+    dir_travel: use for one-way. F, T, B
+    status_code: C, N, P, UC, UR, V
+
+    text histogram: value counts
+    """
+    FILENAME = 'Street Center Lines.geojson'
+    CLASS_MAP = {'1': 'expr',
+                 '2': 'art',
+                 '3': 'coll',
+                 '4': 'neigh',
+                 '5': 'alley',
+                 '7': 'tier',
+                 '9': 'ramp',
+                 'E': 'extent',
+                 'RIV': 'river',
+                 'S': 'sdwk',
+                 '99': 'unk'}
+
+    def __init__(self):
+        super().__init__()
+
+    def matches(self, filename):
+        assert filename.find('/') == -1
+        return filename == self.FILENAME
+
+    @staticmethod
+    def fix_street_name(street_name):
+        """
+        Converts bike lane street names to normalized Street Center Lines names
+        """
+        return {'AVENUE': 'AVENUE L',
+                'PLLYMOUTH': 'PLYMOUTH',
+                'MARTIN LUTHER KING JR': 'DR MARTIN LUTHER KING JR',
+                }.get(street_name, street_name).upper()
+
+    def process(self, df):
+        for c in ['contraflow', 'br_oneway']:
+            df[c] = df[c].apply(self.fix_bool)
+        df['bike_ow'] = df.apply(self.bike_ow, axis=1)
+        df.st_name = df.st_name.apply(self.fix_street_name)
+        return df
+
+
 class File:
     PROCESSORS = [BikeRouteProcessor]
     """
@@ -91,6 +141,7 @@ class File:
     def process(self):
         if self.exists_in_cache():
             if self.exists_in_destination():
+                print(f'Skipping {self.name}')
                 return
             df = geopandas.read_file(os.path.join(MAP_CACHE, self.name))
             df2 = df.drop(columns=[x for x in df.columns if df[x].dtype.name.startswith('datetime')])
