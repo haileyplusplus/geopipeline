@@ -126,7 +126,7 @@ class StreetProcessor(ProcessorInterface):
     """
     CLASS_MAP = {'1': 'expr',
                  '2': 'art',
-                 '3': 'coll',
+                 '3': 'coll', # Racine, Sheffield, etc
                  '4': 'neigh',
                  '5': 'alley',
                  '7': 'tier',
@@ -134,7 +134,8 @@ class StreetProcessor(ProcessorInterface):
                  'E': 'extent',
                  'RIV': 'river',
                  'S': 'sdwk',
-                 '99': 'unk'}
+                 '99': 'unk' # these appear to be mostly in O'hare
+                 }
 
     def __init__(self):
         super().__init__()
@@ -201,6 +202,60 @@ class BikeStreets(ProcessorInterface):
         if x.contraflow == 'N' and x.br_oneway == 'Y':
             return 'Y'
         return 'N'
+
+    @staticmethod
+    def suitability(x):
+        """
+        Suitability index
+
+        0 - do not display
+        1 - bikes prohibited
+        2 - not recommended
+        3 - caution
+        4 - probably light traffic, no specific infra
+        5 - bike lane
+        6 - greenway, buffered
+        7 - protected
+        8 - off-street trail
+        :param x:
+        :return:
+        """
+        if x.status != 'N':
+            return 0
+        cmap = {
+            'RIV': 0,
+            'S': 0,
+            '99': 0,
+            '5': 0,
+            'E': 0,
+            '1': 1,
+            '9': 1,
+        }
+        # 2, 3, 4, 7  might have bike infra
+        rv = cmap.get(x['class'])
+        if rv is not None:
+            return rv
+        dr = x.displayrou
+        rmap = {
+            'BIKE LANE': 5,
+            'NEIGHBORHOOD GREENWAY': 6,
+            'BUFFERED BIKE LANE': 6,
+            'PROTECTED BIKE LANE': 7,
+        }
+        rv = rmap.get(dr)
+        if rv is not None:
+            return rv
+        if x['class'] == '4':
+            return 4
+        if x['class'] == '3':
+            return 3
+        if x['class'] == '2':
+            return 2
+        if x['class'] == '7':
+            return 2
+        # shouldn't get here
+        return -1
+
 
     @staticmethod
     def fix_street_name(street_name):
@@ -290,7 +345,12 @@ class BikeStreets(ProcessorInterface):
         df = self.normalize()
         #print(df)
         ostr = self.streets.orig
-        return pd.concat([df, ostr[ostr.street_nam.isin(other_streets)]])
+        result = pd.concat([df, ostr[ostr.street_nam.isin(other_streets)]])
+        # add one last column
+        print(result)
+        print(result.columns)
+        result['suitability'] = result.apply(self.suitability, axis=1)
+        return result
 
 
 class File:
