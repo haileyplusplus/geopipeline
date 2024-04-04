@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 
+import datetime
+import io
 import os
 import glob
 import sys
 
 from abc import abstractmethod, ABC
+from dataclasses import dataclass
 
+from peewee import SqliteDatabase, Model, CharField, DateTimeField
 import geopandas
+
+import catalogfetcher
 
 """
  Todo:
@@ -15,14 +21,40 @@ import geopandas
 
 DESTINATION_DIR = '/Users/hailey/Documents/ArcGIS/data/chicago'
 MAP_CACHE = '/Users/hailey/tmp/mapcache'
-#db = SqliteDatabase('/Users/hailey/datasets/processed-data.sqlite3')
+db = SqliteDatabase('/Users/hailey/datasets/processed-data.sqlite3')
 SOURCE_DIRS = ['/Users/hailey/datasets/cook',
                '/Users/hailey/datasets/chicago',
                '/Users/hailey/datasets/chicago/manual']
 
+
+class BaseModel(Model):
+    class Meta:
+        database = db
+
+
+class Processing(BaseModel):
+    # different dbs so no fk relationship
+    name = CharField()
+    process_time = DateTimeField
+
+
+@dataclass(frozen=True)
+class DataSource:
+    id_: str
+    filename: str
+
+
 class ProcessorInterface(ABC):
+    def __init__(self):
+        self.sources = {}
+        self.name = None
+
     @abstractmethod
-    def process(self, df):
+    def process(self):
+        pass
+
+    @abstractmethod
+    def get_sources(self):
         pass
 
     @staticmethod
@@ -31,16 +63,31 @@ class ProcessorInterface(ABC):
             return 'Y'
         return 'N'
 
+    def fetch(self):
+        name = self.__class__.__name__
+        p = Processing.get_or_none(name)
+        if not p:
+            p = Processing()
+            p.name = name
+        self.name = name
+        p.process_time = datetime.datetime.now()
+        for s in self.get_sources():
+            rawsource, _ = catalogfetcher.fetch_resource(s.id_)
+            self.sources[s] = geopandas.read_file(io.StringIO(rawsource))
+
+    def shapefile_name(self):
+        return f'{self.name}.shp'
+
+    def shapefile_dest_name(self):
+        return os.path.join(DESTINATION_DIR, self.shapefile_name())
+
 
 class BikeRouteProcessor(ProcessorInterface):
-    FILENAME = 'Bike Routes.geojson'
-
     def __init__(self):
         super().__init__()
 
-    def matches(self, filename):
-        assert filename.find('/') == -1
-        return filename == self.FILENAME
+    def get_sources(self):
+        return [DataSource('3w5d-sru8', 'Bike Routes')]
 
     @staticmethod
     def bike_ow(x):
@@ -58,7 +105,8 @@ class BikeRouteProcessor(ProcessorInterface):
                 'MARTIN LUTHER KING JR': 'DR MARTIN LUTHER KING JR',
                 }.get(street_name, street_name).upper()
 
-    def process(self, df):
+    def process(self):
+        df = self.sources[self.get_sources()[0]]
         for c in ['contraflow', 'br_oneway']:
             df[c] = df[c].apply(self.fix_bool)
         df['bike_ow'] = df.apply(self.bike_ow, axis=1)
@@ -74,7 +122,6 @@ class StreetProcessor(ProcessorInterface):
 
     text histogram: value counts
     """
-    FILENAME = 'Street Center Lines.geojson'
     CLASS_MAP = {'1': 'expr',
                  '2': 'art',
                  '3': 'coll',
@@ -90,9 +137,8 @@ class StreetProcessor(ProcessorInterface):
     def __init__(self):
         super().__init__()
 
-    def matches(self, filename):
-        assert filename.find('/') == -1
-        return filename == self.FILENAME
+    def get_sources(self):
+        return [DataSource('6imu-meau', 'Street Center Lines')]
 
     @staticmethod
     def fix_street_name(street_name):
@@ -138,7 +184,8 @@ class File:
     def exists_in_destination(self):
         return os.path.exists(self.shapefile_dest_name())
 
-    def process(self):
+    def process_old(self):
+        # preserve all file mode
         if self.exists_in_cache():
             if self.exists_in_destination():
                 print(f'Skipping {self.name}')
@@ -162,6 +209,21 @@ class File:
         df2.to_file(self.shapefile_dest_name())
 
 
+class Processor:
+    PROCESSORS = [BikeRouteProcessor]
+
+    def process(self):
+        for p in self.PROCESSORS:
+            inst = p()
+            inst.fetch()
+            gdf = inst.process()
+            cache_dest = os.path.join(MAP_CACHE, f'{inst.name}.geojson')
+            gdf.to_file(cache_dest, driver='GeoJSON')
+            df2 = gdf.drop(columns=[x for x in gdf.columns if gdf[x].dtype.name.startswith('datetime')])
+            df2.to_file(inst.shapefile_dest_name())
+            print(f'Wrote {cache_dest}')
+
+
 class Catalog:
     def __init__(self, datadir):
         self.datadir = datadir
@@ -175,7 +237,20 @@ class Catalog:
             count += 1
         print(f'Processed {count} in {self.datadir}')
 
+
+def db_initialize():
+    db.connect()
+    db.create_tables([
+        Processing
+    ])
+
+
 if __name__ == "__main__":
-    for dir_ in SOURCE_DIRS:
-        c = Catalog(dir_)
-        c.process()
+    # add override command
+    catalogfetcher.db_initialize()
+    db_initialize()
+    # for dir_ in SOURCE_DIRS:
+    #     c = Catalog(dir_)
+    #     c.process()
+    p = Processor()
+    p.process()

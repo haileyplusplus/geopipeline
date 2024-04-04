@@ -36,6 +36,7 @@ class Category(BaseModel):
 
 
 class DataSet(BaseModel):
+    # add sha256
     id_ = CharField(unique=True)
     name = CharField()
     description = TextField()
