@@ -13,10 +13,12 @@ import urllib.parse
 import sys
 import datetime
 import sanitize_filename
+from enum import Enum
 
 import pandas as pd
 import requests
 from peewee import SqliteDatabase, Model, CharField, IntegerField, DateTimeField, BooleanField, TextField, ForeignKeyField
+
 
 
 DESTINATION_DIR = '/Users/hailey/datasets/chicago'
@@ -47,9 +49,11 @@ class DataSet(BaseModel):
     metadata_period = CharField(null=True)
     category = ForeignKeyField(Category)
     raw = TextField()
+    # These are internal properties; maybe they should be a different object
     retrieved = DateTimeField(null=True)
     fullpath = CharField(null=True)
     success = BooleanField(null=True)
+    data_stale = BooleanField(null=True)
 
 
 class GenericFetcher:
@@ -83,6 +87,12 @@ class CategoryFetcher(GenericFetcher):
             _, _ = Category().get_or_create(name=item['domain_category'], count=item['count'])
 
 
+class UpdateResult(Enum):
+    NONE = 1
+    METADATA = 2
+    DATA = 3
+
+
 class ResourceFetcher(GenericFetcher):
     URL_TEMPLATE = 'https://api.us.socrata.com/api/catalog/v1?domains=data.cityofchicago.org&limit=400&search_context=data.cityofchicago.org&categories=%s'
 
@@ -92,16 +102,43 @@ class ResourceFetcher(GenericFetcher):
         self.category = category
         self.expected_count = expected_count
 
+    @staticmethod
+    def check_newer(ds: DataSet, other: DataSet) -> UpdateResult:
+        """
+        :param ds:
+        :param other:
+        :return: Whether ds is newer than other
+        """
+        newer = lambda t1, t2: t1 and t2 and (t1 > t2)
+        ur: UpdateResult = UpdateResult.NONE
+        if newer(ds.metadata_updated, other.metadata_updated):
+            ur = UpdateResult.METADATA
+        if newer(ds.updated, other.updated) or newer(ds.data_updated, other.data_updated):
+            ur = UpdateResult.DATA
+        return ur
+
+    @staticmethod
+    def last_update(ds):
+        #d = datetime.datetime.fromtimestamp(0)
+        d = ''
+        if ds.updated:
+            #if not type(ds.updated) is datetime.datetime:
+            #    print(f'Assertion error: {ds.name}, {ds.updated}')
+            d = max(d, ds.updated)
+        if ds.metadata_updated:
+            d = max(d, ds.metadata_updated)
+        if ds.data_updated:
+            d = max(d, ds.data_updated)
+        return d
+
     def parse_one_resource(self, d: dict):
         r = d['resource']
         id_ = r['id']
         # check metadata date for update
-        if DataSet.get_or_none(DataSet.id_ == id_):
-            return False
         dataset = DataSet()
         dataset.id_ = id_
         dataset.name = r['name']
-        dataset.raw = r
+        dataset.raw = json.dumps(d)
         dataset.description = r['description']
         dataset.resource_type = r['type']
         dataset.updated = r['updatedAt']
@@ -118,6 +155,24 @@ class ResourceFetcher(GenericFetcher):
         if c['domain_category'] != self.category:
             print(f'Category mismatch in item {id_}')
         dataset.category = Category.get(Category.name == self.category)
+        previous = DataSet.get_or_none(DataSet.id_ == id_)
+        if previous:
+            ur = self.check_newer(dataset, previous)
+            if ur == UpdateResult.NONE:
+                return False
+            dataset.retrieved = previous.retrieved
+            dataset.success = previous.success
+            dataset.fullpath = previous.fullpath
+            stale = False
+            if ur == UpdateResult.DATA and previous.retrieved:
+                dataset.data_stale = True
+                stale = True
+            dataset.id = previous.id
+            if ur == UpdateResult.METADATA:
+                print(f'Metadata-only update for {dataset.name}')
+            if ur == UpdateResult.DATA:
+                print(f'Data update for {dataset.name}. Existing stale: {stale}')
+                print(f'  Previous {self.last_update(previous)} New {self.last_update(dataset)}')
         dataset.save()
         return True
 

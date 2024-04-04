@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Update catalog fetcher">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Add arguments to catalog fetcher">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/catalogfetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/catalogfetcher.py" afterDir="false" />
     </list>
@@ -279,7 +279,15 @@
       <option name="project" value="LOCAL" />
       <updated>1712199596045</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="Add arguments to catalog fetcher">
+      <option name="closed" value="true" />
+      <created>1712239749061</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1712239749061</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -294,7 +302,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Minor refactor" />
     <MESSAGE value="Add browser and fetcher" />
     <MESSAGE value="Filter out deprecated stuff" />
     <MESSAGE value="Implement fetcher" />
@@ -319,6 +326,7 @@
     <MESSAGE value="Kind of stash street processing work." />
     <MESSAGE value="Add catalog fetcher" />
     <MESSAGE value="Update catalog fetcher" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update catalog fetcher" />
+    <MESSAGE value="Add arguments to catalog fetcher" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add arguments to catalog fetcher" />
   </component>
 </project>
