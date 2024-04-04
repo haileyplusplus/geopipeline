@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="More map processor combining">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Merges, but investigate missing rows">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/map_processor.py" beforeDir="false" afterPath="$PROJECT_DIR$/map_processor.py" afterDir="false" />
     </list>
@@ -319,7 +319,15 @@
       <option name="project" value="LOCAL" />
       <updated>1712262774022</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="Merges, but investigate missing rows">
+      <option name="closed" value="true" />
+      <created>1712265045365</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1712265045365</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -334,7 +342,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Add force option" />
     <MESSAGE value="Refactor" />
     <MESSAGE value="Extract archives with sensible names" />
     <MESSAGE value="Handle bad and non-zipfiles" />
@@ -359,6 +366,7 @@
     <MESSAGE value="Improvements and bugfixes" />
     <MESSAGE value="Refactor map processor interface to allow combining multiple data sources" />
     <MESSAGE value="More map processor combining" />
-    <option name="LAST_COMMIT_MESSAGE" value="More map processor combining" />
+    <MESSAGE value="Merges, but investigate missing rows" />
+    <option name="LAST_COMMIT_MESSAGE" value="Merges, but investigate missing rows" />
   </component>
 </project>

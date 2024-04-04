@@ -222,6 +222,7 @@ class BikeStreets(ProcessorInterface):
         assert not bike_route.empty
         cumulative = geopandas.GeoDataFrame()
         # street trans_id is a good unique key. we want to make sure we include segs without bike route info, too
+        # 150299 is missing
         matched_segs = set([])
         for ri, route in bike_route.iterrows():
             matching = []
@@ -244,7 +245,7 @@ class BikeStreets(ProcessorInterface):
         #print(f'cumulative with bike routes: {cumulative}')
         # now get segs without bike routes
         #return pd.concat([df, ostr[ostr.street_nam.isin(other_streets)]])
-        rest_streets = street[street.trans_id.isin(matched_segs)]
+        rest_streets = street[~street.trans_id.isin(matched_segs)]
         #print(f'rest streets: {rest_streets}')
         rest_streets.crs = 26916
         cumulative = pd.concat([cumulative, rest_streets])
