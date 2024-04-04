@@ -11,6 +11,8 @@ from dataclasses import dataclass
 
 from peewee import SqliteDatabase, Model, CharField, DateTimeField
 import geopandas
+import pandas as pd
+import tqdm
 
 import catalogfetcher
 
@@ -158,6 +160,124 @@ class StreetProcessor(ProcessorInterface):
         return df
 
 
+# move these to different files
+class BikeStreetsWrapper:
+    def __init__(self, df):
+        self.orig = df
+        # for the Chicago area, unit in meters
+        self.layer = self.orig.to_crs(epsg=26916)
+
+    def get_buffer(self):
+        return self.layer.buffer(2)
+
+    def get_street(self, name):
+        colname = 'st_name'
+        if colname not in self.layer.columns:
+            colname = 'street_nam'
+        return self.layer[self.layer[colname] == name]
+
+    def get_streets(self):
+        colname = 'st_name'
+        if colname not in self.layer.columns:
+            colname = 'street_nam'
+        return set(self.layer[colname].unique())
+
+
+class BikeStreets(ProcessorInterface):
+    def __init__(self):
+        super().__init__()
+        self.output = pd.DataFrame()
+        self.streets = None
+        self.bike_routes = None
+
+    def get_sources(self):
+        return [
+            DataSource('3w5d-sru8', 'Bike Routes'),
+            DataSource('6imu-meau', 'Street Center Lines'),
+        ]
+
+    @staticmethod
+    def bike_ow(x):
+        if x.contraflow == 'N' and x.br_oneway == 'Y':
+            return 'Y'
+        return 'N'
+
+    @staticmethod
+    def fix_street_name(street_name):
+        """
+        Converts bike lane street names to normalized Street Center Lines names
+        """
+        return {'AVENUE': 'AVENUE L',
+                'PLLYMOUTH': 'PLYMOUTH',
+                'MARTIN LUTHER KING JR': 'DR MARTIN LUTHER KING JR',
+                }.get(street_name, street_name).upper()
+
+    def merge_street(self, street_name):
+        #print(f'Processing {street_name}')
+        street = self.streets.get_street(street_name)
+        bike_route = self.bike_routes.get_street(street_name)
+        if bike_route.empty:
+            self.output = pd.concat([self.output, street])
+            return
+        cumulative = geopandas.GeoDataFrame()
+        # street trans_id is a good unique key. we want to make sure we include segs without bike route info, too
+        matched_segs = set([])
+        for ri, route in bike_route.iterrows():
+            matching = []
+            nonmatching = []
+            rgbuffer = route.geometry.buffer(3)
+            for si, seg in street.iterrows():
+                match = rgbuffer.contains(seg.geometry)
+                if match:
+                    matching.append(seg.drop(['create_tim', 'update_tim', 'status_dat']))
+                    matched_segs.add(seg.trans_id)
+            matched_frame = geopandas.GeoDataFrame(matching)
+            route_frame = pd.DataFrame([route.drop('geometry')])
+            if matched_frame.empty or route_frame.empty:
+                #print(f'  Empty frame: {matched_frame}, {route_frame}')
+                continue
+            m = matched_frame.merge(route_frame, left_on='street_nam', right_on='st_name')
+            cumulative = pd.concat([cumulative, m])
+        # now get segs without bike routes
+        for si, seg in street.iterrows():
+            if seg.trans_id in matched_segs:
+                continue
+            cumulative = pd.concat([cumulative, seg.drop(['create_tim', 'update_tim', 'status_dat'])])
+        if not cumulative.empty:
+            cumulative.crs = 26916
+            self.output = pd.concat([self.output, cumulative])
+            #self.output.append(cumulative)
+
+    def normalize(self):
+        #if not self.output:
+        #    return None
+        assert not self.output.empty
+        #merged = pd.concat(self.output)
+        self.output.crs = 26916
+        #merged.crs = 26916
+        #return merged.to_crs(epsg=4326)
+        return self.output.to_crs(epsg=4326)
+
+    def process(self):
+        df = self.sources[self.get_sources()[0]]
+        for c in ['contraflow', 'br_oneway']:
+            df[c] = df[c].apply(self.fix_bool)
+        df['bike_ow'] = df.apply(self.bike_ow, axis=1)
+        df.st_name = df.st_name.apply(self.fix_street_name)
+
+        self.streets = BikeStreetsWrapper(self.sources[self.get_sources()[1]])
+        self.bike_routes = BikeStreetsWrapper(df)
+
+        bike_streets = self.streets.get_streets() & self.bike_routes.get_streets()
+        other_streets = self.streets.get_streets() - self.bike_routes.get_streets()
+        pbar = tqdm.tqdm(bike_streets)
+        for streetname in pbar:
+            self.merge_street(streetname)
+        df = self.normalize()
+        ostr = self.streets.orig
+        return pd.concat([df, ostr[ostr.street_nam.isin(other_streets)]])
+
+
 class File:
     PROCESSORS = [BikeRouteProcessor]
     """
@@ -210,8 +330,9 @@ class File:
 
 
 class Processor:
-    PROCESSORS = [BikeRouteProcessor]
+    PROCESSORS = [BikeRouteProcessor, BikeStreets]
 
+    # consider pbar / tqdm
     def process(self):
         for p in self.PROCESSORS:
             inst = p()

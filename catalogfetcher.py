@@ -284,7 +284,10 @@ if __name__ == "__main__":
         combined.to_json('/tmp/combined.json')
     else:
         for k in args.key:
-            r = fetch_resource(k)
+            r, ds = fetch_resource(k)
+            if ds.resource_type == 'map':
+                import geopandas
+                gdf = geopandas.read_file(io.StringIO(r))
 
         #q = DataSet.select().join(Category).where(DataSet.id_ == k)
         #for ds in q:
