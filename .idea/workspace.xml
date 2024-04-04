@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Kind of stash street processing work.">
-      <change afterPath="$PROJECT_DIR$/catalogfetcher.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc2.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc2.iml" afterDir="false" />
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Add catalog fetcher">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/catalogfetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/catalogfetcher.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -265,7 +263,15 @@
       <option name="project" value="LOCAL" />
       <updated>1712163037624</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="Add catalog fetcher">
+      <option name="closed" value="true" />
+      <created>1712166312533</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1712166312533</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -280,7 +286,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Workspace init" />
     <MESSAGE value="Simple open data csv converter" />
     <MESSAGE value="Minor refactor" />
     <MESSAGE value="Add browser and fetcher" />
@@ -305,6 +310,7 @@
     <MESSAGE value="Add kmz converter" />
     <MESSAGE value="Add map processor." />
     <MESSAGE value="Kind of stash street processing work." />
-    <option name="LAST_COMMIT_MESSAGE" value="Kind of stash street processing work." />
+    <MESSAGE value="Add catalog fetcher" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add catalog fetcher" />
   </component>
 </project>
