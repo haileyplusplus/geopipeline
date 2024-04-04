@@ -200,26 +200,45 @@ def populate_all():
 
 
 def fetch_resource(id_):
-    url = 'https://data.cityofchicago.org/d/ydr8-5enu'
-    #q = DataSet.select().join(Category).where(DataSet.id_ == id_)
     dataset: DataSet | None = DataSet.get_or_none(DataSet.id_ == id_)
     if not dataset:
         print(f'Couldn\'t fetch dataset {id_}')
         return None
     fetch_time = datetime.datetime.now()
-    filename = sanitize_filename.sanitize(f'{dataset.name}.json')
+    ext = 'json'
+    map = dataset.resource_type == 'map'
+    if map:
+        ext = 'geojson'
+    filename = sanitize_filename.sanitize(f'{dataset.name}.{ext}')
     fullpath = os.path.join(DESTINATION_DIR, filename)
     if os.path.exists(fullpath):
-        #print(f'Skipping fetch because {fullpath} exists')
+        print(f'Skipping fetch because {fullpath} exists')
+        print(f'Retrieved: {dataset.retrieved}')
+        print(f'Stale: {dataset.data_stale}')
+        print(f'Updated: {dataset.updated}')
+        print(f'Data updated: {dataset.data_updated}')
+        print(f'Metadata updated: {dataset.metadata_updated}')
         return open(fullpath).read(), dataset
     dataset.retrieved = fetch_time
+    # heuristic: mistrust updated too close to retrieved time?
     print(f'Fetching {filename}')
     # datasets available in csv or json
-    r = requests.get(f'https://data.cityofchicago.org/resource/{id_}.json')
-    dataset.success = r.status_code == 200
+    if map:
+        req = requests.get(f'https://data.cityofchicago.org/api/geospatial/{id_}?method=export&format=GeoJSON')
+    else:
+        req = requests.get(f'https://data.cityofchicago.org/resource/{id_}.json')
+    dataset.success = req.status_code == 200
     with open(fullpath, 'w') as fh:
-        fh.write(r.text)
-    return r.text, dataset
+        fh.write(req.text)
+    dataset.save()
+    return req.text, dataset
+
+
+def db_initialize():
+    db.connect()
+    db.create_tables([
+        Category, DataSet
+    ])
 
 # pandas join dataset series
 
@@ -228,10 +247,7 @@ if __name__ == "__main__":
     #gf = GenericFetcher('https://api.us.socrata.com/api/catalog/v1/domain_categories?domains=data.cityofchicago.org')
     #gf = GenericFetcher('https://api.us.socrata.com/api/catalog/v1?domains=data.cityofchicago.org&search_context=data.cityofchicago.org&categories=Public%20Safety')
     #print(f'Fetched: {gf.fetch()}')
-    db.connect()
-    db.create_tables([
-        Category, DataSet
-    ])
+    db_initialize()
     parser = argparse.ArgumentParser(
         prog='OpenDataBrowser',
         description='Show info about open datasets',
@@ -244,13 +260,17 @@ if __name__ == "__main__":
     parser.add_argument('--series', action='store_true')
     parser.add_argument('--category', nargs=1, required=False)
     parser.add_argument('--map', action='store_true')
+    parser.add_argument('--pandas', action='store_true')
     args = parser.parse_args()
+    if args.pandas:
+        q = DataSet.select().join(Category)
+        df = pd.read_sql(q.sql()[0], db.connection())
     if args.populate:
         populate_all()
     if args.s:
         q = DataSet.select().join(Category).where(DataSet.name.contains(args.s[0])).order_by(DataSet.name)
         for ds in q:
-            print(f'{ds.id_}  {ds.name}')
+            print(f'{ds.id_}  {ds.resource_type:12} {ds.name}')
     if args.series:
         dfs = []
         for k in args.key:
