@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Refactor map processor interface to allow combining multiple data sources">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="More map processor combining">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/catalogfetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/catalogfetcher.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/map_processor.py" beforeDir="false" afterPath="$PROJECT_DIR$/map_processor.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -312,7 +311,15 @@
       <option name="project" value="LOCAL" />
       <updated>1712244886846</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="More map processor combining">
+      <option name="closed" value="true" />
+      <created>1712262774022</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1712262774022</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -327,7 +334,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Refinements" />
     <MESSAGE value="Add force option" />
     <MESSAGE value="Refactor" />
     <MESSAGE value="Extract archives with sensible names" />
@@ -352,6 +358,7 @@
     <MESSAGE value="Show what data feeds have been updated" />
     <MESSAGE value="Improvements and bugfixes" />
     <MESSAGE value="Refactor map processor interface to allow combining multiple data sources" />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactor map processor interface to allow combining multiple data sources" />
+    <MESSAGE value="More map processor combining" />
+    <option name="LAST_COMMIT_MESSAGE" value="More map processor combining" />
   </component>
 </project>

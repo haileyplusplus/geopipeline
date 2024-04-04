@@ -216,9 +216,10 @@ class BikeStreets(ProcessorInterface):
         #print(f'Processing {street_name}')
         street = self.streets.get_street(street_name)
         bike_route = self.bike_routes.get_street(street_name)
-        if bike_route.empty:
-            self.output = pd.concat([self.output, street])
-            return
+        #if bike_route.empty:
+        #    self.output = pd.concat([self.output, street])
+        #    return
+        assert not bike_route.empty
         cumulative = geopandas.GeoDataFrame()
         # street trans_id is a good unique key. we want to make sure we include segs without bike route info, too
         matched_segs = set([])
@@ -237,12 +238,23 @@ class BikeStreets(ProcessorInterface):
                 #print(f'  Empty frame: {matched_frame}, {route_frame}')
                 continue
             m = matched_frame.merge(route_frame, left_on='street_nam', right_on='st_name')
+            #print(f'merging {m}')
+            m.crs = 26916
             cumulative = pd.concat([cumulative, m])
+        #print(f'cumulative with bike routes: {cumulative}')
         # now get segs without bike routes
-        for si, seg in street.iterrows():
-            if seg.trans_id in matched_segs:
-                continue
-            cumulative = pd.concat([cumulative, seg.drop(['create_tim', 'update_tim', 'status_dat'])])
+        #return pd.concat([df, ostr[ostr.street_nam.isin(other_streets)]])
+        rest_streets = street[street.trans_id.isin(matched_segs)]
+        #print(f'rest streets: {rest_streets}')
+        rest_streets.crs = 26916
+        cumulative = pd.concat([cumulative, rest_streets])
+        #for si, seg in street.iterrows():
+        #    if seg.trans_id in matched_segs:
+        #        continue
+        #    cumulative = cumulative.merge(seg.drop(['create_tim', 'update_tim', 'status_dat']))
+        #cumulative = pd.concat([cumulative, seg.drop(['create_tim', 'update_tim', 'status_dat'])])
+        #cumulative = pd.concat([cumulative, seg.drop(['create_tim', 'update_tim', 'status_dat'])], axis=0).reset_index(drop=True)
+        #print(f'cumulative with all routes: {cumulative}')
         if not cumulative.empty:
             cumulative.crs = 26916
             self.output = pd.concat([self.output, cumulative])
@@ -273,7 +285,9 @@ class BikeStreets(ProcessorInterface):
         pbar = tqdm.tqdm(bike_streets)
         for streetname in pbar:
             self.merge_street(streetname)
+        #print('to merge')
         df = self.normalize()
+        #print(df)
         ostr = self.streets.orig
         return pd.concat([df, ostr[ostr.street_nam.isin(other_streets)]])
 
@@ -339,6 +353,8 @@ class Processor:
             inst.fetch()
             gdf = inst.process()
             cache_dest = os.path.join(MAP_CACHE, f'{inst.name}.geojson')
+            print(f'Write to {cache_dest}')
+            print(gdf)
             gdf.to_file(cache_dest, driver='GeoJSON')
             df2 = gdf.drop(columns=[x for x in gdf.columns if gdf[x].dtype.name.startswith('datetime')])
             df2.to_file(inst.shapefile_dest_name())
