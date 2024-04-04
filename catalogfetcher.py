@@ -5,11 +5,16 @@ https://api.us.socrata.com/api/catalog/v1?domains=data.cityofchicago.org
 
 https://dev.socrata.com/docs/other/discovery#?route=overview
 """
-
+import argparse
+import io
 import json
 import os
 import urllib.parse
+import sys
+import datetime
+import sanitize_filename
 
+import pandas as pd
 import requests
 from peewee import SqliteDatabase, Model, CharField, IntegerField, DateTimeField, BooleanField, TextField, ForeignKeyField
 
@@ -139,6 +144,31 @@ def populate_all():
         rf.initialize()
 
 
+def fetch_resource(id_):
+    url = 'https://data.cityofchicago.org/d/ydr8-5enu'
+    #q = DataSet.select().join(Category).where(DataSet.id_ == id_)
+    dataset: DataSet | None = DataSet.get_or_none(DataSet.id_ == id_)
+    if not dataset:
+        print(f'Couldn\'t fetch dataset {id_}')
+        return None
+    fetch_time = datetime.datetime.now()
+    filename = sanitize_filename.sanitize(f'{dataset.name}.json')
+    fullpath = os.path.join(DESTINATION_DIR, filename)
+    if os.path.exists(fullpath):
+        #print(f'Skipping fetch because {fullpath} exists')
+        return open(fullpath).read(), dataset
+    dataset.retrieved = fetch_time
+    print(f'Fetching {filename}')
+    # datasets available in csv or json
+    r = requests.get(f'https://data.cityofchicago.org/resource/{id_}.json')
+    dataset.success = r.status_code == 200
+    with open(fullpath, 'w') as fh:
+        fh.write(r.text)
+    return r.text, dataset
+
+# pandas join dataset series
+
+
 if __name__ == "__main__":
     #gf = GenericFetcher('https://api.us.socrata.com/api/catalog/v1/domain_categories?domains=data.cityofchicago.org')
     #gf = GenericFetcher('https://api.us.socrata.com/api/catalog/v1?domains=data.cityofchicago.org&search_context=data.cityofchicago.org&categories=Public%20Safety')
@@ -147,5 +177,41 @@ if __name__ == "__main__":
     db.create_tables([
         Category, DataSet
     ])
-    populate_all()
+    parser = argparse.ArgumentParser(
+        prog='OpenDataBrowser',
+        description='Show info about open datasets',
+    )
+    parser.add_argument('key', nargs='*')
+    parser.add_argument('-s', nargs=1, required=False)
+    parser.add_argument('--summary', action='store_true')
+    parser.add_argument('--show-deprecated', action='store_true')
+    parser.add_argument('--populate', action='store_true')
+    parser.add_argument('--series', action='store_true')
+    parser.add_argument('--category', nargs=1, required=False)
+    parser.add_argument('--map', action='store_true')
+    args = parser.parse_args()
+    if args.populate:
+        populate_all()
+    if args.s:
+        q = DataSet.select().join(Category).where(DataSet.name.contains(args.s[0])).order_by(DataSet.name)
+        for ds in q:
+            print(f'{ds.id_}  {ds.name}')
+    if args.series:
+        dfs = []
+        for k in args.key:
+            r, dataset = fetch_resource(k)
+            df = pd.read_json(io.StringIO(r))
+            df['dataset'] = dataset.name
+            dfs.append(df)
+        combined = pd.concat(dfs, axis=0, ignore_index=True)
+        print(combined['dataset'])
+        combined.to_json('/tmp/combined.json')
+    else:
+        for k in args.key:
+            r = fetch_resource(k)
+
+        #q = DataSet.select().join(Category).where(DataSet.id_ == k)
+        #for ds in q:
+        #    print(ds.raw)
+    #df = pd.read_sql(q.sql()[0], db.connection())
 
