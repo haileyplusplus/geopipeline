@@ -252,6 +252,7 @@ class BikeStreets(ProcessorInterface):
         if x['class'] == '2':
             return 2
         if x['class'] == '7':
+            # consider changing this to 1
             return 2
         # shouldn't get here
         return -1

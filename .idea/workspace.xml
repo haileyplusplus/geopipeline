@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Fix negation bug">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Implement suitability">
+      <change afterPath="$PROJECT_DIR$/cafilt.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/map_processor.py" beforeDir="false" afterPath="$PROJECT_DIR$/map_processor.py" afterDir="false" />
     </list>
@@ -335,7 +336,15 @@
       <option name="project" value="LOCAL" />
       <updated>1712266580309</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="Implement suitability">
+      <option name="closed" value="true" />
+      <created>1712268692202</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1712268692202</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -350,7 +359,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Extract archives with sensible names" />
     <MESSAGE value="Handle bad and non-zipfiles" />
     <MESSAGE value="Rewrite fetcher to fetch geojson" />
     <MESSAGE value="Add conversion utility" />
@@ -375,6 +383,7 @@
     <MESSAGE value="More map processor combining" />
     <MESSAGE value="Merges, but investigate missing rows" />
     <MESSAGE value="Fix negation bug" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix negation bug" />
+    <MESSAGE value="Implement suitability" />
+    <option name="LAST_COMMIT_MESSAGE" value="Implement suitability" />
   </component>
 </project>
