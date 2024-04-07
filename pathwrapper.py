@@ -51,6 +51,7 @@ class Finder:
                 'route.ts',
                 self.filename,
                 '/tmp/pointsfile.json',
+                'trans_id',
                 ]
         cp = subprocess.run(args)
         if cp.returncode == 0:
