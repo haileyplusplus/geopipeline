@@ -227,7 +227,7 @@ class BikeStreets(ProcessorInterface):
             'S': 0,
             '99': 0,
             '5': 0,
-            'E': 0,
+            'E': 4, # try this instead
             '1': 1,
             '9': 1,
         }
@@ -253,7 +253,7 @@ class BikeStreets(ProcessorInterface):
             return 2
         if x['class'] == '7':
             # consider changing this to 1
-            return 2
+            return 1
         # shouldn't get here
         return -1
 

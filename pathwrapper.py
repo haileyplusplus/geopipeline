@@ -31,11 +31,18 @@ class Finder:
                 minr = x
         return minr
 
+    def make_gdf(self, ids):
+        rv = []
+        for id_ in ids:
+            row = self.gdf[self.gdf['trans_id'] == id_].iloc[0]
+            rv.append(row)
+        return gpd.GeoDataFrame(rv)
+
     def router(self, colname, start, end):
         startpoint = self.closest_point(self.points_df[self.points_df[colname] == start])
         endpoint = self.closest_point(self.points_df[self.points_df[colname] == end])
         if startpoint.empty or endpoint.empty:
-            return False
+            return None
         print(startpoint)
         pointmap = lambda x: {'type': 'Feature', 'properties': {}, 'geometry': shapely.geometry.mapping(x.boundary.geoms[0])}
         sp = pointmap(startpoint.geometry)
@@ -55,12 +62,13 @@ class Finder:
                 ]
         cp = subprocess.run(args)
         if cp.returncode == 0:
-            print(os.stat('/tmp/path.geojson'))
-            return True
-        return False
+            #print(os.stat('/tmp/path.json'))
+            return json.load(open('/tmp/path.json'))
+        return None
 
 
 if __name__ == "__main__":
     #f = Finder(sys.argv[1], sys.argv[2])
-    f = Finder('/tmp/bikelp.json', '/tmp/schools.geojson')
-    f.router('school_nm', 'LINCOLN PARK HS', 'LASALLE')
+    f = Finder('/Users/hailey/tmp/mapcache/BikeStreets.Lincoln Park.geojson', '/tmp/schools.geojson')
+    rj = f.router('school_nm', 'PRESCOTT', 'LASALLE')
+    route = f.make_gdf(rj['edgeDatas'])
