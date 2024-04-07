@@ -17,10 +17,14 @@ class Finder:
         self.gdf = gpd.read_file(self.filename)
         self.points_df = gpd.read_file(self.points_filename)
 
+    def reset_points(self, points_filename):
+        self.points_filename = points_filename
+        self.points_df = gpd.read_file(self.points_filename)
+
     def closest_point(self, pointrow):
         p = pointrow.iloc[0].geometry
-        print(type(pointrow))
-        print(type(p))
+        #print(type(pointrow))
+        #print(type(p))
         assert type(p) is shapely.geometry.point.Point
         mind = -1
         minr = None
@@ -43,7 +47,7 @@ class Finder:
         endpoint = self.closest_point(self.points_df[self.points_df[colname] == end])
         if startpoint.empty or endpoint.empty:
             return None
-        print(startpoint)
+        #print(startpoint)
         pointmap = lambda x: {'type': 'Feature', 'properties': {}, 'geometry': shapely.geometry.mapping(x.boundary.geoms[0])}
         sp = pointmap(startpoint.geometry)
         ep = pointmap(endpoint.geometry)
@@ -60,15 +64,22 @@ class Finder:
                 '/tmp/pointsfile.json',
                 'trans_id',
                 ]
-        cp = subprocess.run(args)
+        cp = subprocess.run(args, stdout=subprocess.DEVNULL)
         if cp.returncode == 0:
             #print(os.stat('/tmp/path.json'))
             return json.load(open('/tmp/path.json'))
         return None
 
+    def route_edges(self, colname, start, end):
+        rj2 = self.router(colname, start, end)
+        if not rj2:
+            return []
+        return list(rj2['edgeDatas'])
+
 
 if __name__ == "__main__":
     #f = Finder(sys.argv[1], sys.argv[2])
-    f = Finder('/Users/hailey/tmp/mapcache/BikeStreets.Lincoln Park.geojson', '/tmp/schools.geojson')
-    rj = f.router('school_nm', 'PRESCOTT', 'LASALLE')
+    f = Finder('/Users/hailey/tmp/mapcache/BikeStreets.LINCOLN PARK.LAKE VIEW.geojson', '/tmp/schools.geojson')
+    #rj = f.router('school_nm', 'LAKE VIEW HS', 'LASALLE')
+    rj = f.router('school_nm', 'LASALLE', 'LAKE VIEW HS')
     route = f.make_gdf(rj['edgeDatas'])
