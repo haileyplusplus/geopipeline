@@ -15,6 +15,7 @@ import pandas as pd
 import tqdm
 
 import catalogfetcher
+import cafilt
 
 """
  Todo:
@@ -244,7 +245,11 @@ class BikeStreets(ProcessorInterface):
         }
         rv = rmap.get(dr)
         if rv is not None:
-            return rv
+            if rv == 5 and x['class'] == '2':
+                # don't allow bike lane optimization on class 2
+                pass
+            else:
+                return rv
         if x['class'] == '4':
             return 4
         if x['class'] == '3':
@@ -453,3 +458,5 @@ if __name__ == "__main__":
     #     c.process()
     p = Processor()
     p.process()
+    cafilt.filter_file('BikeStreets.geojson',
+                       ['LINCOLN PARK', 'LAKE VIEW', 'NEAR NORTH SIDE', 'WEST TOWN'])

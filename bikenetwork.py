@@ -29,13 +29,16 @@ class Network:
         iters = 0
         cf = self.filter_points()
         cross = cf.merge(cf['school_nm'], how='cross')
-        for _, row in tqdm.tqdm(cross.iterrows()):
+        inputs = []
+        for _, row in cross.iterrows():
             if row.school_nm_x == row.school_nm_y:
                 continue
             iters += 1
             if limit and iters > limit:
                 break
-            path = self.finder.route_edges('school_nm', row.school_nm_x, row.school_nm_y)
+            inputs.append((row.school_nm_x, row.school_nm_y))
+        paths = self.finder.route_edges('school_nm', inputs)
+        for path in paths:
             for p in path:
                 segcounts[p] = segcounts.get(p, 0) + 1
         return segcounts, iters
@@ -52,10 +55,14 @@ class Network:
 
 
 if __name__ == "__main__":
-    f = pathwrapper.Finder('/Users/hailey/tmp/mapcache/BikeStreets.LINCOLN PARK.LAKE VIEW.geojson', '/tmp/schools.geojson')
+    # need to hook this up
+    filtered_file = open('/tmp/filterfile.txt').read().strip()
+    print(f'Reading from {filtered_file}')
+    f = pathwrapper.Finder(filtered_file, '/tmp/schools.geojson', silent=False)
     n = Network(f)
     applied = n.apply()
     filt = applied[applied.geometry.type == 'LineString']
     #print(applied)
     #print(filt)
+    filt.to_file('/tmp/computed_bike_network.geojson', driver='GeoJSON')
     filt.to_file(os.path.join(DESTINATION_DIR, 'computed_bike_network.shp'))
