@@ -224,11 +224,20 @@ def fetch_resource(id_):
     # heuristic: mistrust updated too close to retrieved time?
     print(f'Fetching {filename}')
     # datasets available in csv or json
+
     if map:
-        req = requests.get(f'https://data.cityofchicago.org/api/geospatial/{id_}?method=export&format=GeoJSON')
+        url = f'https://data.cityofchicago.org/api/geospatial/{id_}?method=export&format=GeoJSON'
     else:
-        req = requests.get(f'https://data.cityofchicago.org/resource/{id_}.json')
+        url = f'https://data.cityofchicago.org/resource/{id_}.json'
+    print(f'Fetching {url}')
+    req = requests.get(url)
     dataset.success = req.status_code == 200
+    print(f'dataset: {dataset.success}')
+    if len(req.text) < 500:
+        print(f'short text: {req.text}')
+    print(len(req.content))
+    print(req.headers)
+    print(f'json: {len(req.json())}')
     with open(fullpath, 'w') as fh:
         fh.write(req.text)
     dataset.save()
