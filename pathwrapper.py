@@ -19,6 +19,7 @@ class Finder:
         self.gdf = gpd.read_file(self.filename)
         self.points_df = gpd.read_file(self.points_filename)
         self.silent = silent
+        self.pointrow_cache = {}
 
     def reset_points(self, points_filename):
         self.points_filename = points_filename
@@ -27,6 +28,9 @@ class Finder:
     def closest_point(self, pointrow):
         # this is slow (iterates over entire dataframe)
         p = pointrow.iloc[0].geometry
+        cached = self.pointrow_cache.get(p)
+        if cached is not None:
+            return cached
         #print(type(pointrow))
         #print(type(p))
         assert type(p) is shapely.geometry.point.Point
@@ -37,6 +41,7 @@ class Finder:
             if minr is None or dist < mind:
                 mind = dist
                 minr = x
+        self.pointrow_cache[p] = minr
         return minr
 
     def make_gdf(self, ids):
