@@ -228,7 +228,7 @@ def fetch_resource(id_):
     if map:
         url = f'https://data.cityofchicago.org/api/geospatial/{id_}?method=export&format=GeoJSON'
     else:
-        url = f'https://data.cityofchicago.org/resource/{id_}.json'
+        url = f'https://data.cityofchicago.org/resource/{id_}.json?$limit=200000000'
     print(f'Fetching {url}')
     req = requests.get(url)
     dataset.success = req.status_code == 200

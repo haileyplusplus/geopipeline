@@ -13,11 +13,13 @@ import tqdm
 
 
 class Finder:
-    def __init__(self, filename, points_filename, silent=False):
+    def __init__(self, filename, points_filename, silent=False, sample=None):
         self.filename = filename
         self.points_filename = points_filename
         self.gdf = gpd.read_file(self.filename)
         self.points_df = gpd.read_file(self.points_filename)
+        if sample and sample < len(self.points_df):
+            self.points_df = self.points_df.sample(sample)
         self.silent = silent
         self.pointrow_cache = {}
 
