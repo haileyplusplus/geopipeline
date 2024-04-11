@@ -3,6 +3,8 @@
 """
 https://api.us.socrata.com/api/catalog/v1?domains=data.cityofchicago.org
 
+datacatalog.cookcountyil.gov
+
 https://dev.socrata.com/docs/other/discovery#?route=overview
 """
 import argparse
@@ -12,6 +14,8 @@ import os
 import urllib.parse
 import sys
 import datetime
+from dataclasses import dataclass
+
 import sanitize_filename
 from enum import Enum
 
@@ -20,9 +24,18 @@ import requests
 from peewee import SqliteDatabase, Model, CharField, IntegerField, DateTimeField, BooleanField, TextField, ForeignKeyField
 
 
+@dataclass
+class CatalogInfo:
+    name: str
+    destination_dir: str
+    domain: str
 
-DESTINATION_DIR = '/Users/hailey/datasets/chicago'
-db = SqliteDatabase(os.path.join(DESTINATION_DIR, 'fetchermetadata2.sqlite3'))
+
+db = SqliteDatabase(None)
+DOMAINS = [
+    CatalogInfo('chicago', '/Users/hailey/datasets/chicago', 'data.cityofchicago.org'),
+    CatalogInfo('cook', '/Users/hailey/datasets/cook', 'datacatalog.cookcountyil.gov'),
+]
 
 
 class BaseModel(Model):
@@ -72,14 +85,18 @@ class GenericFetcher:
         if r.headers['content-type'].startswith('application/json'):
             self.d = r.json()
             return True
+        print(r.headers)
+        print(r.text)
         return False
 
 
 class CategoryFetcher(GenericFetcher):
-    CATEGORY_URL = 'https://api.us.socrata.com/api/catalog/v1/domain_categories?domains=data.cityofchicago.org'
+    # https://datacatalog.cookcountyil.gov/
 
-    def __init__(self):
-        super().__init__(self.CATEGORY_URL)
+    def __init__(self, catalog: CatalogInfo):
+        self.catalog = catalog
+        url = f'https://api.us.socrata.com/api/catalog/v1/domain_categories?domains={self.catalog.domain}'
+        super().__init__(url)
         self.initialize()
 
     def initialize(self):
@@ -95,10 +112,11 @@ class UpdateResult(Enum):
 
 
 class ResourceFetcher(GenericFetcher):
-    URL_TEMPLATE = 'https://api.us.socrata.com/api/catalog/v1?domains=data.cityofchicago.org&limit=400&search_context=data.cityofchicago.org&categories=%s'
-
-    def __init__(self, category, expected_count):
-        url = self.URL_TEMPLATE % urllib.parse.quote_plus(category)
+    def __init__(self, catalog: CatalogInfo, category, expected_count):
+        self.catalog = catalog
+        cat = urllib.parse.quote_plus(category)
+        d = self.catalog.domain
+        url = f'https://api.us.socrata.com/api/catalog/v1?domains={d}&limit=400&search_context={d}&categories={cat}'
         super().__init__(url)
         self.category = category
         self.expected_count = expected_count
@@ -192,63 +210,65 @@ class ResourceFetcher(GenericFetcher):
         print(f'Parsed {self.category}: {parsed} items, {updated} updated')
 
 
-def populate_all():
-    cf = CategoryFetcher()
-    cf.initialize()
-    for item in Category.select():
-        rf = ResourceFetcher(item.name, item.count)
-        rf.initialize()
+class Manager:
+    def __init__(self, catalog: CatalogInfo):
+        self.catalog = catalog
 
+    def populate_all(self):
+        cf = CategoryFetcher(self.catalog)
+        cf.initialize()
+        for item in Category.select():
+            rf = ResourceFetcher(self.catalog, item.name, item.count)
+            rf.initialize()
 
-def fetch_resource(id_):
-    dataset: DataSet | None = DataSet.get_or_none(DataSet.id_ == id_)
-    if not dataset:
-        print(f'Couldn\'t fetch dataset {id_}')
-        return None
-    fetch_time = datetime.datetime.now()
-    ext = 'json'
-    map = dataset.resource_type == 'map'
-    if map:
-        ext = 'geojson'
-    filename = sanitize_filename.sanitize(f'{dataset.name}.{ext}')
-    fullpath = os.path.join(DESTINATION_DIR, filename)
-    if os.path.exists(fullpath):
-        print(f'Skipping fetch because {fullpath} exists')
-        print(f'Retrieved: {dataset.retrieved}')
-        print(f'Stale: {dataset.data_stale}')
-        print(f'Updated: {dataset.updated}')
-        print(f'Data updated: {dataset.data_updated}')
-        print(f'Metadata updated: {dataset.metadata_updated}')
-        return open(fullpath).read(), dataset
-    dataset.retrieved = fetch_time
-    # heuristic: mistrust updated too close to retrieved time?
-    print(f'Fetching {filename}')
-    # datasets available in csv or json
+    def fetch_resource(self, id_):
+        dataset: DataSet | None = DataSet.get_or_none(DataSet.id_ == id_)
+        if not dataset:
+            print(f'Couldn\'t fetch dataset {id_}')
+            return None
+        fetch_time = datetime.datetime.now()
+        ext = 'json'
+        map = dataset.resource_type == 'map'
+        if map:
+            ext = 'geojson'
+        filename = sanitize_filename.sanitize(f'{dataset.name}.{ext}')
+        fullpath = os.path.join(self.catalog.destination_dir, filename)
+        if os.path.exists(fullpath):
+            print(f'Skipping fetch because {fullpath} exists')
+            print(f'Retrieved: {dataset.retrieved}')
+            print(f'Stale: {dataset.data_stale}')
+            print(f'Updated: {dataset.updated}')
+            print(f'Data updated: {dataset.data_updated}')
+            print(f'Metadata updated: {dataset.metadata_updated}')
+            return open(fullpath).read(), dataset
+        dataset.retrieved = fetch_time
+        # heuristic: mistrust updated too close to retrieved time?
+        print(f'Fetching {filename}')
+        # datasets available in csv or json
+        if map:
+            url = f'https://{self.catalog.domain}/api/geospatial/{id_}?method=export&format=GeoJSON'
+        else:
+            url = f'https://{self.catalog.domain}/resource/{id_}.json?$limit=200000000'
+        print(f'Fetching {url}')
+        req = requests.get(url)
+        dataset.success = req.status_code == 200
+        print(f'dataset: {dataset.success}')
+        if len(req.text) < 500:
+            print(f'short text: {req.text}')
+        print(len(req.content))
+        print(req.headers)
+        print(f'json: {len(req.json())}')
+        with open(fullpath, 'w') as fh:
+            fh.write(req.text)
+        dataset.save()
+        return req.text, dataset
 
-    if map:
-        url = f'https://data.cityofchicago.org/api/geospatial/{id_}?method=export&format=GeoJSON'
-    else:
-        url = f'https://data.cityofchicago.org/resource/{id_}.json?$limit=200000000'
-    print(f'Fetching {url}')
-    req = requests.get(url)
-    dataset.success = req.status_code == 200
-    print(f'dataset: {dataset.success}')
-    if len(req.text) < 500:
-        print(f'short text: {req.text}')
-    print(len(req.content))
-    print(req.headers)
-    print(f'json: {len(req.json())}')
-    with open(fullpath, 'w') as fh:
-        fh.write(req.text)
-    dataset.save()
-    return req.text, dataset
-
-
-def db_initialize():
-    db.connect()
-    db.create_tables([
-        Category, DataSet
-    ])
+    def db_initialize(self):
+        db.init(os.path.join(self.catalog.destination_dir, 'fetchermetadata2.sqlite3'))
+        db.connect()
+        db.create_tables([
+            Category, DataSet
+        ])
 
 # pandas join dataset series
 
@@ -257,7 +277,6 @@ if __name__ == "__main__":
     #gf = GenericFetcher('https://api.us.socrata.com/api/catalog/v1/domain_categories?domains=data.cityofchicago.org')
     #gf = GenericFetcher('https://api.us.socrata.com/api/catalog/v1?domains=data.cityofchicago.org&search_context=data.cityofchicago.org&categories=Public%20Safety')
     #print(f'Fetched: {gf.fetch()}')
-    db_initialize()
     parser = argparse.ArgumentParser(
         prog='OpenDataBrowser',
         description='Show info about open datasets',
@@ -271,12 +290,23 @@ if __name__ == "__main__":
     parser.add_argument('--category', nargs=1, required=False)
     parser.add_argument('--map', action='store_true')
     parser.add_argument('--pandas', action='store_true')
+    parser.add_argument('--domain', nargs=1, required=False, default='chicago')
     args = parser.parse_args()
+    catalog = None
+    for d in DOMAINS:
+        if d.name == args.domain[0]:
+            catalog = d
+            break
+    if catalog is None:
+        print(f'Domain {args.domain} not found.')
+        sys.exit(1)
+    m = Manager(catalog)
+    m.db_initialize()
     if args.pandas:
         q = DataSet.select().join(Category)
         df = pd.read_sql(q.sql()[0], db.connection())
     if args.populate:
-        populate_all()
+        m.populate_all()
     if args.s:
         q = DataSet.select().join(Category).where(DataSet.name.contains(args.s[0])).order_by(DataSet.name)
         for ds in q:
@@ -284,7 +314,7 @@ if __name__ == "__main__":
     if args.series:
         dfs = []
         for k in args.key:
-            r, dataset = fetch_resource(k)
+            r, dataset = m.fetch_resource(k)
             df = pd.read_json(io.StringIO(r))
             df['dataset'] = dataset.name
             dfs.append(df)
@@ -293,7 +323,7 @@ if __name__ == "__main__":
         combined.to_json('/tmp/combined.json')
     else:
         for k in args.key:
-            r, ds = fetch_resource(k)
+            r, ds = m.fetch_resource(k)
             if ds.resource_type == 'map':
                 import geopandas
                 gdf = geopandas.read_file(io.StringIO(r))
