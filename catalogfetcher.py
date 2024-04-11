@@ -102,7 +102,11 @@ class CategoryFetcher(GenericFetcher):
     def initialize(self):
         assert self.fetch()
         for item in self.d['results']:
-            _, _ = Category().get_or_create(name=item['domain_category'], count=item['count'])
+            category, created = Category().get_or_create(name=item['domain_category'])
+            if not created and category.count != item['count']:
+                print(f'Item count update for {category.name}: was {category.count}, now {item['count']}')
+            category.count = item['count']
+            category.save()
 
 
 class UpdateResult(Enum):
