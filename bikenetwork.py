@@ -14,6 +14,10 @@ import pathwrapper
 # todo: merge all shapefile writing / processing
 DESTINATION_DIR = '/Users/hailey/Documents/ArcGIS/data/chicago'
 
+"""
+Add shell script to run pipeline
+"""
+
 @dataclass
 class PointInfo:
     filename: str
