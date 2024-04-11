@@ -13,11 +13,15 @@ import tqdm
 
 
 class Finder:
+    CHICAGO_CRS = 26916
+
     def __init__(self, filename, points_filename, silent=False, sample=None):
         self.filename = filename
         self.points_filename = points_filename
         self.gdf = gpd.read_file(self.filename)
         self.points_df = gpd.read_file(self.points_filename)
+        self.points_alt = self.points_df.to_crs(self.CHICAGO_CRS)
+        self.gdf_alt = self.gdf.to_crs(self.CHICAGO_CRS)
         if sample and sample < len(self.points_df):
             self.points_df = self.points_df.sample(sample)
         self.silent = silent
@@ -46,6 +50,20 @@ class Finder:
         self.pointrow_cache[p] = minr
         return minr
 
+    def closest_point2(self, pointrow):
+        p = pointrow.iloc[0].geometry
+        cached = self.pointrow_cache.get(p)
+        if cached is not None:
+            return cached
+        alt = self.gdf_alt.clip(pointrow.geometry.buffer(20))
+        if alt.empty:
+            self.pointrow_cache[p] = geopandas.GeoDataFrame()
+            return geopandas.GeoDataFrame()
+        alt = alt.sample(1)
+        rv = self.gdf[self.gdf.trans_id == alt.trans_id.iloc[0]].iloc[0]
+        self.pointrow_cache[p] = rv
+        return rv
+
     def make_gdf(self, ids):
         rv = []
         for id_ in ids:
@@ -56,11 +74,15 @@ class Finder:
     def router(self, colname, tups: List[Tuple[str, str]]):
         points = []
         for start, end in tqdm.tqdm(tups):
-            startpoint = self.closest_point(self.points_df[self.points_df[colname] == start])
-            endpoint = self.closest_point(self.points_df[self.points_df[colname] == end])
+            #startpoint = self.closest_point(self.points_df[self.points_df[colname] == start])
+            #endpoint = self.closest_point(self.points_df[self.points_df[colname] == end])
+            startpoint = self.closest_point2(self.points_alt[self.points_alt[colname] == start])
+            endpoint = self.closest_point2(self.points_alt[self.points_alt[colname] == end])
             if startpoint.empty or endpoint.empty:
                 continue
             pointmap = lambda x: {'type': 'Feature', 'properties': {}, 'geometry': shapely.geometry.mapping(x.boundary.geoms[0])}
+            #print(startpoint)
+            #print(startpoint.geometry)
             sp = pointmap(startpoint.geometry)
             ep = pointmap(endpoint.geometry)
         #sp = json.loads(startpoint.to_json())['features'][0]
