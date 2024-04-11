@@ -6,6 +6,13 @@ https://api.us.socrata.com/api/catalog/v1?domains=data.cityofchicago.org
 datacatalog.cookcountyil.gov
 
 https://dev.socrata.com/docs/other/discovery#?route=overview
+
+
+Improvements
+- chunked data and progress bar
+- limits and updating
+- better parsing of success status
+
 """
 import argparse
 import io
@@ -32,6 +39,7 @@ class CatalogInfo:
 
 
 db = SqliteDatabase(None)
+# make this a dict
 DOMAINS = [
     CatalogInfo('chicago', '/Users/hailey/datasets/chicago', 'data.cityofchicago.org'),
     CatalogInfo('cook', '/Users/hailey/datasets/cook', 'datacatalog.cookcountyil.gov'),
@@ -215,8 +223,9 @@ class ResourceFetcher(GenericFetcher):
 
 
 class Manager:
-    def __init__(self, catalog: CatalogInfo):
+    def __init__(self, catalog: CatalogInfo, limit: int):
         self.catalog = catalog
+        self.limit = limit
 
     def populate_all(self):
         cf = CategoryFetcher(self.catalog)
@@ -252,7 +261,7 @@ class Manager:
         if map:
             url = f'https://{self.catalog.domain}/api/geospatial/{id_}?method=export&format=GeoJSON'
         else:
-            url = f'https://{self.catalog.domain}/resource/{id_}.json?$limit=200000000'
+            url = f'https://{self.catalog.domain}/resource/{id_}.json?$limit={self.limit}'
         print(f'Fetching {url}')
         req = requests.get(url)
         dataset.success = req.status_code == 200
@@ -295,6 +304,8 @@ if __name__ == "__main__":
     parser.add_argument('--map', action='store_true')
     parser.add_argument('--pandas', action='store_true')
     parser.add_argument('--domain', nargs=1, required=False, default='chicago')
+    parser.add_argument('--dump', action='store_true')
+    parser.add_argument('--limit', nargs=1, type=int, default=200000000)
     args = parser.parse_args()
     catalog = None
     for d in DOMAINS:
@@ -304,7 +315,8 @@ if __name__ == "__main__":
     if catalog is None:
         print(f'Domain {args.domain} not found.')
         sys.exit(1)
-    m = Manager(catalog)
+    print(f'Using domain {args.domain}')
+    m = Manager(catalog, args.limit[0])
     m.db_initialize()
     if args.pandas:
         q = DataSet.select().join(Category)
@@ -313,6 +325,10 @@ if __name__ == "__main__":
         m.populate_all()
     if args.s:
         q = DataSet.select().join(Category).where(DataSet.name.contains(args.s[0])).order_by(DataSet.name)
+        for ds in q:
+            print(f'{ds.id_}  {ds.resource_type:12} {ds.name}')
+    if args.dump:
+        q = DataSet.select().join(Category).order_by(DataSet.name)
         for ds in q:
             print(f'{ds.id_}  {ds.resource_type:12} {ds.name}')
     if args.series:
