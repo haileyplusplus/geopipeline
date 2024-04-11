@@ -115,7 +115,8 @@ class Finder:
 
 if __name__ == "__main__":
     #f = Finder(sys.argv[1], sys.argv[2])
-    f = Finder('/Users/hailey/tmp/mapcache/BikeStreets.LINCOLN PARK.LAKE VIEW.geojson', '/tmp/schools.geojson')
+    schools_filename = '/Users/hailey/datasets/chicago/Chicago Public Schools - School Locations SY1819.geojson'
+    f = Finder('/Users/hailey/tmp/mapcache/BikeStreets.LINCOLN PARK.LAKE VIEW.geojson', schools_filename)
     #rj = f.router('school_nm', 'LAKE VIEW HS', 'LASALLE')
     #rj = f.router('school_nm', 'LASALLE', 'LAKE VIEW HS')
 

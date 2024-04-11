@@ -20,6 +20,8 @@ import cafilt
 """
  Todo:
   - fix output name to not be .geojson.shp
+  - support multiple map projects, each with different processing inputs
+  - support quick shapefile passthrough for map evaluation
 """
 
 DESTINATION_DIR = '/Users/hailey/Documents/ArcGIS/data/chicago'
@@ -48,9 +50,10 @@ class DataSource:
 
 
 class ProcessorInterface(ABC):
-    def __init__(self):
+    def __init__(self, manager):
         self.sources = {}
         self.name = None
+        self.manager = manager
 
     @abstractmethod
     def process(self):
@@ -75,7 +78,7 @@ class ProcessorInterface(ABC):
         self.name = name
         p.process_time = datetime.datetime.now()
         for s in self.get_sources():
-            rawsource, _ = catalogfetcher.fetch_resource(s.id_)
+            rawsource, _ = self.manager.fetch_resource(s.id_)
             self.sources[s] = geopandas.read_file(io.StringIO(rawsource))
 
     def shapefile_name(self):
@@ -86,8 +89,8 @@ class ProcessorInterface(ABC):
 
 
 class BikeRouteProcessor(ProcessorInterface):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, manager):
+        super().__init__(manager)
 
     def get_sources(self):
         return [DataSource('3w5d-sru8', 'Bike Routes')]
@@ -138,8 +141,8 @@ class StreetProcessor(ProcessorInterface):
                  '99': 'unk' # these appear to be mostly in O'hare
                  }
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, manager):
+        super().__init__(manager)
 
     def get_sources(self):
         return [DataSource('6imu-meau', 'Street Center Lines')]
@@ -186,8 +189,8 @@ class BikeStreetsWrapper:
 
 
 class BikeStreets(ProcessorInterface):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, manager):
+        super().__init__(manager)
         self.output = pd.DataFrame()
         self.streets = None
         self.bike_routes = None
@@ -413,10 +416,13 @@ class File:
 class Processor:
     PROCESSORS = [BikeRouteProcessor, BikeStreets]
 
+    def __init__(self, manager: catalogfetcher.Manager):
+        self.manager = manager
+
     # consider pbar / tqdm
     def process(self):
         for p in self.PROCESSORS:
-            inst = p()
+            inst = p(self.manager)
             inst.fetch()
             gdf = inst.process()
             cache_dest = os.path.join(MAP_CACHE, f'{inst.name}.geojson')
@@ -451,12 +457,14 @@ def db_initialize():
 
 if __name__ == "__main__":
     # add override command
-    catalogfetcher.db_initialize()
+    catalog = catalogfetcher.DOMAINS[0]
+    m = catalogfetcher.Manager(catalog, limit=-1)
+    m.db_initialize()
     db_initialize()
     # for dir_ in SOURCE_DIRS:
     #     c = Catalog(dir_)
     #     c.process()
-    p = Processor()
+    p = Processor(m)
     p.process()
     cafilt.filter_file('BikeStreets.geojson',
                        ['LINCOLN PARK', 'LAKE VIEW', 'NEAR NORTH SIDE', 'WEST TOWN'])
