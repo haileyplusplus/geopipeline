@@ -23,6 +23,7 @@ class Finder:
         self.points_df = gpd.read_file(self.points_filename)
         self.gdf_alt = self.gdf.to_crs(self.CHICAGO_CRS)
         if sample and sample < len(self.points_df):
+            print(f'Sampling original size {len(self.points_df)} to {sample}')
             self.points_df = self.points_df.sample(sample)
         self.points_alt = self.points_df.to_crs(self.CHICAGO_CRS)
         self.silent = silent

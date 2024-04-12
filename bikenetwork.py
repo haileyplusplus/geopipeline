@@ -16,6 +16,9 @@ DESTINATION_DIR = '/Users/hailey/Documents/ArcGIS/data/chicago'
 
 """
 Add shell script to run pipeline
+
+- add debugging info: raw route count, min route #
+- output path id numbers
 """
 
 @dataclass
@@ -81,7 +84,7 @@ if __name__ == "__main__":
     point_info = Network.BUSINESS_POINTS
     #point_info = Network.SCHOOL_POINTS
     points_filename = point_info.filename
-    f = pathwrapper.Finder(filtered_file, points_filename, silent=False, sample=1000)
+    f = pathwrapper.Finder(filtered_file, points_filename, silent=False, sample=2000)
     n = Network(f, point_info)
     applied = n.apply()
     filt = applied[applied.geometry.type == 'LineString']
