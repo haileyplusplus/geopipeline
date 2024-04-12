@@ -8,7 +8,7 @@ import sys
 
 from abc import abstractmethod, ABC
 from dataclasses import dataclass, field
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Callable
 
 from peewee import SqliteDatabase, Model, CharField, DateTimeField
 import geopandas
@@ -49,6 +49,7 @@ class DataSource:
     domain: str
     id_: str
     filename: str
+    filter: Callable = None
     keep_cols: frozenset[str] = frozenset()
 
 
@@ -89,10 +90,13 @@ class ProcessorInterface(ABC):
             rawsource, _ = tup
             df = geopandas.read_file(io.StringIO(rawsource))
             print(f'Raw {s.filename}: {df}')
+            # Filter rows first since some columns might only be used for filtering rows
+            if s.filter is not None:
+                df = s.filter(df)
             if len(s.keep_cols) > 0:
-               df = df[s.keep_cols]
+                df = df[s.keep_cols]
             print(f'Filtered {s.filename}: {df}')
-            self.sources[s] = df
+            self.sources[s.filename] = df
         return True
 
     def shapefile_name(self):
@@ -126,7 +130,7 @@ class BikeRouteProcessor(ProcessorInterface):
                 }.get(street_name, street_name).upper()
 
     def process(self):
-        df = self.sources[self.get_sources()[0]]
+        df = self.sources[self.get_sources()[0].filename]
         for c in ['contraflow', 'br_oneway']:
             df[c] = df[c].apply(self.fix_bool)
         df['bike_ow'] = df.apply(self.bike_ow, axis=1)
@@ -213,6 +217,7 @@ class BikeStreets(ProcessorInterface):
         return [
             DataSource(
                 'chicago', '3w5d-sru8', 'Bike Routes',
+                keep_cols=frozenset(['contraflow', 'br_oneway', 'displayrou', 'st_name', 'geometry']),
             ),
             DataSource(
                 'chicago', '6imu-meau', 'Street Center Lines',
@@ -220,7 +225,13 @@ class BikeStreets(ProcessorInterface):
                            'dir_travel', 'status', 'class', 'length',
                            'trans_id', 'geometry']),
             ),
-            #DataSource('cookgis', '900b69139e874c8f823744d8fd5b71eb', 'Off-Street Bike Trails'),
+            DataSource(
+                'cookgis',
+                '900b69139e874c8f823744d8fd5b71eb',
+                'Off-Street Bike Trails',
+                filter=lambda df: df[df.Muni == 'Chicago'][df.Status == 'Existing'],
+                keep_cols=frozenset(['OBJECTID', 'Street', 'FacName', 'Sub_System', 'ShapeSTLength', 'geometry']),
+            ),
         ]
 
     @staticmethod
@@ -267,6 +278,7 @@ class BikeStreets(ProcessorInterface):
             'NEIGHBORHOOD GREENWAY': 6,
             'BUFFERED BIKE LANE': 6,
             'PROTECTED BIKE LANE': 7,
+            'OFF STREET': 8, # this is fictionally postprocessed
         }
         rv = rmap.get(dr)
         if rv is not None:
@@ -359,14 +371,14 @@ class BikeStreets(ProcessorInterface):
         return self.output.to_crs(epsg=4326)
 
     def process(self):
-        df = self.sources[self.get_sources()[0]]
+        df = self.sources[self.get_sources()[0].filename]
         print(f'Processing with {df} src 0 (bike routes)')
         for c in ['contraflow', 'br_oneway']:
             df[c] = df[c].apply(self.fix_bool)
         df['bike_ow'] = df.apply(self.bike_ow, axis=1)
         df.st_name = df.st_name.apply(self.fix_street_name)
 
-        self.streets = BikeStreetsWrapper(self.sources[self.get_sources()[1]])
+        self.streets = BikeStreetsWrapper(self.sources[self.get_sources()[1].filename])
         self.bike_routes = BikeStreetsWrapper(df)
 
         bike_streets = self.streets.get_streets() & self.bike_routes.get_streets()
@@ -380,6 +392,36 @@ class BikeStreets(ProcessorInterface):
         ostr = self.streets.orig
         print(f'ostr {ostr}')
         result = pd.concat([df, ostr[ostr.street_nam.isin(other_streets)]])
+
+        # Now add in off-street routes using the column format above
+
+        off_street: geopandas.GeoDataFrame = self.sources[self.get_sources()[2].filename]
+        print(f'Off street {off_street}')
+        dds = []
+        for _, row in off_street.iterrows():
+            id_ = row.FacName
+            if not id_:
+                id_ = row.Street
+            if not id_:
+                id_ = row.Sub_System
+            rd = {'length': row.ShapeSTLength,
+                  'status': 'N',
+                  'dir_travel': 'B',
+                  'street_nam': id_,
+                  'trans_id': f'B{row.OBJECTID}',
+                  'geometry': row.geometry,
+                  'street_typ': '',
+                  'ewns_dir': '',
+                  'class': '4',
+                  'displayrou': 'OFF STREET',
+                  'st_name': id_,
+                  'br_oneway': 'N',
+                  'contraflow': 'N',
+                  'bike_ow': 'N'}
+            dds.append(rd)
+        offdf = geopandas.GeoDataFrame(dds)
+        offdf.crs = 4326
+        result = pd.concat([result, offdf], ignore_index=True)
         # add one last column
         print(result)
         print(result.columns)
