@@ -49,6 +49,7 @@ db = SqliteDatabase(None)
 DOMAINS = [
     CatalogInfo('chicago', '/Users/hailey/datasets/chicago', 'data.cityofchicago.org'),
     CatalogInfo('cook', '/Users/hailey/datasets/cook', 'datacatalog.cookcountyil.gov'),
+    CatalogInfo('cookgis', '/Users/hailey/datasets/cookgis', None),
 ]
 
 
@@ -182,6 +183,18 @@ class CategoryFetcher2(GenericFetcher):
 
 
 class ManagerBase(ManagerInterface):
+    def __init__(self, catalog: CatalogInfo, limit: int):
+        self.catalog = catalog
+        self.limit = limit
+
+    @abstractmethod
+    def populate_all(self):
+        pass
+
+    @abstractmethod
+    def fetch_resource(self, id_):
+        pass
+
     @staticmethod
     def check_newer(ds: DataSet, other: DataSet) -> UpdateResult:
         """
@@ -234,11 +247,17 @@ class ManagerBase(ManagerInterface):
         dataset.save()
         return True
 
+    def db_initialize(self):
+        db.init(os.path.join(self.catalog.destination_dir, 'fetchermetadata2.sqlite3'))
+        db.connect()
+        db.create_tables([
+            Category, DataSet
+        ])
 
-class Manager(ManagerInterface):
+
+class Manager(ManagerBase):
     def __init__(self, catalog: CatalogInfo, limit: int):
-        self.catalog = catalog
-        self.limit = limit
+        super().__init__(catalog, limit)
 
     def fetch_category(self, category, expected_count):
         cat = urllib.parse.quote_plus(category)
@@ -298,22 +317,16 @@ class Manager(ManagerInterface):
         dataset.save()
         return req.text, dataset
 
-    def db_initialize(self):
-        db.init(os.path.join(self.catalog.destination_dir, 'fetchermetadata2.sqlite3'))
-        db.connect()
-        db.create_tables([
-            Category, DataSet
-        ])
 
-
-class CookGISManager(ManagerInterface):
+class CookGISManager(ManagerBase):
     def __init__(self, catalog: CatalogInfo, limit: int):
-        self.catalog = catalog
-        self.limit = limit
+        super().__init__(catalog, limit)
         self.data_catalog = {}
 
-    def parse_dataset(self, dataset2):
-        filtered = {k: v for k, v in dataset2.items() if k in {'identifier', 'title', 'description', 'modified'}}
+    @staticmethod
+    def parse_dataset(dsdict) -> DataSet:
+        category, _ = Category().get_or_create(name='CookGIS', count=-1)
+        filtered = {k: v for k, v in dsdict.items() if k in {'identifier', 'title', 'description', 'modified', 'issued'}}
         fi = filtered['identifier'].split('=')[1]
         s2 = fi.split('&')
         sublayer = False
@@ -321,26 +334,29 @@ class CookGISManager(ManagerInterface):
             sublayer = True
         filtered['sublayer'] = sublayer
         filtered['identifier'] = s2[0]
-        if DataSet.get_or_none(DataSet.id_ == filtered['identifier']) is not None:
-            return
-        dist = dataset.get('distribution', [])
+        dist = dsdict.get('distribution', [])
         geojson_url = None
         for dd in dist:
             if dd['format'] == 'GeoJSON':
-                geojson_url = d['accessURL']
-
+                geojson_url = dd['accessURL']
                 break
         if geojson_url:
             filtered['geojson_url'] = geojson_url
-        ds = DataSet.create(**filtered)
-        for keyword in dataset['keyword']:
-            kw, created = Keyword.get_or_create(keyword=keyword)
-            dsk = DataSetKeyword.create(keywords=kw, dataset=ds)
-            dsk.save()
-
-    def parse(self):
-        for ds in self.catalog['dataset']:
-            self.parse_dataset(ds)
+        rv = DataSet()
+        rv.id_ = filtered['identifier']
+        rv.name = filtered['title']
+        rv.description = filtered['description']
+        rv.resource_type = 'map'
+        rv.updated = filtered['modified']
+        rv.category = category
+        rv.raw = json.dumps(dsdict)
+        issued = filtered.get('issued')
+        if issued:
+            rv.created = issued
+        if geojson_url:
+            rv.url = geojson_url
+        assert rv is not None
+        return rv
 
     def populate_all(self):
         gf = GenericFetcher('https://hub-cookcountyil.opendata.arcgis.com/api/feed/dcat-us/1.1.json')
@@ -348,15 +364,53 @@ class CookGISManager(ManagerInterface):
             return False
         self.data_catalog = gf.d
         for dataset2 in self.data_catalog['dataset']:
-            self.parse_dataset(dataset2)
+            ds2 = self.parse_dataset(dataset2)
+            assert ds2 is not None
+            ManagerBase.parse_one_resource(ds2)
         return True
 
+    # need to refactor and combine this
     def fetch_resource(self, id_):
-        pass
-
-    def db_initialize(self):
-        pass
-
+        dataset: DataSet | None = DataSet.get_or_none(DataSet.id_ == id_)
+        if not dataset:
+            print(f'Couldn\'t fetch dataset {id_}')
+            return None
+        fetch_time = datetime.datetime.now()
+        ext = 'json'
+        map = dataset.resource_type == 'map'
+        if map:
+            ext = 'geojson'
+        filename = sanitize_filename.sanitize(f'{dataset.name}.{ext}')
+        fullpath = os.path.join(self.catalog.destination_dir, filename)
+        if os.path.exists(fullpath):
+            print(f'Skipping fetch because {fullpath} exists')
+            print(f'Retrieved: {dataset.retrieved}')
+            print(f'Stale: {dataset.data_stale}')
+            print(f'Updated: {dataset.updated}')
+            print(f'Data updated: {dataset.data_updated}')
+            print(f'Metadata updated: {dataset.metadata_updated}')
+            return open(fullpath).read(), dataset
+        dataset.retrieved = fetch_time
+        # heuristic: mistrust updated too close to retrieved time?
+        print(f'Fetching {filename}')
+        # datasets available in csv or json
+        if not dataset.url:
+            print(f'No URL for dataset')
+            return None
+        url = dataset.url
+        print(f'Fetching {url}')
+        req = requests.get(url)
+        dataset.success = req.status_code == 200
+        print(f'dataset: {dataset.success}')
+        if len(req.text) < 500:
+            print(f'short text: {req.text}')
+        print(len(req.content))
+        print(req.headers)
+        print(f'json: {len(req.json())}')
+        with open(fullpath, 'w') as fh:
+            fh.write(req.text)
+        dataset.save()
+        return req.text, dataset
 
 # pandas join dataset series
 
@@ -366,8 +420,8 @@ if __name__ == "__main__":
     #gf = GenericFetcher('https://api.us.socrata.com/api/catalog/v1?domains=data.cityofchicago.org&search_context=data.cityofchicago.org&categories=Public%20Safety')
     #print(f'Fetched: {gf.fetch()}')
     parser = argparse.ArgumentParser(
-        prog='OpenDataBrowser',
-        description='Show info about open datasets',
+        prog='CatalogFetcher',
+        description='Fetch data catalogs and data',
     )
     parser.add_argument('key', nargs='*')
     parser.add_argument('-s', nargs=1, required=False)
@@ -391,7 +445,10 @@ if __name__ == "__main__":
         print(f'Domain {args.domain} not found.')
         sys.exit(1)
     print(f'Using domain {args.domain}')
-    m = Manager(catalog, args.limit[0])
+    if catalog.name == 'cookgis':
+        m = CookGISManager(catalog, args.limit[0])
+    else:
+        m = Manager(catalog, args.limit[0])
     m.db_initialize()
     if args.pandas:
         q = DataSet.select().join(Category)
