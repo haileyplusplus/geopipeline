@@ -25,6 +25,8 @@ import urllib.parse
 import sys
 import datetime
 from dataclasses import dataclass
+from abc import ABC, abstractmethod
+from typing import Callable
 
 import sanitize_filename
 from enum import Enum
@@ -104,7 +106,7 @@ class GenericFetcher:
         return False
 
 
-class CategoryFetcher(GenericFetcher):
+class CategoryIndexFetcher(GenericFetcher):
     # https://datacatalog.cookcountyil.gov/
 
     def __init__(self, catalog: CatalogInfo):
@@ -129,16 +131,57 @@ class UpdateResult(Enum):
     DATA = 3
 
 
-class ResourceFetcher(GenericFetcher):
-    def __init__(self, catalog: CatalogInfo, category, expected_count):
-        self.catalog = catalog
+class CategoryFetcher2(GenericFetcher):
+    def __init__(self, domain, category, expected_count):
         cat = urllib.parse.quote_plus(category)
-        d = self.catalog.domain
-        url = f'https://api.us.socrata.com/api/catalog/v1?domains={d}&limit=400&search_context={d}&categories={cat}'
+        url = f'https://api.us.socrata.com/api/catalog/v1?domains={domain}&limit=400&search_context={domain}&categories={cat}'
         super().__init__(url)
         self.category = category
         self.expected_count = expected_count
 
+    def produce_dataset(self, rd: dict) -> DataSet:
+        r = rd['resource']
+        id_ = r['id']
+        # check metadata date for update
+        dataset = DataSet()
+        dataset.id_ = id_
+        dataset.name = r['name']
+        dataset.raw = json.dumps(rd)
+        dataset.description = r['description']
+        dataset.resource_type = r['type']
+        dataset.updated = r['updatedAt']
+        dataset.created = r['createdAt']
+        dataset.metadata_updated = r['metadata_updated_at']
+        dataset.data_updated = r['data_updated_at']
+        c = rd['classification']
+        dmd = {}
+        for dd in c['domain_metadata']:
+            dmd[dd['key']] = dd['value']
+        dataset.metadata_frequency = dmd.get('Metadata_Frequency')
+        dataset.metadata_owner = dmd.get('Metadata_Data-Owner')
+        dataset.metadata_period = dmd.get('Metadata_Time-Period')
+        if c['domain_category'] != self.category:
+            print(f'Category mismatch in item {id_}')
+        dataset.category = Category.get(Category.name == self.category)
+        return dataset
+
+    def populate_category(self, producer: Callable[[DataSet], bool]):
+        assert self.fetch()
+        results = self.d['results']
+        parsed = 0
+        updated = 0
+        for item in results:
+            dataset3 = self.produce_dataset(item)
+            update = producer(dataset3)
+            parsed += 1
+            if update:
+                updated += 1
+        if parsed != self.expected_count:
+            print(f'Error processing {self.category}: Expected {self.expected_count} but got {parsed}')
+        print(f'Parsed {self.category}: {parsed} items, {updated} updated')
+
+
+class ManagerBase(ManagerInterface):
     @staticmethod
     def check_newer(ds: DataSet, other: DataSet) -> UpdateResult:
         """
@@ -168,33 +211,11 @@ class ResourceFetcher(GenericFetcher):
             d = max(d, ds.data_updated)
         return d
 
-    def parse_one_resource(self, d: dict):
-        r = d['resource']
-        id_ = r['id']
-        # check metadata date for update
-        dataset = DataSet()
-        dataset.id_ = id_
-        dataset.name = r['name']
-        dataset.raw = json.dumps(d)
-        dataset.description = r['description']
-        dataset.resource_type = r['type']
-        dataset.updated = r['updatedAt']
-        dataset.created = r['createdAt']
-        dataset.metadata_updated = r['metadata_updated_at']
-        dataset.data_updated = r['data_updated_at']
-        c = d['classification']
-        dmd = {}
-        for dd in c['domain_metadata']:
-            dmd[dd['key']] = dd['value']
-        dataset.metadata_frequency = dmd.get('Metadata_Frequency')
-        dataset.metadata_owner = dmd.get('Metadata_Data-Owner')
-        dataset.metadata_period = dmd.get('Metadata_Time-Period')
-        if c['domain_category'] != self.category:
-            print(f'Category mismatch in item {id_}')
-        dataset.category = Category.get(Category.name == self.category)
-        previous = DataSet.get_or_none(DataSet.id_ == id_)
+    @staticmethod
+    def parse_one_resource(dataset: DataSet) -> bool:
+        previous = DataSet.get_or_none(DataSet.id_ == dataset.id_)
         if previous:
-            ur = self.check_newer(dataset, previous)
+            ur = ManagerBase.check_newer(dataset, previous)
             if ur == UpdateResult.NONE:
                 return False
             dataset.retrieved = previous.retrieved
@@ -209,23 +230,9 @@ class ResourceFetcher(GenericFetcher):
                 print(f'Metadata-only update for {dataset.name}')
             if ur == UpdateResult.DATA:
                 print(f'Data update for {dataset.name}. Existing stale: {stale}')
-                print(f'  Previous {self.last_update(previous)} New {self.last_update(dataset)}')
+                print(f'  Previous {ManagerBase.last_update(previous)} New {ManagerBase.last_update(dataset)}')
         dataset.save()
         return True
-
-    def initialize(self):
-        assert self.fetch()
-        results = self.d['results']
-        parsed = 0
-        updated = 0
-        for item in results:
-            update = self.parse_one_resource(item)
-            parsed += 1
-            if update:
-                updated += 1
-        if parsed != self.expected_count:
-            print(f'Error processing {self.category}: Expected {self.expected_count} but got {parsed}')
-        print(f'Parsed {self.category}: {parsed} items, {updated} updated')
 
 
 class Manager(ManagerInterface):
@@ -233,12 +240,21 @@ class Manager(ManagerInterface):
         self.catalog = catalog
         self.limit = limit
 
+    def fetch_category(self, category, expected_count):
+        cat = urllib.parse.quote_plus(category)
+        domain = self.catalog.domain
+        url = f'https://api.us.socrata.com/api/catalog/v1?domains={domain}&limit=400&search_context={domain}&categories={cat}'
+        #super().__init__(url)
+        #self.category = category
+        #self.expected_count = expected_count
+
+
     def populate_all(self):
-        cf = CategoryFetcher(self.catalog)
+        cf = CategoryIndexFetcher(self.catalog)
         cf.initialize()
         for item in Category.select():
-            rf = ResourceFetcher(self.catalog, item.name, item.count)
-            rf.initialize()
+            rf = CategoryFetcher2(self.catalog.domain, item.name, item.count)
+            rf.populate_category(ManagerBase.parse_one_resource)
 
     def fetch_resource(self, id_):
         dataset: DataSet | None = DataSet.get_or_none(DataSet.id_ == id_)
@@ -362,13 +378,13 @@ if __name__ == "__main__":
     parser.add_argument('--category', nargs=1, required=False)
     parser.add_argument('--map', action='store_true')
     parser.add_argument('--pandas', action='store_true')
-    parser.add_argument('--domain', nargs=1, required=False, default='chicago')
+    parser.add_argument('--domain', nargs=1, required=False, default=['chicago'])
     parser.add_argument('--dump', action='store_true')
     parser.add_argument('--limit', nargs=1, type=int, default=[200000000])
     args = parser.parse_args()
     catalog = None
     for d in DOMAINS:
-        if d.name == args.domain[0]:
+        if d.name == args.domain[0].strip():
             catalog = d
             break
     if catalog is None:
