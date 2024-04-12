@@ -15,6 +15,7 @@ from peewee import SqliteDatabase, Model, CharField, DateTimeField, BooleanField
 import sanitize_filename
 
 from opendatabrowser import Browser
+from interfaces import ManagerInterface
 
 """
 Next: 
@@ -126,7 +127,6 @@ class Catalog:
         item.save()
         return True
 
-
     def inner_fetch(self, item):
         #url = self.URL_TEMPLATE % item.identifier
         if not item.geojson_url:
@@ -146,6 +146,7 @@ class Catalog:
         item.success = cp.returncode == 0
         item.save()
         return True
+
 
 def initialize():
     db.connect()

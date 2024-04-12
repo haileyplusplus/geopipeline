@@ -33,6 +33,7 @@ import pandas as pd
 import requests
 from peewee import SqliteDatabase, Model, CharField, IntegerField, DateTimeField, BooleanField, TextField, ForeignKeyField
 
+from interfaces import ManagerInterface
 
 @dataclass
 class CatalogInfo:
@@ -65,6 +66,8 @@ class DataSet(BaseModel):
     name = CharField()
     description = TextField()
     resource_type = CharField()
+    sha256 = CharField(null=True)
+    url = CharField(null=True)
     updated = DateTimeField(null=True)
     created = DateTimeField(null=True)
     metadata_updated = DateTimeField(null=True)
@@ -225,7 +228,7 @@ class ResourceFetcher(GenericFetcher):
         print(f'Parsed {self.category}: {parsed} items, {updated} updated')
 
 
-class Manager:
+class Manager(ManagerInterface):
     def __init__(self, catalog: CatalogInfo, limit: int):
         self.catalog = catalog
         self.limit = limit
@@ -285,6 +288,59 @@ class Manager:
         db.create_tables([
             Category, DataSet
         ])
+
+
+class CookGISManager(ManagerInterface):
+    def __init__(self, catalog: CatalogInfo, limit: int):
+        self.catalog = catalog
+        self.limit = limit
+        self.data_catalog = {}
+
+    def parse_dataset(self, dataset2):
+        filtered = {k: v for k, v in dataset2.items() if k in {'identifier', 'title', 'description', 'modified'}}
+        fi = filtered['identifier'].split('=')[1]
+        s2 = fi.split('&')
+        sublayer = False
+        if len(s2) > 1 and s2[1] == 'sublayer':
+            sublayer = True
+        filtered['sublayer'] = sublayer
+        filtered['identifier'] = s2[0]
+        if DataSet.get_or_none(DataSet.id_ == filtered['identifier']) is not None:
+            return
+        dist = dataset.get('distribution', [])
+        geojson_url = None
+        for dd in dist:
+            if dd['format'] == 'GeoJSON':
+                geojson_url = d['accessURL']
+
+                break
+        if geojson_url:
+            filtered['geojson_url'] = geojson_url
+        ds = DataSet.create(**filtered)
+        for keyword in dataset['keyword']:
+            kw, created = Keyword.get_or_create(keyword=keyword)
+            dsk = DataSetKeyword.create(keywords=kw, dataset=ds)
+            dsk.save()
+
+    def parse(self):
+        for ds in self.catalog['dataset']:
+            self.parse_dataset(ds)
+
+    def populate_all(self):
+        gf = GenericFetcher('https://hub-cookcountyil.opendata.arcgis.com/api/feed/dcat-us/1.1.json')
+        if not gf.fetch():
+            return False
+        self.data_catalog = gf.d
+        for dataset2 in self.data_catalog['dataset']:
+            self.parse_dataset(dataset2)
+        return True
+
+    def fetch_resource(self, id_):
+        pass
+
+    def db_initialize(self):
+        pass
+
 
 # pandas join dataset series
 
