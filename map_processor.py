@@ -87,7 +87,12 @@ class ProcessorInterface(ABC):
                 print(f"Couldn't fetch from {s}")
                 return False
             rawsource, _ = tup
-            self.sources[s] = geopandas.read_file(io.StringIO(rawsource))
+            df = geopandas.read_file(io.StringIO(rawsource))
+            print(f'Raw {s.filename}: {df}')
+            if len(s.keep_cols) > 0:
+               df = df[s.keep_cols]
+            print(f'Filtered {s.filename}: {df}')
+            self.sources[s] = df
         return True
 
     def shapefile_name(self):
@@ -206,7 +211,9 @@ class BikeStreets(ProcessorInterface):
 
     def get_sources(self):
         return [
-            DataSource('chicago', '3w5d-sru8', 'Bike Routes'),
+            DataSource(
+                'chicago', '3w5d-sru8', 'Bike Routes',
+            ),
             DataSource(
                 'chicago', '6imu-meau', 'Street Center Lines',
                 keep_cols=frozenset(['street_nam', 'street_typ', 'ewns_dir',
@@ -310,7 +317,8 @@ class BikeStreets(ProcessorInterface):
             for si, seg in street.iterrows():
                 match = rgbuffer.contains(seg.geometry)
                 if match:
-                    matching.append(seg.drop(['create_tim', 'update_tim', 'status_dat']))
+                    #matching.append(seg.drop(['create_tim', 'update_tim', 'status_dat']))
+                    matching.append(seg)
                     matched_segs.add(seg.trans_id)
             matched_frame = geopandas.GeoDataFrame(matching)
             route_frame = pd.DataFrame([route.drop('geometry')])
@@ -352,6 +360,7 @@ class BikeStreets(ProcessorInterface):
 
     def process(self):
         df = self.sources[self.get_sources()[0]]
+        print(f'Processing with {df} src 0 (bike routes)')
         for c in ['contraflow', 'br_oneway']:
             df[c] = df[c].apply(self.fix_bool)
         df['bike_ow'] = df.apply(self.bike_ow, axis=1)
@@ -369,6 +378,7 @@ class BikeStreets(ProcessorInterface):
         df = self.normalize()
         #print(df)
         ostr = self.streets.orig
+        print(f'ostr {ostr}')
         result = pd.concat([df, ostr[ostr.street_nam.isin(other_streets)]])
         # add one last column
         print(result)
@@ -378,7 +388,8 @@ class BikeStreets(ProcessorInterface):
 
 
 class Processor:
-    PROCESSORS = [BikeRouteProcessor, BikeStreets]
+    #PROCESSORS = [BikeRouteProcessor, BikeStreets]
+    PROCESSORS = [BikeStreets]
 
     def __init__(self, managers: Dict[str, catalogfetcher.Manager]):
         self.managers = managers
@@ -395,7 +406,11 @@ class Processor:
             print(f'Write to {cache_dest}')
             print(gdf)
             gdf.to_file(cache_dest, driver='GeoJSON')
-            df2 = gdf.drop(columns=[x for x in gdf.columns if gdf[x].dtype.name.startswith('datetime')])
+            dropped = [x for x in gdf.columns if gdf[x].dtype.name.startswith('datetime')]
+            if dropped:
+                df2 = gdf.drop(columns=dropped)
+            else:
+                df2 = gdf
             df2.to_file(inst.shapefile_dest_name())
             print(f'Wrote {cache_dest}')
 
