@@ -2,11 +2,20 @@
 
 import sys
 
-import geopandas
+import pandas as pd
+import geopandas as gpd
 
 if __name__ == "__main__":
     filename = sys.argv[1]
-    f = geopandas.read_file(filename)
+    if filename.endswith('.geojson'):
+        f = gpd.read_file(filename)
+    elif filename.endswith('.json'):
+        f = pd.read_json(filename)
+    elif filename.endswith('.csv'):
+        f = pd.read_csv(filename)
+    else:
+        print(f'Filename {filename} not recognized')
+        sys.exit(1)
     print(f)
     print(f.iloc[0])
     for c in f.columns:
