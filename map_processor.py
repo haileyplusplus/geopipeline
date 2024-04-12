@@ -8,6 +8,7 @@ import sys
 
 from abc import abstractmethod, ABC
 from dataclasses import dataclass
+from typing import Dict
 
 from peewee import SqliteDatabase, Model, CharField, DateTimeField
 import geopandas
@@ -45,15 +46,16 @@ class Processing(BaseModel):
 
 @dataclass(frozen=True)
 class DataSource:
+    domain: str
     id_: str
     filename: str
 
 
 class ProcessorInterface(ABC):
-    def __init__(self, manager):
+    def __init__(self, managers):
         self.sources = {}
         self.name = None
-        self.manager = manager
+        self.managers = managers
 
     @abstractmethod
     def process(self):
@@ -78,8 +80,14 @@ class ProcessorInterface(ABC):
         self.name = name
         p.process_time = datetime.datetime.now()
         for s in self.get_sources():
-            rawsource, _ = self.manager.fetch_resource(s.id_)
+            manager = self.managers[s.domain]
+            tup = manager.fetch_resource(s.id_)
+            if tup is None:
+                print(f"Couldn't fetch from {s}")
+                return False
+            rawsource, _ = tup
             self.sources[s] = geopandas.read_file(io.StringIO(rawsource))
+        return True
 
     def shapefile_name(self):
         return f'{self.name}.shp'
@@ -93,7 +101,7 @@ class BikeRouteProcessor(ProcessorInterface):
         super().__init__(manager)
 
     def get_sources(self):
-        return [DataSource('3w5d-sru8', 'Bike Routes')]
+        return [DataSource('chicago', '3w5d-sru8', 'Bike Routes')]
 
     @staticmethod
     def bike_ow(x):
@@ -145,7 +153,7 @@ class StreetProcessor(ProcessorInterface):
         super().__init__(manager)
 
     def get_sources(self):
-        return [DataSource('6imu-meau', 'Street Center Lines')]
+        return [DataSource('chicago', '6imu-meau', 'Street Center Lines')]
 
     @staticmethod
     def fix_street_name(street_name):
@@ -197,8 +205,9 @@ class BikeStreets(ProcessorInterface):
 
     def get_sources(self):
         return [
-            DataSource('3w5d-sru8', 'Bike Routes'),
-            DataSource('6imu-meau', 'Street Center Lines'),
+            DataSource('chicago', '3w5d-sru8', 'Bike Routes'),
+            DataSource('chicago', '6imu-meau', 'Street Center Lines'),
+            #DataSource('cookgis', '900b69139e874c8f823744d8fd5b71eb', 'Off-Street Bike Trails'),
         ]
 
     @staticmethod
@@ -416,14 +425,16 @@ class File:
 class Processor:
     PROCESSORS = [BikeRouteProcessor, BikeStreets]
 
-    def __init__(self, manager: catalogfetcher.Manager):
-        self.manager = manager
+    def __init__(self, managers: Dict[str, catalogfetcher.Manager]):
+        self.managers = managers
 
     # consider pbar / tqdm
     def process(self):
         for p in self.PROCESSORS:
-            inst = p(self.manager)
-            inst.fetch()
+            print(f'Running processor {p}')
+            inst = p(self.managers)
+            if not inst.fetch():
+                return False
             gdf = inst.process()
             cache_dest = os.path.join(MAP_CACHE, f'{inst.name}.geojson')
             print(f'Write to {cache_dest}')
@@ -457,14 +468,15 @@ def db_initialize():
 
 if __name__ == "__main__":
     # add override command
-    catalog = catalogfetcher.DOMAINS[0]
-    m = catalogfetcher.Manager(catalog, limit=-1)
-    m.db_initialize()
+    managers = {}
+    for d in catalogfetcher.DOMAINS:
+        managers[d.name] = d.manager(d, limit=-1)
+        managers[d.name].db_initialize()
     db_initialize()
     # for dir_ in SOURCE_DIRS:
     #     c = Catalog(dir_)
     #     c.process()
-    p = Processor(m)
+    p = Processor(managers)
     p.process()
     cafilt.filter_file('BikeStreets.geojson',
                        ['LINCOLN PARK', 'LAKE VIEW', 'NEAR NORTH SIDE', 'WEST TOWN'])

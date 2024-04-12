@@ -42,15 +42,10 @@ class CatalogInfo:
     name: str
     destination_dir: str
     domain: str
+    manager: type
 
 
 db = SqliteDatabase(None)
-# make this a dict
-DOMAINS = [
-    CatalogInfo('chicago', '/Users/hailey/datasets/chicago', 'data.cityofchicago.org'),
-    CatalogInfo('cook', '/Users/hailey/datasets/cook', 'datacatalog.cookcountyil.gov'),
-    CatalogInfo('cookgis', '/Users/hailey/datasets/cookgis', None),
-]
 
 
 class BaseModel(Model):
@@ -248,7 +243,9 @@ class ManagerBase(ManagerInterface):
         return True
 
     def db_initialize(self):
-        db.init(os.path.join(self.catalog.destination_dir, 'fetchermetadata2.sqlite3'))
+        dbpath = os.path.join(self.catalog.destination_dir, 'fetchermetadata2.sqlite3')
+        print(f'Loading {dbpath}')
+        db.init(dbpath)
         db.connect()
         db.create_tables([
             Category, DataSet
@@ -415,6 +412,13 @@ class CookGISManager(ManagerBase):
 # pandas join dataset series
 
 
+# make this a dict
+DOMAINS = [
+    CatalogInfo('chicago', '/Users/hailey/datasets/chicago', 'data.cityofchicago.org', Manager),
+    CatalogInfo('cook', '/Users/hailey/datasets/cook', 'datacatalog.cookcountyil.gov', Manager),
+    CatalogInfo('cookgis', '/Users/hailey/datasets/cookgis', None, CookGISManager),
+]
+
 if __name__ == "__main__":
     #gf = GenericFetcher('https://api.us.socrata.com/api/catalog/v1/domain_categories?domains=data.cityofchicago.org')
     #gf = GenericFetcher('https://api.us.socrata.com/api/catalog/v1?domains=data.cityofchicago.org&search_context=data.cityofchicago.org&categories=Public%20Safety')
@@ -445,10 +449,8 @@ if __name__ == "__main__":
         print(f'Domain {args.domain} not found.')
         sys.exit(1)
     print(f'Using domain {args.domain}')
-    if catalog.name == 'cookgis':
-        m = CookGISManager(catalog, args.limit[0])
-    else:
-        m = Manager(catalog, args.limit[0])
+    #m = CookGISManager(catalog, args.limit[0])
+    m = catalog.manager(catalog, args.limit[0])
     m.db_initialize()
     if args.pandas:
         q = DataSet.select().join(Category)
