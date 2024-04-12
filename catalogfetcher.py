@@ -466,7 +466,7 @@ if __name__ == "__main__":
     m.db_initialize()
     if args.pandas:
         q = DataSet.select().join(Category)
-        df = pd.read_sql(q.sql()[0], db.connection())
+        df = pd.read_sql(q.sql()[0], m.mydb.connection())
     if args.populate:
         m.populate_all()
     if args.s:
