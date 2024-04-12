@@ -8,7 +8,7 @@ import sys
 
 from abc import abstractmethod, ABC
 from dataclasses import dataclass, field
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from peewee import SqliteDatabase, Model, CharField, DateTimeField
 import geopandas
@@ -49,7 +49,7 @@ class DataSource:
     domain: str
     id_: str
     filename: str
-    keep_cols: List[str] = field(default_factory=list)
+    keep_cols: frozenset[str] = frozenset()
 
 
 class ProcessorInterface(ABC):
@@ -209,9 +209,9 @@ class BikeStreets(ProcessorInterface):
             DataSource('chicago', '3w5d-sru8', 'Bike Routes'),
             DataSource(
                 'chicago', '6imu-meau', 'Street Center Lines',
-                keep_cols=['street_nam', 'street_typ', 'ewns_dir',
+                keep_cols=frozenset(['street_nam', 'street_typ', 'ewns_dir',
                            'dir_travel', 'status', 'class', 'length',
-                           'trans_id', 'geometry'],
+                           'trans_id', 'geometry']),
             ),
             #DataSource('cookgis', '900b69139e874c8f823744d8fd5b71eb', 'Off-Street Bike Trails'),
         ]
@@ -377,57 +377,6 @@ class BikeStreets(ProcessorInterface):
         return result
 
 
-class File:
-    PROCESSORS = [BikeRouteProcessor]
-    """
-    Process: copy to cache, with processing step if needed
-    """
-    def __init__(self, filename):
-        path, name = os.path.split(filename)
-        root, ext = os.path.splitext(name)
-        self.path = path
-        self.name = name
-        self.root = root
-        self.ext = ext
-        self.filename = filename
-
-    def shapefile_name(self):
-        return f'{self.name}.shp'
-
-    def shapefile_dest_name(self):
-        return os.path.join(DESTINATION_DIR, self.shapefile_name())
-
-    def exists_in_cache(self):
-        return os.path.exists(os.path.join(MAP_CACHE, self.name))
-
-    def exists_in_destination(self):
-        return os.path.exists(self.shapefile_dest_name())
-
-    def process_old(self):
-        # preserve all file mode
-        if self.exists_in_cache():
-            if self.exists_in_destination():
-                print(f'Skipping {self.name}')
-                return
-            df = geopandas.read_file(os.path.join(MAP_CACHE, self.name))
-            df2 = df.drop(columns=[x for x in df.columns if df[x].dtype.name.startswith('datetime')])
-            df2.to_file(self.shapefile_dest_name())
-            return
-        # Load file from its location
-        df = geopandas.read_file(self.filename)
-        processed = False
-        for p in self.PROCESSORS:
-            inst = p()
-            if inst.matches(self.name):
-                df = inst.process(df)
-                processed = True
-                break
-        print(f'Processed {self.filename}: {processed}')
-        df.to_file(os.path.join(MAP_CACHE, self.name), driver='GeoJSON')
-        df2 = df.drop(columns=[x for x in df.columns if df[x].dtype.name.startswith('datetime')])
-        df2.to_file(self.shapefile_dest_name())
-
-
 class Processor:
     PROCESSORS = [BikeRouteProcessor, BikeStreets]
 
@@ -449,20 +398,6 @@ class Processor:
             df2 = gdf.drop(columns=[x for x in gdf.columns if gdf[x].dtype.name.startswith('datetime')])
             df2.to_file(inst.shapefile_dest_name())
             print(f'Wrote {cache_dest}')
-
-
-class Catalog:
-    def __init__(self, datadir):
-        self.datadir = datadir
-        self.files = glob.glob(os.path.join(self.datadir, '*.geojson'))
-
-    def process(self):
-        count = 0
-        for f in self.files:
-            file_ = File(f)
-            file_.process()
-            count += 1
-        print(f'Processed {count} in {self.datadir}')
 
 
 def db_initialize():
