@@ -11,8 +11,11 @@ https://dev.socrata.com/docs/other/discovery#?route=overview
 Improvements
 - chunked data and progress bar
 - limits and updating
+  - filter Cook Co data to Chicago townships
 - better parsing of success status
-
+- fix pseudo-geojson (thegeometry column)
+- infer data series over time, use metadata to coalesce same set
+- read column metadata and make accessible
 """
 import argparse
 import io
@@ -305,7 +308,7 @@ if __name__ == "__main__":
     parser.add_argument('--pandas', action='store_true')
     parser.add_argument('--domain', nargs=1, required=False, default='chicago')
     parser.add_argument('--dump', action='store_true')
-    parser.add_argument('--limit', nargs=1, type=int, default=200000000)
+    parser.add_argument('--limit', nargs=1, type=int, default=[200000000])
     args = parser.parse_args()
     catalog = None
     for d in DOMAINS:

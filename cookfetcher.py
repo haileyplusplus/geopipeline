@@ -23,6 +23,7 @@ Next:
  Should work for anything with this schema:
   https://project-open-data.cio.gov/v1.1/schema/catalog.json
   
+  // https://hub-cookcountyil.opendata.arcgis.com/api/feed/dcat-us/1.1.json
   
   Fetch URL:
   https://opendata.arcgis.com/api/v3/datasets/900b69139e874c8f823744d8fd5b71eb_10/downloads/data?format=geojson&spatialRefId=4326&where=1%3D1

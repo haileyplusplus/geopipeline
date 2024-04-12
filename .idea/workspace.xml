@@ -4,11 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Greatly speed up path computation">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Make explorer more robust">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bikenetwork.py" beforeDir="false" afterPath="$PROJECT_DIR$/bikenetwork.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/catalogfetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/catalogfetcher.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pathwrapper.py" beforeDir="false" afterPath="$PROJECT_DIR$/pathwrapper.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cookfetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/cookfetcher.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +42,8 @@
   "keyToString": {
     "Python.bikenetwork.executor": "Debug",
     "Python.map_processor.executor": "Run",
+    "Python.pathwrapper.executor": "Run",
+    "Python.pwcompare.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "master",
@@ -50,7 +51,7 @@
     "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
 }]]></component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.pwcompare">
     <configuration name="bikenetwork" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="misc2" />
       <option name="ENV_FILES" value="" />
@@ -73,8 +74,54 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="pathwrapper" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="misc2" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pathwrapper.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pwcompare" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="misc2" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pwcompare.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.pwcompare" />
+        <item itemvalue="Python.pathwrapper" />
         <item itemvalue="Python.bikenetwork" />
       </list>
     </recent_temporary>
@@ -94,46 +141,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1710167841513</updated>
-    </task>
-    <task id="LOCAL-00001" summary="Workspace init">
-      <option name="closed" value="true" />
-      <created>1710170098384</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1710170098384</updated>
-    </task>
-    <task id="LOCAL-00002" summary="Simple open data csv converter">
-      <option name="closed" value="true" />
-      <created>1710170108975</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1710170108975</updated>
-    </task>
-    <task id="LOCAL-00003" summary="Minor refactor">
-      <option name="closed" value="true" />
-      <created>1710191424817</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1710191424817</updated>
-    </task>
-    <task id="LOCAL-00004" summary="Add browser and fetcher">
-      <option name="closed" value="true" />
-      <created>1710191432754</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1710191432754</updated>
-    </task>
-    <task id="LOCAL-00005" summary="Filter out deprecated stuff">
-      <option name="closed" value="true" />
-      <created>1710192244514</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1710192244514</updated>
     </task>
     <task id="LOCAL-00006" summary="Implement fetcher">
       <option name="closed" value="true" />
@@ -447,7 +454,87 @@
       <option name="project" value="LOCAL" />
       <updated>1712543901387</updated>
     </task>
-    <option name="localTasksCounter" value="45" />
+    <task id="LOCAL-00045" summary="Abstract away points types and allow sampling of large datasets">
+      <option name="closed" value="true" />
+      <created>1712553358380</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1712553358380</updated>
+    </task>
+    <task id="LOCAL-00046" summary="Quick utility to verify that lastpass stuff migrated properly to onepassword">
+      <option name="closed" value="true" />
+      <created>1712631829418</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1712631829418</updated>
+    </task>
+    <task id="LOCAL-00047" summary="Enable catalog fetcher to run on different domains">
+      <option name="closed" value="true" />
+      <created>1712841487915</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1712841487915</updated>
+    </task>
+    <task id="LOCAL-00048" summary="Fix bug in insert when counts change.">
+      <option name="closed" value="true" />
+      <created>1712841893704</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1712841893704</updated>
+    </task>
+    <task id="LOCAL-00049" summary="Attempt second closest point algorithm; unclear why it's slower.">
+      <option name="closed" value="true" />
+      <created>1712841920682</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1712841920682</updated>
+    </task>
+    <task id="LOCAL-00050" summary="Fix processor after refactoring">
+      <option name="closed" value="true" />
+      <created>1712844319956</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1712844319956</updated>
+    </task>
+    <task id="LOCAL-00051" summary="Add more domain options and debug output">
+      <option name="closed" value="true" />
+      <created>1712844341947</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1712844341947</updated>
+    </task>
+    <task id="LOCAL-00052" summary="Big speedup by doing coord transformation on filtered dataset">
+      <option name="closed" value="true" />
+      <created>1712846953934</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1712846953934</updated>
+    </task>
+    <task id="LOCAL-00053" summary="Update TODOs, sample size">
+      <option name="closed" value="true" />
+      <created>1712929024099</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1712929024099</updated>
+    </task>
+    <task id="LOCAL-00054" summary="Make explorer more robust">
+      <option name="closed" value="true" />
+      <created>1712929035004</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1712929035004</updated>
+    </task>
+    <option name="localTasksCounter" value="55" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -462,16 +549,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Store more precise identifiers" />
-    <MESSAGE value="Basic retrieval works" />
-    <MESSAGE value="Add map filter" />
-    <MESSAGE value="Add kmz converter" />
-    <MESSAGE value="Add map processor." />
-    <MESSAGE value="Kind of stash street processing work." />
-    <MESSAGE value="Add catalog fetcher" />
-    <MESSAGE value="Update catalog fetcher" />
-    <MESSAGE value="Add arguments to catalog fetcher" />
-    <MESSAGE value="Show what data feeds have been updated" />
     <MESSAGE value="Improvements and bugfixes" />
     <MESSAGE value="Refactor map processor interface to allow combining multiple data sources" />
     <MESSAGE value="More map processor combining" />
@@ -487,6 +564,16 @@
     <MESSAGE value="Create bike network generator and path wrapper convenience functions." />
     <MESSAGE value="Pipeline improvements" />
     <MESSAGE value="Greatly speed up path computation" />
-    <option name="LAST_COMMIT_MESSAGE" value="Greatly speed up path computation" />
+    <MESSAGE value="Abstract away points types and allow sampling of large datasets" />
+    <MESSAGE value="Quick utility to verify that lastpass stuff migrated properly to onepassword" />
+    <MESSAGE value="Enable catalog fetcher to run on different domains" />
+    <MESSAGE value="Fix bug in insert when counts change." />
+    <MESSAGE value="Attempt second closest point algorithm; unclear why it's slower." />
+    <MESSAGE value="Fix processor after refactoring" />
+    <MESSAGE value="Add more domain options and debug output" />
+    <MESSAGE value="Big speedup by doing coord transformation on filtered dataset" />
+    <MESSAGE value="Update TODOs, sample size" />
+    <MESSAGE value="Make explorer more robust" />
+    <option name="LAST_COMMIT_MESSAGE" value="Make explorer more robust" />
   </component>
 </project>
