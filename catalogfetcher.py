@@ -253,13 +253,13 @@ class ManagerBase(ManagerInterface):
         db.create_tables([
             Category, DataSet
         ])
-        print(f'Initialized {db} in {self.catalog.name}')
+        #print(f'Initialized {db} in {self.catalog.name}')
         return db
 
     def rebind(self):
-        print(f'Rebinding db was: {DataSet._meta.database}')
+        #print(f'Rebinding db was: {DataSet._meta.database}')
         self.mydb.bind([Category, DataSet])
-        print(f'Now bound to: {DataSet._meta.database}')
+        #print(f'Now bound to: {DataSet._meta.database}')
 
 
 class Manager(ManagerBase):
