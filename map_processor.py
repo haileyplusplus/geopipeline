@@ -7,8 +7,8 @@ import glob
 import sys
 
 from abc import abstractmethod, ABC
-from dataclasses import dataclass
-from typing import Dict
+from dataclasses import dataclass, field
+from typing import Dict, List
 
 from peewee import SqliteDatabase, Model, CharField, DateTimeField
 import geopandas
@@ -49,6 +49,7 @@ class DataSource:
     domain: str
     id_: str
     filename: str
+    keep_cols: List[str] = field(default_factory=list)
 
 
 class ProcessorInterface(ABC):
@@ -206,7 +207,12 @@ class BikeStreets(ProcessorInterface):
     def get_sources(self):
         return [
             DataSource('chicago', '3w5d-sru8', 'Bike Routes'),
-            DataSource('chicago', '6imu-meau', 'Street Center Lines'),
+            DataSource(
+                'chicago', '6imu-meau', 'Street Center Lines',
+                keep_cols=['street_nam', 'street_typ', 'ewns_dir',
+                           'dir_travel', 'status', 'class', 'length',
+                           'trans_id', 'geometry'],
+            ),
             #DataSource('cookgis', '900b69139e874c8f823744d8fd5b71eb', 'Off-Street Bike Trails'),
         ]
 
