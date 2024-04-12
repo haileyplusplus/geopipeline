@@ -33,7 +33,7 @@ from enum import Enum
 
 import pandas as pd
 import requests
-from peewee import SqliteDatabase, Model, CharField, IntegerField, DateTimeField, BooleanField, TextField, ForeignKeyField
+from peewee import SqliteDatabase, Model, CharField, IntegerField, DateTimeField, BooleanField, TextField, ForeignKeyField, DatabaseProxy
 
 from interfaces import ManagerInterface
 
@@ -45,12 +45,12 @@ class CatalogInfo:
     manager: type
 
 
-db = SqliteDatabase(None)
-
+#db = SqliteDatabase(None)
+database_proxy = DatabaseProxy()
 
 class BaseModel(Model):
     class Meta:
-        database = db
+        database = database_proxy
 
 
 class Category(BaseModel):
@@ -178,9 +178,10 @@ class CategoryFetcher2(GenericFetcher):
 
 
 class ManagerBase(ManagerInterface):
-    def __init__(self, catalog: CatalogInfo, limit: int):
-        self.catalog = catalog
+    def __init__(self, catalog2: CatalogInfo, limit: int):
+        self.catalog = catalog2
         self.limit = limit
+        self.mydb: SqliteDatabase = self.db_initialize()
 
     @abstractmethod
     def populate_all(self):
@@ -244,12 +245,21 @@ class ManagerBase(ManagerInterface):
 
     def db_initialize(self):
         dbpath = os.path.join(self.catalog.destination_dir, 'fetchermetadata2.sqlite3')
+        db = SqliteDatabase(dbpath)
         print(f'Loading {dbpath}')
-        db.init(dbpath)
+        #db.init(dbpath)
+        database_proxy.initialize(db)
         db.connect()
         db.create_tables([
             Category, DataSet
         ])
+        print(f'Initialized {db} in {self.catalog.name}')
+        return db
+
+    def rebind(self):
+        print(f'Rebinding db was: {DataSet._meta.database}')
+        self.mydb.bind([Category, DataSet])
+        print(f'Now bound to: {DataSet._meta.database}')
 
 
 class Manager(ManagerBase):
@@ -273,6 +283,7 @@ class Manager(ManagerBase):
             rf.populate_category(ManagerBase.parse_one_resource)
 
     def fetch_resource(self, id_):
+        self.rebind()
         dataset: DataSet | None = DataSet.get_or_none(DataSet.id_ == id_)
         if not dataset:
             print(f'Couldn\'t fetch dataset {id_}')
@@ -368,6 +379,7 @@ class CookGISManager(ManagerBase):
 
     # need to refactor and combine this
     def fetch_resource(self, id_):
+        self.rebind()
         dataset: DataSet | None = DataSet.get_or_none(DataSet.id_ == id_)
         if not dataset:
             print(f'Couldn\'t fetch dataset {id_}')

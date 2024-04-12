@@ -13,3 +13,7 @@ class ManagerInterface(ABC):
     @abstractmethod
     def db_initialize(self):
         pass
+
+    @abstractmethod
+    def rebind(self):
+        pass

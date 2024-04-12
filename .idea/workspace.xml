@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Make explorer more robust">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Refactoring breaks this: need one single db">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/catalogfetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/catalogfetcher.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cookfetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/cookfetcher.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/interfaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/interfaces.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,6 +49,11 @@
     "git-widget-placeholder": "master",
     "last_opened_file_path": "/Users/hailey/projcode/misc2",
     "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  },
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "TEXT"
+    ]
   }
 }]]></component>
   <component name="RunManager" selected="Python.pwcompare">
@@ -141,62 +146,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1710167841513</updated>
-    </task>
-    <task id="LOCAL-00006" summary="Implement fetcher">
-      <option name="closed" value="true" />
-      <created>1710192840810</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1710192840810</updated>
-    </task>
-    <task id="LOCAL-00007" summary="Refinements">
-      <option name="closed" value="true" />
-      <created>1710194760681</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1710194760681</updated>
-    </task>
-    <task id="LOCAL-00008" summary="Add force option">
-      <option name="closed" value="true" />
-      <created>1710195445297</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1710195445297</updated>
-    </task>
-    <task id="LOCAL-00009" summary="Refactor">
-      <option name="closed" value="true" />
-      <created>1710208239090</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1710208239090</updated>
-    </task>
-    <task id="LOCAL-00010" summary="Extract archives with sensible names">
-      <option name="closed" value="true" />
-      <created>1710209487002</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1710209487002</updated>
-    </task>
-    <task id="LOCAL-00011" summary="Handle bad and non-zipfiles">
-      <option name="closed" value="true" />
-      <created>1711391319966</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1711391319966</updated>
-    </task>
-    <task id="LOCAL-00012" summary="Rewrite fetcher to fetch geojson">
-      <option name="closed" value="true" />
-      <created>1711397183222</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1711397183222</updated>
     </task>
     <task id="LOCAL-00013" summary="Add conversion utility">
       <option name="closed" value="true" />
@@ -534,7 +483,63 @@
       <option name="project" value="LOCAL" />
       <updated>1712929035004</updated>
     </task>
-    <option name="localTasksCounter" value="55" />
+    <task id="LOCAL-00055" summary="Add workspace to gitignore">
+      <option name="closed" value="true" />
+      <created>1712929086067</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1712929086067</updated>
+    </task>
+    <task id="LOCAL-00056" summary="Document TODOs">
+      <option name="closed" value="true" />
+      <created>1712929104824</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1712929104824</updated>
+    </task>
+    <task id="LOCAL-00057" summary="Pseudo stash">
+      <option name="closed" value="true" />
+      <created>1712931119023</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1712931119023</updated>
+    </task>
+    <task id="LOCAL-00058" summary="Pseudo stash">
+      <option name="closed" value="true" />
+      <created>1712931122561</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1712931122562</updated>
+    </task>
+    <task id="LOCAL-00059" summary="Refactor to make more generic">
+      <option name="closed" value="true" />
+      <created>1712936734818</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1712936734818</updated>
+    </task>
+    <task id="LOCAL-00060" summary="Add Cook County GIS fetcher">
+      <option name="closed" value="true" />
+      <created>1712939273165</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1712939273165</updated>
+    </task>
+    <task id="LOCAL-00061" summary="Refactoring breaks this: need one single db">
+      <option name="closed" value="true" />
+      <created>1712951736092</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1712951736092</updated>
+    </task>
+    <option name="localTasksCounter" value="62" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -549,12 +554,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Improvements and bugfixes" />
-    <MESSAGE value="Refactor map processor interface to allow combining multiple data sources" />
-    <MESSAGE value="More map processor combining" />
-    <MESSAGE value="Merges, but investigate missing rows" />
-    <MESSAGE value="Fix negation bug" />
-    <MESSAGE value="Implement suitability" />
     <MESSAGE value="Add filtering utility" />
     <MESSAGE value="Add utility to interface with typescript path routing engine" />
     <MESSAGE value="Update arguments following route change" />
@@ -574,6 +573,12 @@
     <MESSAGE value="Big speedup by doing coord transformation on filtered dataset" />
     <MESSAGE value="Update TODOs, sample size" />
     <MESSAGE value="Make explorer more robust" />
-    <option name="LAST_COMMIT_MESSAGE" value="Make explorer more robust" />
+    <MESSAGE value="Add workspace to gitignore" />
+    <MESSAGE value="Document TODOs" />
+    <MESSAGE value="Pseudo stash" />
+    <MESSAGE value="Refactor to make more generic" />
+    <MESSAGE value="Add Cook County GIS fetcher" />
+    <MESSAGE value="Refactoring breaks this: need one single db" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactoring breaks this: need one single db" />
   </component>
 </project>
