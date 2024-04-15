@@ -120,8 +120,8 @@ class BikeRouteProcessor(ProcessorInterface):
     @staticmethod
     def bike_ow(x):
         if x.contraflow == 'N' and x.br_oneway == 'Y':
-            return 'Y'
-        return 'N'
+            return True
+        return False
 
     @staticmethod
     def fix_street_name(street_name):
@@ -343,14 +343,14 @@ class BikeStreets(ProcessorInterface):
                 continue
             m = matched_frame.merge(route_frame, left_on='street_nam', right_on='st_name')
             #print(f'merging {m}')
-            m.crs = 26916
+            m.crs = constants.CHICAGO_DATUM
             cumulative = pd.concat([cumulative, m])
         #print(f'cumulative with bike routes: {cumulative}')
         # now get segs without bike routes
         #return pd.concat([df, ostr[ostr.street_nam.isin(other_streets)]])
         rest_streets = street[~street.trans_id.isin(matched_segs)]
         #print(f'rest streets: {rest_streets}')
-        rest_streets.crs = 26916
+        rest_streets.crs = constants.CHICAGO_DATUM
         cumulative = pd.concat([cumulative, rest_streets])
         #for si, seg in street.iterrows():
         #    if seg.trans_id in matched_segs:
@@ -360,17 +360,19 @@ class BikeStreets(ProcessorInterface):
         #cumulative = pd.concat([cumulative, seg.drop(['create_tim', 'update_tim', 'status_dat'])], axis=0).reset_index(drop=True)
         #print(f'cumulative with all routes: {cumulative}')
         if not cumulative.empty:
-            cumulative.crs = 26916
+            cumulative.crs = constants.CHICAGO_DATUM
             self.output = pd.concat([self.output, cumulative])
             #self.output.append(cumulative)
 
     def normalize(self):
+        # incompletely working on processing everything in consistent coord systems
         #if not self.output:
         #    return None
         assert not self.output.empty
         #merged = pd.concat(self.output)
-        self.output.crs = 26916
-        #merged.crs = 26916
+        self.output.crs = constants.CHICAGO_DATUM
+        self.output['actual'] = self.output.apply(lambda x: x.geometry.length, axis=1)
+        #merged.crs = constants.CHICAGO_DATUM
         #return merged.to_crs(epsg=4326)
         return self.output.to_crs(epsg=4326)
 
@@ -411,6 +413,7 @@ class BikeStreets(ProcessorInterface):
             if prev is not None:
                 rd['trans_id'] = f'{tid}-{count}'
                 rd['geometry'] = shapely.LineString([prev, c])
+                rd['actual'] = rd['geometry'].length
                 yield rd
             prev = c
 
@@ -418,6 +421,7 @@ class BikeStreets(ProcessorInterface):
         off_street: geopandas.GeoDataFrame = self.sources[self.get_sources()[2].filename]
         print(f'Off street {off_street}')
         dds = []
+        off_street = off_street.to_crs(constants.CHICAGO_DATUM)
         for _, row in off_street.iterrows():
             if row.geometry.geom_type != 'LineString':
                 continue
@@ -426,6 +430,9 @@ class BikeStreets(ProcessorInterface):
                 id_ = row.Street
             if not id_:
                 id_ = row.Sub_System
+            #rca = gpd.GeoDataFrame([row])
+            #rca.crs = 4326
+            #rc = rca.to_crs(constants.CHICAGO_DATUM)
             rd = {'length': row.ShapeSTLength,
                   'status': 'N',
                   'dir_travel': 'B',
@@ -439,17 +446,16 @@ class BikeStreets(ProcessorInterface):
                   'st_name': id_,
                   'br_oneway': 'N',
                   'contraflow': 'N',
-                  'bike_ow': 'N'}
-            rca = gpd.GeoDataFrame([row])
-            rca.crs = 4326
-            rc = rca.to_crs(constants.CHICAGO_DATUM)
-            if rc.length.iloc[0] > 200:
-                for d in self.get_dicts(rd):
-                    dds.append(copy.copy(d))
+                  'bike_ow': False,
+                  'actual': row.geometry.length}
+            if row.geometry.length > 200:
+                for d2 in self.get_dicts(rd):
+                    dds.append(copy.copy(d2))
             else:
                 dds.append(copy.copy(rd))
         offdf = geopandas.GeoDataFrame(dds)
-        offdf.crs = 4326
+        offdf.crs = constants.CHICAGO_DATUM
+        #return offdf.to_crs(4326)
         return offdf
 
     def process(self):
@@ -471,16 +477,18 @@ class BikeStreets(ProcessorInterface):
         for streetname in pbar:
             self.merge_street(streetname)
         #print('to merge')
-        df = self.normalize()
+        #df = self.normalize()
         #print(df)
-        ostr = self.streets.orig
-        print(f'ostr {ostr}')
-        result = pd.concat([df, ostr[ostr.street_nam.isin(other_streets)]])
+        ostr = self.streets.layer
+        #print(f'ostr {ostr}')
+        #result = pd.concat([df, ostr[ostr.street_nam.isin(other_streets)]])
+        #result = pd.concat([df, ostr[ostr.street_nam.isin(other_streets)]])
+        self.output = pd.concat([self.output, ostr[ostr.street_nam.isin(other_streets)]])
 
         # Now add in off-street routes using the column format above
         offdf = self.preprocess_off_street()
-
-        result = pd.concat([result, offdf], ignore_index=True)
+        self.output = pd.concat([self.output, offdf], ignore_index=True)
+        result = self.normalize()
         # add one last column
         print(result)
         print(result.columns)

@@ -63,7 +63,7 @@ if __name__ == "__main__":
     gdf = gpd.read_file(sys.argv[1])
     filt = gdf[gdf.geometry.type == 'LineString']
     proj = filt.to_crs(constants.CHICAGO_DATUM)
-    G = momepy.gdf_to_nx(proj, approach='primal')
+    G = momepy.gdf_to_nx(proj, approach='primal', oneway_column='bike_ow', directed=True)
     # https://stackoverflow.com/questions/21739569/finding-separate-graphs-within-a-graph-object-in-networkx
-    subgraph_analyze(G)
+    #subgraph_analyze(G)
 
