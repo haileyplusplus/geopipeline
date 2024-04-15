@@ -5,6 +5,7 @@ import io
 import os
 import glob
 import sys
+import copy
 
 from abc import abstractmethod, ABC
 from dataclasses import dataclass, field
@@ -12,11 +13,14 @@ from typing import Dict, List, Tuple, Callable
 
 from peewee import SqliteDatabase, Model, CharField, DateTimeField
 import geopandas
+import shapely
+import geopandas as gpd
 import pandas as pd
 import tqdm
 
 import catalogfetcher
 import cafilt
+import constants
 
 """
  Todo:
@@ -370,6 +374,84 @@ class BikeStreets(ProcessorInterface):
         #return merged.to_crs(epsg=4326)
         return self.output.to_crs(epsg=4326)
 
+    @staticmethod
+    def dfline(gdf):
+        """
+        Splits all linestrings into 2-seg strings
+
+        May want to try to interpolate intersecting vertices
+
+        :param gdf:
+        :return:
+        """
+        df = gpd.GeoDataFrame()
+        df.crs = 4326
+        for _, f in gdf.iterrows():
+            t = f.to_dict()
+            g = f.geometry
+            assert g.geom_type == 'LineString'
+            prev = None
+            for i, c in enumerate(g.coords):
+                if prev is not None:
+                    t['si'] = i
+                    t['geometry'] = shapely.LineString([prev, c])
+                    df = pd.concat([df, gpd.GeoDataFrame([t])])
+                prev = c
+        return df
+
+    @staticmethod
+    def get_dicts(rd):
+        g = rd['geometry']
+        tid = rd['trans_id']
+        assert g.geom_type == 'LineString'
+        prev = None
+        count = 0
+        for i, c in enumerate(g.coords):
+            count += 1
+            if prev is not None:
+                rd['trans_id'] = f'{tid}-{count}'
+                rd['geometry'] = shapely.LineString([prev, c])
+                yield rd
+            prev = c
+
+    def preprocess_off_street(self):
+        off_street: geopandas.GeoDataFrame = self.sources[self.get_sources()[2].filename]
+        print(f'Off street {off_street}')
+        dds = []
+        for _, row in off_street.iterrows():
+            if row.geometry.geom_type != 'LineString':
+                continue
+            id_ = row.FacName
+            if not id_:
+                id_ = row.Street
+            if not id_:
+                id_ = row.Sub_System
+            rd = {'length': row.ShapeSTLength,
+                  'status': 'N',
+                  'dir_travel': 'B',
+                  'street_nam': id_,
+                  'trans_id': f'B{row.OBJECTID}',
+                  'geometry': row.geometry,
+                  'street_typ': '',
+                  'ewns_dir': '',
+                  'class': '4',
+                  'displayrou': 'OFF STREET',
+                  'st_name': id_,
+                  'br_oneway': 'N',
+                  'contraflow': 'N',
+                  'bike_ow': 'N'}
+            rca = gpd.GeoDataFrame([row])
+            rca.crs = 4326
+            rc = rca.to_crs(constants.CHICAGO_DATUM)
+            if rc.length.iloc[0] > 200:
+                for d in self.get_dicts(rd):
+                    dds.append(copy.copy(d))
+            else:
+                dds.append(copy.copy(rd))
+        offdf = geopandas.GeoDataFrame(dds)
+        offdf.crs = 4326
+        return offdf
+
     def process(self):
         df = self.sources[self.get_sources()[0].filename]
         print(f'Processing with {df} src 0 (bike routes)')
@@ -396,33 +478,8 @@ class BikeStreets(ProcessorInterface):
         result = pd.concat([df, ostr[ostr.street_nam.isin(other_streets)]])
 
         # Now add in off-street routes using the column format above
+        offdf = self.preprocess_off_street()
 
-        off_street: geopandas.GeoDataFrame = self.sources[self.get_sources()[2].filename]
-        print(f'Off street {off_street}')
-        dds = []
-        for _, row in off_street.iterrows():
-            id_ = row.FacName
-            if not id_:
-                id_ = row.Street
-            if not id_:
-                id_ = row.Sub_System
-            rd = {'length': row.ShapeSTLength,
-                  'status': 'N',
-                  'dir_travel': 'B',
-                  'street_nam': id_,
-                  'trans_id': f'B{row.OBJECTID}',
-                  'geometry': row.geometry,
-                  'street_typ': '',
-                  'ewns_dir': '',
-                  'class': '4',
-                  'displayrou': 'OFF STREET',
-                  'st_name': id_,
-                  'br_oneway': 'N',
-                  'contraflow': 'N',
-                  'bike_ow': 'N'}
-            dds.append(rd)
-        offdf = geopandas.GeoDataFrame(dds)
-        offdf.crs = 4326
         result = pd.concat([result, offdf], ignore_index=True)
         # add one last column
         print(result)
