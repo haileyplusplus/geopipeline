@@ -378,7 +378,9 @@ class BikeStreets(ProcessorInterface):
         df['bike_ow'] = df.apply(self.bike_ow, axis=1)
         df.st_name = df.st_name.apply(self.fix_street_name)
 
-        self.streets = BikeStreetsWrapper(self.sources[self.get_sources()[1].filename])
+        centerlines = self.sources[self.get_sources()[1].filename]
+        centerlines['trans_id'] = centerlines['trans_id'].apply(lambda x: f'A{x}')
+        self.streets = BikeStreetsWrapper(centerlines)
         self.bike_routes = BikeStreetsWrapper(df)
 
         bike_streets = self.streets.get_streets() & self.bike_routes.get_streets()

@@ -5,6 +5,7 @@ import sys
 from typing import List
 
 import geopandas as gpd
+import shapely
 
 COMMUNITY_AREAS = '/Users/hailey/tmp/mapcache/Boundaries - Community Areas (current).geojson'
 MAP_CACHE = '/Users/hailey/tmp/mapcache'
@@ -41,11 +42,19 @@ def filter_file(filename: str, neighborhoods: List[str]):
         ff.write('\n')
 
 
+def to_multilinestring(g):
+    if type(g) is shapely.geometry.linestring.LineString:
+        return shapely.geometry.multilinestring.MultiLineString([g])
+    return g
+
+
 if __name__ == "__main__":
     filename = sys.argv[1]
     neighborhoods = sys.argv[2:]
     path, ext = os.path.splitext(filename)
     gdf = gpd.read_file(filename)
+    #gdf['geometry'] = gdf['geometry'].apply(to_multilinestring)
+    #print(f'Orig {gdf}')
     filtered = filter(gdf, neighborhoods)
     if filtered.empty:
         sys.exit(1)
