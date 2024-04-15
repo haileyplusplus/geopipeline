@@ -10,6 +10,7 @@ import shapely
 import tqdm
 
 import pathwrapper
+import graphexplore
 
 # todo: merge all shapefile writing / processing
 DESTINATION_DIR = '/Users/hailey/Documents/ArcGIS/data/chicago'
@@ -30,7 +31,7 @@ class Network:
     SCHOOL_POINTS = PointInfo('/tmp/schools.geojson', 'school_nm')
     BUSINESS_POINTS = PointInfo('/Users/hailey/datasets/chicago/Business Licenses - Current Active - Map.geojson', 'license_id')
 
-    def __init__(self, finder: pathwrapper.Finder, point_info: PointInfo):
+    def __init__(self, finder: graphexplore.NxFinder, point_info: PointInfo):
         self.finder = finder
         self.point_info = point_info
 
@@ -61,6 +62,7 @@ class Network:
             inputs.append((rx, ry))
         paths = self.finder.route_edges(self.point_info.index_col, inputs)
         for path, rt in paths:
+            #print(f'debug path: {path} {rt}')
             for p in path:
                 segcounts[p] = segcounts.get(p, 0) + 1
                 routes[p] = max(routes.get(p, -1), rt)
@@ -84,13 +86,14 @@ class Network:
 if __name__ == "__main__":
     # need to hook this up
     #SAMPLE_SIZE = 2000
-    SAMPLE_SIZE = 100
+    SAMPLE_SIZE = 300
     filtered_file = open('/tmp/filterfile.txt').read().strip()
     print(f'Reading from {filtered_file}')
     point_info = Network.BUSINESS_POINTS
     #point_info = Network.SCHOOL_POINTS
     points_filename = point_info.filename
-    f = pathwrapper.Finder(filtered_file, points_filename, silent=False, sample=SAMPLE_SIZE)
+    #f = pathwrapper.Finder(filtered_file, points_filename, silent=False, sample=SAMPLE_SIZE)
+    f = graphexplore.NxFinder(filtered_file, points_filename, silent=False, sample=SAMPLE_SIZE)
     n = Network(f, point_info)
     applied = n.apply()
     filt = applied[applied.geometry.type == 'LineString']

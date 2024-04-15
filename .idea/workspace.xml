@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Add route ids for debugging. Look at using native graph libraries.">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Fix bugs and make coordinate systems consistent.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bikenetwork.py" beforeDir="false" afterPath="$PROJECT_DIR$/bikenetwork.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/graphexplore.py" beforeDir="false" afterPath="$PROJECT_DIR$/graphexplore.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/map_processor.py" beforeDir="false" afterPath="$PROJECT_DIR$/map_processor.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -146,14 +146,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1710167841513</updated>
-    </task>
-    <task id="LOCAL-00024" summary="Add map processor.">
-      <option name="closed" value="true" />
-      <created>1711486000989</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1711486000989</updated>
     </task>
     <task id="LOCAL-00025" summary="Kind of stash street processing work.">
       <option name="closed" value="true" />
@@ -539,7 +531,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713198413176</updated>
     </task>
-    <option name="localTasksCounter" value="73" />
+    <task id="LOCAL-00073" summary="Fix bugs and make coordinate systems consistent.">
+      <option name="closed" value="true" />
+      <created>1713205950660</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1713205950660</updated>
+    </task>
+    <option name="localTasksCounter" value="74" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -554,7 +554,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Quick utility to verify that lastpass stuff migrated properly to onepassword" />
     <MESSAGE value="Enable catalog fetcher to run on different domains" />
     <MESSAGE value="Fix bug in insert when counts change." />
     <MESSAGE value="Attempt second closest point algorithm; unclear why it's slower." />
@@ -579,6 +578,7 @@
     <MESSAGE value="Attempt to fix off-street bike trails not routing properly." />
     <MESSAGE value="Split long segments" />
     <MESSAGE value="Add route ids for debugging. Look at using native graph libraries." />
-    <option name="LAST_COMMIT_MESSAGE" value="Add route ids for debugging. Look at using native graph libraries." />
+    <MESSAGE value="Fix bugs and make coordinate systems consistent." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix bugs and make coordinate systems consistent." />
   </component>
 </project>
