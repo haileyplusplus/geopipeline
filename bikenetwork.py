@@ -45,6 +45,7 @@ class Network:
         :return: Segment counts
         """
         segcounts = {}
+        routes = {}
         iters = 0
         cf = self.filter_points()
         cross = cf.merge(cf[self.point_info.index_col], how='cross')
@@ -59,13 +60,14 @@ class Network:
                 break
             inputs.append((rx, ry))
         paths = self.finder.route_edges(self.point_info.index_col, inputs)
-        for path in paths:
+        for path, rt in paths:
             for p in path:
                 segcounts[p] = segcounts.get(p, 0) + 1
-        return segcounts, iters
+                routes[p] = max(routes.get(p, -1), rt)
+        return segcounts, iters, routes
 
     def apply(self):
-        segcounts, iters = self.calculate_n2_network()
+        segcounts, iters, routes = self.calculate_n2_network()
         with open('/tmp/raw_segcounts.json', 'w') as fh:
             json.dump({'segcounts': segcounts, 'iters': iters}, fh)
         new_df = self.finder.gdf.copy()
@@ -73,18 +75,22 @@ class Network:
             count = segcounts.get(x.trans_id, 0)
             return count * 1.0 / iters
         new_df['routegradient'] = new_df.apply(apply_fn, axis=1)
+        new_df['routesamp'] = new_df.apply(lambda x: routes.get(x.trans_id, -1), axis=1)
+        new_df['rtraw'] = new_df.apply(lambda x: segcounts.get(x.trans_id, -1), axis=1)
         df2 = new_df.drop(columns=[x for x in new_df.columns if new_df[x].dtype.name.startswith('datetime')])
         return df2
 
 
 if __name__ == "__main__":
     # need to hook this up
+    #SAMPLE_SIZE = 2000
+    SAMPLE_SIZE = 100
     filtered_file = open('/tmp/filterfile.txt').read().strip()
     print(f'Reading from {filtered_file}')
     point_info = Network.BUSINESS_POINTS
     #point_info = Network.SCHOOL_POINTS
     points_filename = point_info.filename
-    f = pathwrapper.Finder(filtered_file, points_filename, silent=False, sample=2000)
+    f = pathwrapper.Finder(filtered_file, points_filename, silent=False, sample=SAMPLE_SIZE)
     n = Network(f, point_info)
     applied = n.apply()
     filt = applied[applied.geometry.type == 'LineString']

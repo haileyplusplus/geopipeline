@@ -112,7 +112,7 @@ class Finder:
     def route_edges(self, colname, tups: List[Tuple[str, str]]):
         rj2 = self.router(colname, tups)
         for x in rj2:
-            yield list(x['edgeDatas'])
+            yield list(x['edgeDatas']), x['rt']
 
 
 if __name__ == "__main__":
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     #rj = f.router('school_nm', 'LAKE VIEW HS', 'LASALLE')
     #rj = f.router('school_nm', 'LASALLE', 'LAKE VIEW HS')
 
-    for r in f.route_edges('school_nm', [('LASALLE', 'LAKE VIEW HS'), ('PRESCOTT', 'NEWBERRY')]):
+    for r, _ in f.route_edges('school_nm', [('LASALLE', 'LAKE VIEW HS'), ('PRESCOTT', 'NEWBERRY')]):
         print(f'Routing {r}')
         route = f.make_gdf(r)
         print(route)

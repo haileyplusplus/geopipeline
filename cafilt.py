@@ -37,6 +37,7 @@ def filter_file(filename: str, neighborhoods: List[str]):
     output = f'{path}.{nstr}{ext}'
     print(f'Filtered to {output}')
     filtered.to_file(output, driver='GeoJSON')
+    # use symlink instead
     with open('/tmp/filterfile.txt', 'w') as ff:
         ff.write(output)
         ff.write('\n')
