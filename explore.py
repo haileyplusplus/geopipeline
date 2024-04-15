@@ -7,7 +7,7 @@ import geopandas as gpd
 
 if __name__ == "__main__":
     filename = sys.argv[1]
-    if filename.endswith('.geojson'):
+    if filename.endswith('.geojson') or filename.endswith('.shp'):
         f = gpd.read_file(filename)
     elif filename.endswith('.json'):
         f = pd.read_json(filename)
