@@ -20,6 +20,18 @@
         {
           "key": "154623",
           "action": "remove"
+        },
+        {
+          "filter": {
+            "column": "street_nam",
+            "value": "LARRABEE"
+          },
+          "action": {
+            "update": {
+              "column": "class",
+              "value": "3"
+            }
+          }
         }
       ]
     },

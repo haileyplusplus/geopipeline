@@ -72,13 +72,13 @@ class OverrideManager:
                 continue
             source_name = ov['source_id']['source']
             key_field = ov['source_id']['key']
-            td = {}
+            #td = {}
             self.sources[source_name] = {
                 'key': key_field,
-                'transformations': td
+                'transformations': ov['transformations']
             }
-            for t in ov['transformations']:
-                td[t['key']] = t['action']
+            #for t in ov['transformations']:
+            #    td[t['key']] = t['action']
 
     def process(self, source, df):
         transformation = self.sources.get(source)
@@ -86,9 +86,18 @@ class OverrideManager:
             return df
         key = transformation['key']
         remove = []
-        for k, v in transformation['transformations'].items():
-            if v == 'remove':
-                remove.append(k)
+        for t in transformation['transformations']:
+            if 'key' in t:
+                if t['action'] == 'remove':
+                    remove.append(t['key'])
+            if 'filter' in t:
+                f = t['filter']
+                filtercol = f['column']
+                filterval = f['value']
+                if 'update' in t['action']:
+                    u = t['action']['update']
+                    # spurious SettingWithCopyWarning but it seems to work
+                    df.loc[df[filtercol] == filterval, u['column']] = u['value']
         return df[~df[key].isin(remove)]
 
 
