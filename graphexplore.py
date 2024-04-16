@@ -109,21 +109,22 @@ class NxFinder:
     @staticmethod
     def path_weight(e0, e1, raw):
         attrs = list(raw.values())[0]
-        suitability_multipliers = {
-            2: 5.0,
-            3: 2.0,
-            4: 0.9,
-            5: 1,
-            6: 0.75,
-            7: 0.6,
-            8: 0.5,
-        }
-        weight = attrs['actual']
-        mult = suitability_multipliers.get(attrs['suitability'], 0)
-        #print(f'Path weight: {weight} m{mult} E{e0} {e1} {raw}')
-        if mult == 0:
-            return NxFinder.MAX
-        return weight * mult
+        return attrs['weight']
+        # suitability_multipliers = {
+        #     2: 5.0,
+        #     3: 2.0,
+        #     4: 0.9,
+        #     5: 1,
+        #     6: 0.75,
+        #     7: 0.6,
+        #     8: 0.5,
+        # }
+        # weight = attrs['actual']
+        # mult = suitability_multipliers.get(attrs['suitability'], 0)
+        # #print(f'Path weight: {weight} m{mult} E{e0} {e1} {raw}')
+        # if mult == 0:
+        #     return NxFinder.MAX
+        # return weight * mult
 
     def route_edges(self, colname, tups: List[Tuple[str, str]], full=False):
         points = []
