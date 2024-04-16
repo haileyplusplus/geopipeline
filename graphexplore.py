@@ -62,6 +62,9 @@ def subgraph_analyze(g):
 
 
 class NxFinder:
+    # big weight meaning don't use this edge
+    MAX = 1000000000
+
     def __init__(self, filename, points_filename, silent=False, sample=None):
         self.network_filename = filename
         self.points_filename = points_filename
@@ -103,7 +106,26 @@ class NxFinder:
                 yield self.graph.get_edge_data(previous, p1)
             previous = p1
 
-    def route_edges(self, colname, tups: List[Tuple[str, str]]):
+    @staticmethod
+    def path_weight(e0, e1, raw):
+        attrs = list(raw.values())[0]
+        suitability_multipliers = {
+            2: 5.0,
+            3: 2.0,
+            4: 0.9,
+            5: 1,
+            6: 0.75,
+            7: 0.6,
+            8: 0.5,
+        }
+        weight = attrs['actual']
+        mult = suitability_multipliers.get(attrs['suitability'], 0)
+        #print(f'Path weight: {weight} m{mult} E{e0} {e1} {raw}')
+        if mult == 0:
+            return NxFinder.MAX
+        return weight * mult
+
+    def route_edges(self, colname, tups: List[Tuple[str, str]], full=False):
         points = []
         count = 0
         for start, end in tqdm.tqdm(tups):
@@ -115,15 +137,30 @@ class NxFinder:
             startnode = self.graph_index[startpoint['trans_id']][0]
             endnode = self.graph_index[endpoint['trans_id']][0]
             # needs weighting function
-            path = nx.shortest_path(self.graph, startnode, endnode)
+            path = nx.shortest_path(self.graph, startnode, endnode, weight=self.path_weight)
             if not path:
                 print(f'Fail {startnode} {endnode}')
                 continue
             #print(path)
-            yield [list(x.values())[0]['trans_id'] for x in self.edge_datas(path)], count
+            if full:
+                yield [list(x.values())[0] for x in self.edge_datas(path)], count
+            else:
+                yield [list(x.values())[0]['trans_id'] for x in self.edge_datas(path)], count
 
 
-if __name__ == "__main__":
+def schooltest():
+    schools_filename = '/Users/hailey/datasets/chicago/Chicago Public Schools - School Locations SY1819.geojson'
+    filtered_file = open('/tmp/filterfile.txt').read().strip()
+    f = NxFinder(filtered_file, schools_filename)
+    #rj = f.router('school_nm', 'LAKE VIEW HS', 'LASALLE')
+    #rj = f.router('school_nm', 'LASALLE', 'LAKE VIEW HS')
+
+    for r, _ in f.route_edges('school_nm', [('LASALLE', 'LAKE VIEW HS'), ('PRESCOTT', 'NEWBERRY')], full=True):
+        print(f'Route')
+        for rr in r:
+            print(f' Rt {rr}')
+
+def graphtest():
     gdf = gpd.read_file(sys.argv[1])
     filt = gdf[gdf.geometry.type == 'LineString']
     proj = filt.to_crs(constants.CHICAGO_DATUM)
@@ -143,3 +180,6 @@ if __name__ == "__main__":
     # https://stackoverflow.com/questions/21739569/finding-separate-graphs-within-a-graph-object-in-networkx
     #subgraph_analyze(G)
 
+
+if __name__ == "__main__":
+    schooltest()
