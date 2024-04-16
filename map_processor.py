@@ -27,6 +27,7 @@ import constants
   - fix output name to not be .geojson.shp
   - support multiple map projects, each with different processing inputs
   - support quick shapefile passthrough for map evaluation
+  - consider supporting manual tweaks (eg connect Bloomingdale Trail to routing)
 """
 
 DESTINATION_DIR = '/Users/hailey/Documents/ArcGIS/data/chicago'
@@ -62,14 +63,24 @@ class ProcessorInterface(ABC):
         self.sources = {}
         self.name = None
         self.managers = managers
+        self.preprocessing = {}
 
     @abstractmethod
     def process(self):
         pass
 
-    @abstractmethod
     def get_sources(self):
-        pass
+        return self.SOURCES.values()
+
+    def get_source(self, key):
+        rv = self.sources[key]
+        preprocess = self.preprocessing.get(key)
+        if preprocess:
+            return preprocess(rv)
+        return rv
+
+    def add_preprocessing_hook(self, source_key, fn):
+        self.preprocessing[source_key] = fn
 
     @staticmethod
     def fix_bool(x):
@@ -110,39 +121,8 @@ class ProcessorInterface(ABC):
         return os.path.join(DESTINATION_DIR, self.shapefile_name())
 
 
-class BikeRouteProcessor(ProcessorInterface):
-    def __init__(self, manager):
-        super().__init__(manager)
-
-    def get_sources(self):
-        return [DataSource('chicago', '3w5d-sru8', 'Bike Routes')]
-
-    @staticmethod
-    def bike_ow(x):
-        if x.contraflow == 'N' and x.br_oneway == 'Y':
-            return True
-        return False
-
-    @staticmethod
-    def fix_street_name(street_name):
-        """
-        Converts bike lane street names to normalized Street Center Lines names
-        """
-        return {'AVENUE': 'AVENUE L',
-                'PLLYMOUTH': 'PLYMOUTH',
-                'MARTIN LUTHER KING JR': 'DR MARTIN LUTHER KING JR',
-                }.get(street_name, street_name).upper()
-
-    def process(self):
-        df = self.sources[self.get_sources()[0].filename]
-        for c in ['contraflow', 'br_oneway']:
-            df[c] = df[c].apply(self.fix_bool)
-        df['bike_ow'] = df.apply(self.bike_ow, axis=1)
-        df.st_name = df.st_name.apply(self.fix_street_name)
-        return df
-
-
-class StreetProcessor(ProcessorInterface):
+# unused
+class StreetInfo:
     """
     ewns_coord, ewns_dir: SEDGWICK is 400W
     dir_travel: use for one-way. F, T, B
@@ -163,21 +143,9 @@ class StreetProcessor(ProcessorInterface):
                  '99': 'unk' # these appear to be mostly in O'hare
                  }
 
-    def __init__(self, manager):
-        super().__init__(manager)
-
-    def get_sources(self):
-        return [DataSource('chicago', '6imu-meau', 'Street Center Lines')]
-
-    @staticmethod
-    def fix_street_name(street_name):
-        """
-        Converts bike lane street names to normalized Street Center Lines names
-        """
-        return {'AVENUE': 'AVENUE L',
-                'PLLYMOUTH': 'PLYMOUTH',
-                'MARTIN LUTHER KING JR': 'DR MARTIN LUTHER KING JR',
-                }.get(street_name, street_name).upper()
+    SOURCES = {
+        'Street Center Lines': DataSource('chicago', '6imu-meau', 'Street Center Lines')
+    }
 
     def process(self, df):
         for c in ['contraflow', 'br_oneway']:
@@ -211,24 +179,20 @@ class BikeStreetsWrapper:
 
 
 class BikeStreets(ProcessorInterface):
-    def __init__(self, manager):
-        super().__init__(manager)
-        self.output = pd.DataFrame()
-        self.streets = None
-        self.bike_routes = None
-
-    def get_sources(self):
-        return [
+    SOURCES = {
+        'Bike Routes':
             DataSource(
                 'chicago', '3w5d-sru8', 'Bike Routes',
                 keep_cols=frozenset(['contraflow', 'br_oneway', 'displayrou', 'st_name', 'geometry']),
             ),
+        'Street Center Lines':
             DataSource(
                 'chicago', '6imu-meau', 'Street Center Lines',
                 keep_cols=frozenset(['street_nam', 'street_typ', 'ewns_dir',
                            'dir_travel', 'status', 'class', 'length',
                            'trans_id', 'geometry']),
             ),
+        'Off-Street Bike Trails':
             DataSource(
                 'cookgis',
                 '900b69139e874c8f823744d8fd5b71eb',
@@ -236,7 +200,13 @@ class BikeStreets(ProcessorInterface):
                 filter=lambda df: df[df.Muni == 'Chicago'][df.Status == 'Existing'],
                 keep_cols=frozenset(['OBJECTID', 'Street', 'FacName', 'Sub_System', 'ShapeSTLength', 'geometry']),
             ),
-        ]
+    }
+
+    def __init__(self, manager):
+        super().__init__(manager)
+        self.output = pd.DataFrame()
+        self.streets = None
+        self.bike_routes = None
 
     @staticmethod
     def bike_ow(x):
@@ -372,6 +342,27 @@ class BikeStreets(ProcessorInterface):
         #merged = pd.concat(self.output)
         self.output.crs = constants.CHICAGO_DATUM
         self.output['actual'] = self.output.apply(lambda x: x.geometry.length, axis=1)
+        self.output['suitability'] = self.output.apply(self.suitability, axis=1)
+
+        suitability_multipliers = {
+            2: 5.0,
+            3: 2.0,
+            4: 0.9,
+            5: 1,
+            6: 0.75,
+            7: 0.6,
+            8: 0.5,
+        }
+
+        def weightfn(attrs):
+            weight = attrs['actual']
+            mult = suitability_multipliers.get(attrs['suitability'], 0)
+            # print(f'Path weight: {weight} m{mult} E{e0} {e1} {raw}')
+            if mult == 0:
+                return 1000000000
+            return mult * weight
+
+        self.output['weight'] = self.output.apply(weightfn, axis=1)
         #merged.crs = constants.CHICAGO_DATUM
         #return merged.to_crs(epsg=4326)
         return self.output.to_crs(epsg=4326)
@@ -418,7 +409,7 @@ class BikeStreets(ProcessorInterface):
             prev = c
 
     def preprocess_off_street(self):
-        off_street: geopandas.GeoDataFrame = self.sources[self.get_sources()[2].filename]
+        off_street: geopandas.GeoDataFrame = self.get_source('Off-Street Bike Trails')
         print(f'Off street {off_street}')
         dds = []
         off_street = off_street.to_crs(constants.CHICAGO_DATUM)
@@ -459,14 +450,14 @@ class BikeStreets(ProcessorInterface):
         return offdf
 
     def process(self):
-        df = self.sources[self.get_sources()[0].filename]
+        df = self.get_source('Bike Routes')
         print(f'Processing with {df} src 0 (bike routes)')
         for c in ['contraflow', 'br_oneway']:
             df[c] = df[c].apply(self.fix_bool)
         df['bike_ow'] = df.apply(self.bike_ow, axis=1)
         df.st_name = df.st_name.apply(self.fix_street_name)
 
-        centerlines = self.sources[self.get_sources()[1].filename]
+        centerlines = self.get_source('Street Center Lines')
         centerlines['trans_id'] = centerlines['trans_id'].apply(lambda x: f'A{x}')
         self.streets = BikeStreetsWrapper(centerlines)
         self.bike_routes = BikeStreetsWrapper(df)
@@ -492,7 +483,6 @@ class BikeStreets(ProcessorInterface):
         # add one last column
         print(result)
         print(result.columns)
-        result['suitability'] = result.apply(self.suitability, axis=1)
         return result
 
 
@@ -544,4 +534,4 @@ if __name__ == "__main__":
     p = Processor(managers)
     p.process()
     cafilt.filter_file('BikeStreets.geojson',
-                       ['LINCOLN PARK', 'LAKE VIEW', 'NEAR NORTH SIDE', 'WEST TOWN'])
+                       ['LINCOLN PARK', 'LAKE VIEW', 'NEAR NORTH SIDE', 'WEST TOWN', 'LOGAN SQUARE'])
