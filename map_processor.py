@@ -6,6 +6,7 @@ import os
 import glob
 import sys
 import copy
+import json
 
 from abc import abstractmethod, ABC
 from dataclasses import dataclass, field
@@ -58,12 +59,47 @@ class DataSource:
     keep_cols: frozenset[str] = frozenset()
 
 
+class OverrideManager:
+    def __init__(self):
+        filepath = os.path.join(os.path.dirname(__file__), 'manual_overrides.json')
+        self.raw_overrides = json.load(open(filepath))
+        self.sources = {}
+        self.initialize()
+
+    def initialize(self):
+        for ov in self.raw_overrides['overrides']:
+            if not ov.keys():
+                continue
+            source_name = ov['source_id']['source']
+            key_field = ov['source_id']['key']
+            td = {}
+            self.sources[source_name] = {
+                'key': key_field,
+                'transformations': td
+            }
+            for t in ov['transformations']:
+                td[t['key']] = t['action']
+
+    def process(self, source, df):
+        transformation = self.sources.get(source)
+        if not transformation:
+            return df
+        key = transformation['key']
+        remove = []
+        for k, v in transformation['transformations'].items():
+            if v == 'remove':
+                remove.append(k)
+        return df[~df[key].isin(remove)]
+
+
+
 class ProcessorInterface(ABC):
     def __init__(self, managers):
         self.sources = {}
         self.name = None
         self.managers = managers
-        self.preprocessing = {}
+        #self.preprocessing = {}
+        self.overrides = OverrideManager()
 
     @abstractmethod
     def process(self):
@@ -74,13 +110,13 @@ class ProcessorInterface(ABC):
 
     def get_source(self, key):
         rv = self.sources[key]
-        preprocess = self.preprocessing.get(key)
-        if preprocess:
-            return preprocess(rv)
-        return rv
+        #preprocess = self.preprocessing.get(key)
+        #if preprocess:
+        #    return preprocess(rv)
+        return self.overrides.process(key, rv)
 
-    def add_preprocessing_hook(self, source_key, fn):
-        self.preprocessing[source_key] = fn
+    #def add_preprocessing_hook(self, source_key, fn):
+    #    self.preprocessing[source_key] = fn
 
     @staticmethod
     def fix_bool(x):

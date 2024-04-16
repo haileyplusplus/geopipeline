@@ -1,0 +1,28 @@
+{
+  "description": "Overrides to correct issues with underlying map data.",
+  "name": "Map override instructions",
+  "overrides": [
+    {
+      "source_id": {
+        "domain": "chicago",
+        "source": "Street Center Lines",
+        "key": "trans_id"
+      },
+      "transformations": [
+        {
+          "key": "153792",
+          "action": "remove"
+        },
+        {
+          "key": "153791",
+          "action": "remove"
+        },
+        {
+          "key": "154623",
+          "action": "remove"
+        }
+      ]
+    },
+    {}
+  ]
+}

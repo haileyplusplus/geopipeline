@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Fix bugs and make coordinate systems consistent.">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Todo comment">
+      <change afterPath="$PROJECT_DIR$/manual_overrides.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bikenetwork.py" beforeDir="false" afterPath="$PROJECT_DIR$/bikenetwork.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graphexplore.py" beforeDir="false" afterPath="$PROJECT_DIR$/graphexplore.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/map_processor.py" beforeDir="false" afterPath="$PROJECT_DIR$/map_processor.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -146,46 +146,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1710167841513</updated>
-    </task>
-    <task id="LOCAL-00025" summary="Kind of stash street processing work.">
-      <option name="closed" value="true" />
-      <created>1712163037624</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1712163037624</updated>
-    </task>
-    <task id="LOCAL-00026" summary="Add catalog fetcher">
-      <option name="closed" value="true" />
-      <created>1712166312533</created>
-      <option name="number" value="00026" />
-      <option name="presentableId" value="LOCAL-00026" />
-      <option name="project" value="LOCAL" />
-      <updated>1712166312533</updated>
-    </task>
-    <task id="LOCAL-00027" summary="Update catalog fetcher">
-      <option name="closed" value="true" />
-      <created>1712199596045</created>
-      <option name="number" value="00027" />
-      <option name="presentableId" value="LOCAL-00027" />
-      <option name="project" value="LOCAL" />
-      <updated>1712199596045</updated>
-    </task>
-    <task id="LOCAL-00028" summary="Add arguments to catalog fetcher">
-      <option name="closed" value="true" />
-      <created>1712239749061</created>
-      <option name="number" value="00028" />
-      <option name="presentableId" value="LOCAL-00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1712239749061</updated>
-    </task>
-    <task id="LOCAL-00029" summary="Show what data feeds have been updated">
-      <option name="closed" value="true" />
-      <created>1712241601404</created>
-      <option name="number" value="00029" />
-      <option name="presentableId" value="LOCAL-00029" />
-      <option name="project" value="LOCAL" />
-      <updated>1712241601404</updated>
     </task>
     <task id="LOCAL-00030" summary="Improvements and bugfixes">
       <option name="closed" value="true" />
@@ -539,7 +499,47 @@
       <option name="project" value="LOCAL" />
       <updated>1713205950660</updated>
     </task>
-    <option name="localTasksCounter" value="74" />
+    <task id="LOCAL-00074" summary="Switch to pure python implementation. Needs weight function.">
+      <option name="closed" value="true" />
+      <created>1713214769654</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1713214769654</updated>
+    </task>
+    <task id="LOCAL-00075" summary="Fix bug in weight function.">
+      <option name="closed" value="true" />
+      <created>1713233996269</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1713233996269</updated>
+    </task>
+    <task id="LOCAL-00076" summary="Refactor map processor to read sources from dict and allow preprocessing hooks.">
+      <option name="closed" value="true" />
+      <created>1713290181798</created>
+      <option name="number" value="00076" />
+      <option name="presentableId" value="LOCAL-00076" />
+      <option name="project" value="LOCAL" />
+      <updated>1713290181798</updated>
+    </task>
+    <task id="LOCAL-00077" summary="Use precomputed path weight">
+      <option name="closed" value="true" />
+      <created>1713290219276</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1713290219276</updated>
+    </task>
+    <task id="LOCAL-00078" summary="Todo comment">
+      <option name="closed" value="true" />
+      <created>1713290233075</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1713290233075</updated>
+    </task>
+    <option name="localTasksCounter" value="79" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -554,11 +554,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Enable catalog fetcher to run on different domains" />
-    <MESSAGE value="Fix bug in insert when counts change." />
-    <MESSAGE value="Attempt second closest point algorithm; unclear why it's slower." />
-    <MESSAGE value="Fix processor after refactoring" />
-    <MESSAGE value="Add more domain options and debug output" />
     <MESSAGE value="Big speedup by doing coord transformation on filtered dataset" />
     <MESSAGE value="Update TODOs, sample size" />
     <MESSAGE value="Make explorer more robust" />
@@ -579,6 +574,11 @@
     <MESSAGE value="Split long segments" />
     <MESSAGE value="Add route ids for debugging. Look at using native graph libraries." />
     <MESSAGE value="Fix bugs and make coordinate systems consistent." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix bugs and make coordinate systems consistent." />
+    <MESSAGE value="Switch to pure python implementation. Needs weight function." />
+    <MESSAGE value="Fix bug in weight function." />
+    <MESSAGE value="Refactor map processor to read sources from dict and allow preprocessing hooks." />
+    <MESSAGE value="Use precomputed path weight" />
+    <MESSAGE value="Todo comment" />
+    <option name="LAST_COMMIT_MESSAGE" value="Todo comment" />
   </component>
 </project>
