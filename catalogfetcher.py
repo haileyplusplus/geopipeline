@@ -13,6 +13,7 @@ Improvements
 - limits and updating
   - filter Cook Co data to Chicago townships
 - better parsing of success status
+    eg status: pending
 - fix pseudo-geojson (thegeometry column)
 - infer data series over time, use metadata to coalesce same set
 - read column metadata and make accessible
