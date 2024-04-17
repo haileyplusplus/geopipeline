@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Add basic manual override functionality. Only removes are supported.">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Update value override">
+      <change afterPath="$PROJECT_DIR$/pipelineconfig.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pipelinerunner.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/manual_overrides.json" beforeDir="false" afterPath="$PROJECT_DIR$/manual_overrides.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/map_processor.py" beforeDir="false" afterPath="$PROJECT_DIR$/map_processor.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,25 +38,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.bikenetwork.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.map_processor.executor&quot;: &quot;Run&quot;,
-    &quot;Python.pathwrapper.executor&quot;: &quot;Run&quot;,
-    &quot;Python.pwcompare.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/hailey/projcode/misc2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.bikenetwork.executor": "Debug",
+    "Python.map_processor.executor": "Run",
+    "Python.pathwrapper.executor": "Run",
+    "Python.pipelinerunner.executor": "Run",
+    "Python.pwcompare.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "/Users/hailey/projcode/misc2",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;TEXT&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "TEXT"
     ]
   }
-}</component>
-  <component name="RunManager" selected="Python.pwcompare">
+}]]></component>
+  <component name="RunManager">
     <configuration name="bikenetwork" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="misc2" />
       <option name="ENV_FILES" value="" />
@@ -146,14 +147,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1710167841513</updated>
-    </task>
-    <task id="LOCAL-00031" summary="Refactor map processor interface to allow combining multiple data sources">
-      <option name="closed" value="true" />
-      <created>1712244886846</created>
-      <option name="number" value="00031" />
-      <option name="presentableId" value="LOCAL-00031" />
-      <option name="project" value="LOCAL" />
-      <updated>1712244886846</updated>
     </task>
     <task id="LOCAL-00032" summary="More map processor combining">
       <option name="closed" value="true" />
@@ -539,7 +532,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713292434615</updated>
     </task>
-    <option name="localTasksCounter" value="80" />
+    <task id="LOCAL-00080" summary="Update value override">
+      <option name="closed" value="true" />
+      <created>1713294754025</created>
+      <option name="number" value="00080" />
+      <option name="presentableId" value="LOCAL-00080" />
+      <option name="project" value="LOCAL" />
+      <updated>1713294754026</updated>
+    </task>
+    <option name="localTasksCounter" value="81" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -554,7 +555,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Update TODOs, sample size" />
     <MESSAGE value="Make explorer more robust" />
     <MESSAGE value="Add workspace to gitignore" />
     <MESSAGE value="Document TODOs" />
@@ -579,6 +579,7 @@
     <MESSAGE value="Use precomputed path weight" />
     <MESSAGE value="Todo comment" />
     <MESSAGE value="Add basic manual override functionality. Only removes are supported." />
-    <option name="LAST_COMMIT_MESSAGE" value="Add basic manual override functionality. Only removes are supported." />
+    <MESSAGE value="Update value override" />
+    <option name="LAST_COMMIT_MESSAGE" value="Update value override" />
   </component>
 </project>

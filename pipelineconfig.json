@@ -1,0 +1,67 @@
+{
+  "name": "pipelineconfig",
+  "description": "Configuration of pipeline workflows.",
+  "stages": [
+    { "name": "streets_fetch" },
+    { "name": "bike_routes_fetch" },
+    { "name": "off_street_fetch" },
+    { "name": "streets_preprocess" },
+    { "name": "bike_routes_preprocess" },
+    { "name": "off_street_preprocess" },
+    { "name": "streets_bike_join" },
+    { "name": "bikestreets_off_join" },
+    { "name": "community_area_filter" },
+    { "name": "network_analyze" },
+    { "name": "bikestreets_output"}
+  ],
+  "workflows": [
+    {
+      "name": "bikemap",
+      "final": "bikestreets_output",
+      "stages": [
+        {
+          "stage": "bikestreets_output",
+          "dependencies": ["network_analyze"]
+        },
+        {
+          "stage": "network_analyze",
+          "dependencies": ["community_area_filter"]
+        },
+        {
+          "stage": "community_area_filter",
+          "dependencies": ["bikestreets_off_join"]
+        },
+        {
+          "stage": "bikestreets_off_join",
+          "dependencies": [
+            "off_street_preprocess",
+            "streets_bike_join"
+          ]
+        },
+        {
+          "stage": "off_street_preprocess",
+          "dependencies": ["off_street_fetch"]
+        },
+        {
+          "stage": "off_street_fetch",
+          "dependencies": []
+        },
+        {
+          "stage": "streets_bike_join",
+          "dependencies": [
+            "streets_fetch",
+            "bike_routes_fetch"
+          ]
+        },
+        {
+          "stage": "streets_fetch",
+          "dependencies": []
+        },
+        {
+          "stage": "bike_routes_fetch",
+          "dependencies": []
+        }
+      ]
+    }
+  ]
+}
