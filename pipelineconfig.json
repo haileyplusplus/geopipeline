@@ -49,9 +49,17 @@
         {
           "stage": "streets_bike_join",
           "dependencies": [
-            "streets_fetch",
-            "bike_routes_fetch"
+            "streets_preprocess",
+            "bike_routes_preprocess"
           ]
+        },
+        {
+          "stage": "streets_preprocess",
+          "dependencies": ["streets_fetch"]
+        },
+        {
+          "stage": "bike_routes_preprocess",
+          "dependencies": ["bike_routes_fetch"]
         },
         {
           "stage": "streets_fetch",
