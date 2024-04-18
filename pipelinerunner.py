@@ -85,8 +85,11 @@ class WorkContext:
             last_executed = None
             if len(previous_runs) > 0:
                 latest: StageExecution = previous_runs[0]
+                stored_config = json.loads(latest.stage_config)
                 if module_updated > latest.module_updated:
                     print(f'Previous execution on {latest.executed} has older module version.')
+                elif stored_config != stage_info:
+                    print(f'Previous execution on {latest.executed} has a different stored configuration.')
                 else:
                     cached_filename = os.path.join(PIPELINE_STAGE_FILES, latest.filename)
                     last_executed = latest.executed
