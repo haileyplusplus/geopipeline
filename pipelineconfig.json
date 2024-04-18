@@ -148,7 +148,7 @@
       "output_type": "geopandas.GeoDataFrame",
       "output_class": "NetworkStage",
       "parameters": {
-        "sample_size": 400,
+        "sample_size": 401,
         "points_key": "license_id"
       }
     },

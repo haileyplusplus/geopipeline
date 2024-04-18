@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Complete pipeline implementation.">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Re-run pipeline stages when config changes.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipelineconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/pipelineconfig.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipelinerunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipelinerunner.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graphexplore.py" beforeDir="false" afterPath="$PROJECT_DIR$/graphexplore.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -152,14 +151,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1710167841513</updated>
-    </task>
-    <task id="LOCAL-00044" summary="Greatly speed up path computation">
-      <option name="closed" value="true" />
-      <created>1712543901387</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
-      <option name="project" value="LOCAL" />
-      <updated>1712543901387</updated>
     </task>
     <task id="LOCAL-00045" summary="Abstract away points types and allow sampling of large datasets">
       <option name="closed" value="true" />
@@ -545,7 +536,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713471649941</updated>
     </task>
-    <option name="localTasksCounter" value="93" />
+    <task id="LOCAL-00093" summary="Re-run pipeline stages when config changes.">
+      <option name="closed" value="true" />
+      <created>1713473030263</created>
+      <option name="number" value="00093" />
+      <option name="presentableId" value="LOCAL-00093" />
+      <option name="project" value="LOCAL" />
+      <updated>1713473030263</updated>
+    </task>
+    <option name="localTasksCounter" value="94" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -560,7 +559,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Hook up keep column filter and finalize joining of off-street bike data source." />
     <MESSAGE value="Shapefile support" />
     <MESSAGE value="Attempt to fix off-street bike trails not routing properly." />
     <MESSAGE value="Split long segments" />
@@ -585,7 +583,8 @@
     <MESSAGE value="Cache results of pipeline stages" />
     <MESSAGE value="Store config that was used in the cache." />
     <MESSAGE value="Complete pipeline implementation." />
-    <option name="LAST_COMMIT_MESSAGE" value="Complete pipeline implementation." />
+    <MESSAGE value="Re-run pipeline stages when config changes." />
+    <option name="LAST_COMMIT_MESSAGE" value="Re-run pipeline stages when config changes." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -136,15 +136,18 @@ class NxFinder2:
             startnode = self.graph_index[startpoint['trans_id']][0]
             endnode = self.graph_index[endpoint['trans_id']][0]
             # needs weighting function
-            path = nx.shortest_path(self.graph, startnode, endnode, weight=self.path_weight)
-            if not path:
-                print(f'Fail {startnode} {endnode}')
-                continue
-            #print(path)
-            if full:
-                yield [list(x.values())[0] for x in self.edge_datas(path)], count
-            else:
-                yield [list(x.values())[0]['trans_id'] for x in self.edge_datas(path)], count
+            try:
+                path = nx.shortest_path(self.graph, startnode, endnode, weight=self.path_weight)
+                if not path:
+                    print(f'Fail {startnode} {endnode}')
+                    continue
+                #print(path)
+                if full:
+                    yield [list(x.values())[0] for x in self.edge_datas(path)], count
+                else:
+                    yield [list(x.values())[0]['trans_id'] for x in self.edge_datas(path)], count
+            except nx.exception.NetworkXNoPath:
+                print(f'No path: fail {startnode} {endnode}')
 
 
 class NxFinder(NxFinder2):
