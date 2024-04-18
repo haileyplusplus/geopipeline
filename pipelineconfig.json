@@ -87,8 +87,18 @@
       "output_type": "geopandas.GeoDataFrame",
       "output_class": "OffStreetPreprocess"
     },
-    { "name": "streets_bike_join" },
-    { "name": "bikestreets_off_join" },
+    {
+      "name": "streets_bike_join",
+      "module": "map_processor",
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "StreetsBikeJoin"
+    },
+    {
+      "name": "bikestreets_off_join",
+      "module": "map_processor",
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "BikeStreetsOffJoin"
+    },
     { "name": "community_area_filter" },
     { "name": "network_analyze" },
     { "name": "bikestreets_output"}

@@ -42,4 +42,5 @@ class PipelineInterface(ABC):
         self.depend_results = results
 
     def get_dependency(self, name):
+        # need to assert that dependency is actually in config
         return self.depend_results[name]

@@ -645,6 +645,164 @@ class OffStreetPreprocess(PipelineInterface):
         return PipelineResult(obj=offdf)
 
 
+class StreetsBikeJoin(PipelineInterface):
+    def __init__(self, stage_info):
+        super().__init__(stage_info)
+        self.output = pd.DataFrame()
+
+    def merge_street(self, street_name):
+        street = self.streets.get_street(street_name)
+        bike_route = self.bike_routes.get_street(street_name)
+        assert not bike_route.empty
+        cumulative = geopandas.GeoDataFrame()
+        # street trans_id is a good unique key. we want to make sure we include segs without bike route info, too
+        # 150299 is missing
+        matched_segs = set([])
+        for ri, route in bike_route.iterrows():
+            matching = []
+            rgbuffer = route.geometry.buffer(3)
+            for si, seg in street.iterrows():
+                match = rgbuffer.contains(seg.geometry)
+                if match:
+                    matching.append(seg)
+                    matched_segs.add(seg.trans_id)
+            matched_frame = geopandas.GeoDataFrame(matching)
+            route_frame = pd.DataFrame([route.drop('geometry')])
+            if matched_frame.empty or route_frame.empty:
+                continue
+            m = matched_frame.merge(route_frame, left_on='street_nam', right_on='st_name')
+            m.crs = constants.CHICAGO_DATUM
+            cumulative = pd.concat([cumulative, m])
+        # now get segs without bike routes
+        rest_streets = street[~street.trans_id.isin(matched_segs)]
+        rest_streets.crs = constants.CHICAGO_DATUM
+        cumulative = pd.concat([cumulative, rest_streets])
+        if not cumulative.empty:
+            cumulative.crs = constants.CHICAGO_DATUM
+            self.output = pd.concat([self.output, cumulative])
+
+    def run_stage(self) -> PipelineResult:
+        self.streets = BikeStreetsWrapper(self.get_dependency('streets_preprocess').get())
+        self.bike_routes = BikeStreetsWrapper(self.get_dependency('bike_routes_preprocess').get())
+        bike_streets = self.streets.get_streets() & self.bike_routes.get_streets()
+        other_streets = self.streets.get_streets() - self.bike_routes.get_streets()
+        pbar = tqdm.tqdm(bike_streets)
+        for streetname in pbar:
+            self.merge_street(streetname)
+        ostr = self.streets.layer
+        rv = PipelineResult()
+        rv.obj = pd.concat([self.output, ostr[ostr.street_nam.isin(other_streets)]])
+        return rv
+
+
+class BikeStreetsOffJoin(PipelineInterface):
+    def __init__(self, stage_info):
+        super().__init__(stage_info)
+        self.rv = PipelineResult()
+        self.output = self.rv.obj
+
+    @staticmethod
+    def suitability(x):
+        """
+        Suitability index
+
+        0 - do not display
+        1 - bikes prohibited
+        2 - not recommended
+        3 - caution
+        4 - probably light traffic, no specific infra
+        5 - bike lane
+        6 - greenway, buffered
+        7 - protected
+        8 - off-street trail
+        :param x:
+        :return:
+        """
+        if x.status != 'N':
+            return 0
+        cmap = {
+            'RIV': 0,
+            'S': 0,
+            '99': 0,
+            '5': 0,
+            'E': 4, # try this instead
+            '1': 1,
+            '9': 1,
+        }
+        # 2, 3, 4, 7  might have bike infra
+        rv = cmap.get(x['class'])
+        if rv is not None:
+            return rv
+        dr = x.displayrou
+        rmap = {
+            'BIKE LANE': 5,
+            'NEIGHBORHOOD GREENWAY': 6,
+            'BUFFERED BIKE LANE': 6,
+            'PROTECTED BIKE LANE': 7,
+            'OFF STREET': 8, # this is fictionally postprocessed
+        }
+        rv = rmap.get(dr)
+        if rv is not None:
+            if rv == 5 and x['class'] == '2':
+                # don't allow bike lane optimization on class 2
+                pass
+            else:
+                return rv
+        if x['class'] == '4':
+            return 4
+        if x['class'] == '3':
+            return 3
+        if x['class'] == '2':
+            return 2
+        if x['class'] == '7':
+            # consider changing this to 1
+            return 1
+        # shouldn't get here
+        return -1
+
+    def normalize(self):
+        # incompletely working on processing everything in consistent coord systems
+        # if not self.output:
+        #    return None
+        assert not self.output.empty
+        # merged = pd.concat(self.output)
+        self.output.crs = constants.CHICAGO_DATUM
+        self.output['actual'] = self.output.apply(lambda x: x.geometry.length, axis=1)
+        self.output['suitability'] = self.output.apply(self.suitability, axis=1)
+
+        suitability_multipliers = {
+            2: 5.0,
+            3: 2.0,
+            4: 0.9,
+            5: 1,
+            6: 0.75,
+            7: 0.6,
+            8: 0.5,
+        }
+
+        def weightfn(attrs):
+            weight = attrs['actual']
+            mult = suitability_multipliers.get(attrs['suitability'], 0)
+            # print(f'Path weight: {weight} m{mult} E{e0} {e1} {raw}')
+            if mult == 0:
+                return 1000000000
+            return mult * weight
+
+        self.output['weight'] = self.output.apply(weightfn, axis=1)
+        # merged.crs = constants.CHICAGO_DATUM
+        # return merged.to_crs(epsg=4326)
+        return self.output.to_crs(epsg=4326)
+
+    def run_stage(self) -> PipelineResult:
+        # Now add in off-street routes using the column format above
+        offdf = self.get_dependency('off_street_preprocess').get()
+        bikejoin = self.get_dependency('streets_bike_join').get()
+        self.output = pd.concat([bikejoin, offdf], ignore_index=True)
+        result = self.normalize()
+        self.rv.obj = result
+        return self.rv
+
+
 class Processor:
     #PROCESSORS = [BikeRouteProcessor, BikeStreets]
     PROCESSORS = [BikeStreets]
