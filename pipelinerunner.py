@@ -34,6 +34,7 @@ class StageExecution(BaseModel):
     name = CharField()
     executed = DateTimeField()
     status = CharField()
+    stage_config = CharField()
     # relative to stage file directory
     filename = CharField()
     module_updated = DateTimeField()
@@ -113,6 +114,7 @@ class WorkContext:
                     executed=datetime.datetime.now(),
                     status=status,
                     filename=filename,
+                    stage_config=json.dumps(stage_info),
                     module_updated=module_updated
                 )
                 execstage.save()
