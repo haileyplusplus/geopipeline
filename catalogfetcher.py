@@ -439,10 +439,23 @@ DOMAINS = {
 class PipelineFetcher(PipelineInterface):
     def __init__(self, stage_info):
         super().__init__(stage_info)
+        self.rv = PipelineResult()
+        
+    def apply_filters(self):
+        ds: dict = self.stage_info['parameters']['datasource']
+        filters = ds.get('filter', [])
+        for f in filters:
+            col = f['column']
+            val = f['value']
+            action = f['action']
+            if 'keep' in action:
+                self.rv.obj = self.rv.obj[self.rv.obj[col] == val]
+        keep_cols = ds.get('keep_cols')
+        if keep_cols:
+            self.rv.obj = self.rv.obj[keep_cols]
 
     def run_stage(self) -> PipelineResult:
         limit = 10000000
-        rv = PipelineResult()
         ds = self.stage_info['parameters']['datasource']
         #cataloginfo = CatalogInfo(name=ds['name'], destdir, )
         cataloginfo = DOMAINS[ds['domain']]
@@ -450,9 +463,10 @@ class PipelineFetcher(PipelineInterface):
         mm.db_initialize()
         tup = mm.fetch_resource(ds['feed_id'])
         rawsource, _ = tup
-        rv.obj = geopandas.read_file(io.StringIO(rawsource))
+        self.rv.obj = geopandas.read_file(io.StringIO(rawsource))
         # need to do filtering
-        return rv
+        self.apply_filters()
+        return self.rv
 
 
 if __name__ == "__main__":
