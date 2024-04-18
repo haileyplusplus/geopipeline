@@ -536,9 +536,12 @@ class BikeStreets(ProcessorInterface):
 class StreetsPreprocess(PipelineInterface):
     def __init__(self, stage_info):
         super().__init__(stage_info)
+        self.overrides = OverrideManager()
+
 
     def run_stage(self) -> PipelineResult:
         centerlines = self.get_dependency('streets_fetch').get()
+        centerlines = self.overrides.process('Street Center Lines', centerlines)
         centerlines['trans_id'] = centerlines['trans_id'].apply(lambda x: f'A{x}')
         rv = PipelineResult()
         rv.obj = centerlines
@@ -767,6 +770,8 @@ class BikeStreetsOffJoin(PipelineInterface):
         assert not self.output.empty
         # merged = pd.concat(self.output)
         self.output.crs = constants.CHICAGO_DATUM
+        # why is this needed?
+        self.output = self.output[~self.output.geometry.isnull()]
         self.output['actual'] = self.output.apply(lambda x: x.geometry.length, axis=1)
         self.output['suitability'] = self.output.apply(self.suitability, axis=1)
 
