@@ -60,7 +60,7 @@ class WorkContext:
         if m and oc:
             print(f'  Loading module {m}')
             module = importlib.import_module(m)
-            inst = getattr(module, oc)(self.stage_name)
+            inst = getattr(module, oc)(stage_info)
             rv = inst.run_stage()
             if rv.obj is not None:
                 self.results[self.stage_name] = rv

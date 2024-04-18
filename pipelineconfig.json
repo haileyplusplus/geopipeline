@@ -6,18 +6,69 @@
       "name": "streets_fetch",
       "module": "catalogfetcher",
       "output_type": "geopandas.GeoDataFrame",
-      "output_class": "PipelineFetcher"
+      "output_class": "PipelineFetcher",
+      "parameters": {
+        "datasource": {
+          "domain": "chicago",
+          "feed_id": "6imu-meau",
+          "name": "Street Center Lines",
+          "keep_cols": [
+            "street_nam", "street_typ", "ewns_dir",
+            "dir_travel", "status", "class", "length",
+            "trans_id", "geometry"
+          ]
+        }
+      }
     },
     {
       "name": "bike_routes_fetch",
       "module": "catalogfetcher",
       "output_type": "geopandas.GeoDataFrame",
-      "output_class": "PipelineFetcher"
+      "output_class": "PipelineFetcher",
+      "parameters": {
+        "datasource": {
+          "domain": "chicago",
+          "feed_id": "3w5d-sru8",
+          "name": "Bike Routes",
+          "keep_cols": [
+            "contraflow", "br_oneway", "displayrou", 
+            "st_name", "geometry"
+          ]
+        }
+      }
     },
     {
       "name": "off_street_fetch",
       "module": "catalogfetcher",
-      "output_type": "geopandas.GeoDataFrame"
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "PipelineFetcher",
+      "parameters": {
+        "datasource": {
+          "domain": "cookgis",
+          "feed_id": "900b69139e874c8f823744d8fd5b71eb",
+          "name": "Off-Street Bike Trails",
+          "keep_cols": [
+            "OBJECTID", "Street", "FacName", "Sub_System",
+            "ShapeSTLength", "geometry"
+          ],
+          "filter": [
+            {
+              "column": "Muni",
+              "value": "Chicago",
+              "action": {
+                "keep": {}
+              }
+            },
+            {
+              "column": "Status",
+              "value": "Existing",
+              "action": {
+                "keep": {}
+              }
+            }
+          ]
+        }
+      }
     },
     { "name": "streets_preprocess" },
     { "name": "bike_routes_preprocess" },

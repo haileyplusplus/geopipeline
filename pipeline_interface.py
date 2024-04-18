@@ -17,8 +17,12 @@ class PipelineResult:
 
 
 class PipelineInterface(ABC):
-    def __init__(self, stage_name):
-        self.stage_name = stage_name
+    def __init__(self, stage_info: dict):
+        """
+
+        :type stage_info: dict
+        """
+        self.stage_info: dict = stage_info
 
     @abstractmethod
     def run_stage(self) -> PipelineResult:

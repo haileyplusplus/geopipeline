@@ -437,27 +437,21 @@ DOMAINS = {
 
 
 class PipelineFetcher(PipelineInterface):
-    def __init__(self, stage_name):
-        super().__init__(stage_name)
+    def __init__(self, stage_info):
+        super().__init__(stage_info)
 
     def run_stage(self) -> PipelineResult:
         limit = 10000000
         rv = PipelineResult()
-        # this winds up re-implementing map processor stuff
-        if self.stage_name == 'streets_fetch':
-            catalog = DOMAINS['chicago']
-            mm = catalog.manager(DOMAINS['chicago'], limit)
-            mm.db_initialize()
-            tup = mm.fetch_resource('6imu-meau')
-            rawsource, _ = tup
-            rv.obj = geopandas.read_file(io.StringIO(rawsource))
-        elif self.stage_name == 'bike_routes_fetch':
-            catalog = DOMAINS['chicago']
-            mm = catalog.manager(DOMAINS['chicago'], limit)
-            mm.db_initialize()
-            tup = mm.fetch_resource('3w5d-sru8')
-            rawsource, _ = tup
-            rv.obj = geopandas.read_file(io.StringIO(rawsource))
+        ds = self.stage_info['parameters']['datasource']
+        #cataloginfo = CatalogInfo(name=ds['name'], destdir, )
+        cataloginfo = DOMAINS[ds['domain']]
+        mm = cataloginfo.manager(cataloginfo, limit)
+        mm.db_initialize()
+        tup = mm.fetch_resource(ds['feed_id'])
+        rawsource, _ = tup
+        rv.obj = geopandas.read_file(io.StringIO(rawsource))
+        # need to do filtering
         return rv
 
 

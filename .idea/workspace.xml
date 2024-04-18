@@ -4,11 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Implement basic no-op pipeline traversal.">
-      <change afterPath="$PROJECT_DIR$/pipeline_interface.py" afterDir="false" />
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Hook up actual pipeline fetching">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/catalogfetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/catalogfetcher.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/map_processor.py" beforeDir="false" afterPath="$PROJECT_DIR$/map_processor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipeline_interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline_interface.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipelineconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/pipelineconfig.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipelinerunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipelinerunner.py" afterDir="false" />
     </list>
@@ -152,14 +151,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1710167841513</updated>
-    </task>
-    <task id="LOCAL-00034" summary="Fix negation bug">
-      <option name="closed" value="true" />
-      <created>1712266580309</created>
-      <option name="number" value="00034" />
-      <option name="presentableId" value="LOCAL-00034" />
-      <option name="project" value="LOCAL" />
-      <updated>1712266580309</updated>
     </task>
     <task id="LOCAL-00035" summary="Implement suitability">
       <option name="closed" value="true" />
@@ -545,7 +536,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713383004348</updated>
     </task>
-    <option name="localTasksCounter" value="83" />
+    <task id="LOCAL-00083" summary="Hook up actual pipeline fetching">
+      <option name="closed" value="true" />
+      <created>1713406862656</created>
+      <option name="number" value="00083" />
+      <option name="presentableId" value="LOCAL-00083" />
+      <option name="project" value="LOCAL" />
+      <updated>1713406862656</updated>
+    </task>
+    <option name="localTasksCounter" value="84" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -560,7 +559,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Document TODOs" />
     <MESSAGE value="Pseudo stash" />
     <MESSAGE value="Refactor to make more generic" />
     <MESSAGE value="Add Cook County GIS fetcher" />
@@ -585,6 +583,7 @@
     <MESSAGE value="Update value override" />
     <MESSAGE value="Add skeleton of basic pipeline config." />
     <MESSAGE value="Implement basic no-op pipeline traversal." />
-    <option name="LAST_COMMIT_MESSAGE" value="Implement basic no-op pipeline traversal." />
+    <MESSAGE value="Hook up actual pipeline fetching" />
+    <option name="LAST_COMMIT_MESSAGE" value="Hook up actual pipeline fetching" />
   </component>
 </project>
