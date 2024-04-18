@@ -4,8 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Add skeleton of basic pipeline config.">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Implement basic no-op pipeline traversal.">
+      <change afterPath="$PROJECT_DIR$/pipeline_interface.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/catalogfetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/catalogfetcher.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/map_processor.py" beforeDir="false" afterPath="$PROJECT_DIR$/map_processor.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipelineconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/pipelineconfig.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipelinerunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipelinerunner.py" afterDir="false" />
     </list>
@@ -41,8 +44,10 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Python.bikenetwork.executor": "Debug",
+    "Python.catalogfetcher.executor": "Run",
     "Python.map_processor.executor": "Run",
     "Python.pathwrapper.executor": "Run",
+    "Python.pipeline_interface.executor": "Run",
     "Python.pipelinerunner.executor": "Run",
     "Python.pwcompare.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
@@ -147,14 +152,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1710167841513</updated>
-    </task>
-    <task id="LOCAL-00033" summary="Merges, but investigate missing rows">
-      <option name="closed" value="true" />
-      <created>1712265045365</created>
-      <option name="number" value="00033" />
-      <option name="presentableId" value="LOCAL-00033" />
-      <option name="project" value="LOCAL" />
-      <updated>1712265045365</updated>
     </task>
     <task id="LOCAL-00034" summary="Fix negation bug">
       <option name="closed" value="true" />
@@ -540,7 +537,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713375366652</updated>
     </task>
-    <option name="localTasksCounter" value="82" />
+    <task id="LOCAL-00082" summary="Implement basic no-op pipeline traversal.">
+      <option name="closed" value="true" />
+      <created>1713383004348</created>
+      <option name="number" value="00082" />
+      <option name="presentableId" value="LOCAL-00082" />
+      <option name="project" value="LOCAL" />
+      <updated>1713383004348</updated>
+    </task>
+    <option name="localTasksCounter" value="83" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -555,7 +560,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Add workspace to gitignore" />
     <MESSAGE value="Document TODOs" />
     <MESSAGE value="Pseudo stash" />
     <MESSAGE value="Refactor to make more generic" />
@@ -580,6 +584,7 @@
     <MESSAGE value="Add basic manual override functionality. Only removes are supported." />
     <MESSAGE value="Update value override" />
     <MESSAGE value="Add skeleton of basic pipeline config." />
-    <option name="LAST_COMMIT_MESSAGE" value="Add skeleton of basic pipeline config." />
+    <MESSAGE value="Implement basic no-op pipeline traversal." />
+    <option name="LAST_COMMIT_MESSAGE" value="Implement basic no-op pipeline traversal." />
   </component>
 </project>

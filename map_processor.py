@@ -33,6 +33,7 @@ import constants
 
 DESTINATION_DIR = '/Users/hailey/Documents/ArcGIS/data/chicago'
 MAP_CACHE = '/Users/hailey/tmp/mapcache'
+# this is not currently being used
 db = SqliteDatabase('/Users/hailey/datasets/processed-data.sqlite3')
 SOURCE_DIRS = ['/Users/hailey/datasets/cook',
                '/Users/hailey/datasets/chicago',

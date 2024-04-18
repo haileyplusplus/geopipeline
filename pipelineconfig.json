@@ -2,9 +2,23 @@
   "name": "pipelineconfig",
   "description": "Configuration of pipeline workflows.",
   "stages": [
-    { "name": "streets_fetch" },
-    { "name": "bike_routes_fetch" },
-    { "name": "off_street_fetch" },
+    {
+      "name": "streets_fetch",
+      "module": "catalogfetcher",
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "PipelineFetcher"
+    },
+    {
+      "name": "bike_routes_fetch",
+      "module": "catalogfetcher",
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "PipelineFetcher"
+    },
+    {
+      "name": "off_street_fetch",
+      "module": "catalogfetcher",
+      "output_type": "geopandas.GeoDataFrame"
+    },
     { "name": "streets_preprocess" },
     { "name": "bike_routes_preprocess" },
     { "name": "off_street_preprocess" },

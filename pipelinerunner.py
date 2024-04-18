@@ -2,6 +2,7 @@
 
 import os
 import json
+import importlib
 import sys
 from enum import Enum
 from typing import List
@@ -53,7 +54,18 @@ class WorkContext:
     def process(self):
         assert self.state == WorkState.READY
         print(f'Processing {self.stage_name}')
-        self.results[self.stage_name] = 'results'
+        stage_info = self.stages[self.stage_name]
+        m = stage_info.get('module')
+        oc = stage_info.get('output_class')
+        if m and oc:
+            print(f'  Loading module {m}')
+            module = importlib.import_module(m)
+            inst = getattr(module, oc)(self.stage_name)
+            rv = inst.run_stage()
+            if rv.obj is not None:
+                self.results[self.stage_name] = rv
+        else:
+            self.results[self.stage_name] = 'results'
         self.state = WorkState.DONE
 
 
@@ -65,8 +77,7 @@ class WorkflowParser:
         assert self.config.get('name') == 'pipelineconfig'
         self.stages = {}
         for d in self.config['stages']:
-            # placeholder
-            self.stages[d['name']] = 1
+            self.stages[d['name']] = d
         self.workflows = {}
         for d in self.config['workflows']:
             fs = d['final']
@@ -101,6 +112,11 @@ class Runner:
         self.results = {}
         self.workflow = workflow
 
+    def debug(self):
+        print(f'Debug results')
+        for k, v in self.results.items():
+            print(f'  {k:30}  {v}')
+
     def process(self):
         work_queue: List[WorkContext] = []
         work_contexts = self.workflow['stages']
@@ -130,3 +146,4 @@ if __name__ == "__main__":
     wp = WorkflowParser()
     r = Runner(wp.get_workflow('bikemap'))
     r.process()
+    r.debug()

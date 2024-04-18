@@ -28,6 +28,7 @@ import datetime
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from typing import Callable
+import geopandas
 
 import sanitize_filename
 from enum import Enum
@@ -37,6 +38,8 @@ import requests
 from peewee import SqliteDatabase, Model, CharField, IntegerField, DateTimeField, BooleanField, TextField, ForeignKeyField, DatabaseProxy
 
 from interfaces import ManagerInterface
+from pipeline_interface import PipelineInterface, PipelineResult
+
 
 @dataclass
 class CatalogInfo:
@@ -426,11 +429,37 @@ class CookGISManager(ManagerBase):
 
 
 # make this a dict
-DOMAINS = [
-    CatalogInfo('chicago', '/Users/hailey/datasets/chicago', 'data.cityofchicago.org', Manager),
-    CatalogInfo('cook', '/Users/hailey/datasets/cook', 'datacatalog.cookcountyil.gov', Manager),
-    CatalogInfo('cookgis', '/Users/hailey/datasets/cookgis', None, CookGISManager),
-]
+DOMAINS = {
+    'chicago': CatalogInfo('chicago', '/Users/hailey/datasets/chicago', 'data.cityofchicago.org', Manager),
+    'cook': CatalogInfo('cook', '/Users/hailey/datasets/cook', 'datacatalog.cookcountyil.gov', Manager),
+    'cookgis': CatalogInfo('cookgis', '/Users/hailey/datasets/cookgis', None, CookGISManager),
+}
+
+
+class PipelineFetcher(PipelineInterface):
+    def __init__(self, stage_name):
+        super().__init__(stage_name)
+
+    def run_stage(self) -> PipelineResult:
+        limit = 10000000
+        rv = PipelineResult()
+        # this winds up re-implementing map processor stuff
+        if self.stage_name == 'streets_fetch':
+            catalog = DOMAINS['chicago']
+            mm = catalog.manager(DOMAINS['chicago'], limit)
+            mm.db_initialize()
+            tup = mm.fetch_resource('6imu-meau')
+            rawsource, _ = tup
+            rv.obj = geopandas.read_file(io.StringIO(rawsource))
+        elif self.stage_name == 'bike_routes_fetch':
+            catalog = DOMAINS['chicago']
+            mm = catalog.manager(DOMAINS['chicago'], limit)
+            mm.db_initialize()
+            tup = mm.fetch_resource('3w5d-sru8')
+            rawsource, _ = tup
+            rv.obj = geopandas.read_file(io.StringIO(rawsource))
+        return rv
+
 
 if __name__ == "__main__":
     #gf = GenericFetcher('https://api.us.socrata.com/api/catalog/v1/domain_categories?domains=data.cityofchicago.org')
@@ -454,7 +483,8 @@ if __name__ == "__main__":
     parser.add_argument('--limit', nargs=1, type=int, default=[200000000])
     args = parser.parse_args()
     catalog = None
-    for d in DOMAINS:
+    # really?
+    for d in DOMAINS.values():
         if d.name == args.domain[0].strip():
             catalog = d
             break
