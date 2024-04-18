@@ -11,6 +11,7 @@ import tqdm
 
 import pathwrapper
 import graphexplore
+from pipeline_interface import PipelineInterface, PipelineResult
 
 # todo: merge all shapefile writing / processing
 DESTINATION_DIR = '/Users/hailey/Documents/ArcGIS/data/chicago'
@@ -31,9 +32,9 @@ class Network:
     SCHOOL_POINTS = PointInfo('/tmp/schools.geojson', 'school_nm')
     BUSINESS_POINTS = PointInfo('/Users/hailey/datasets/chicago/Business Licenses - Current Active - Map.geojson', 'license_id')
 
-    def __init__(self, finder: graphexplore.NxFinder, point_info: PointInfo):
+    def __init__(self, finder: graphexplore.NxFinder2, point_index: str):
         self.finder = finder
-        self.point_info = point_info
+        self.point_index = point_index
 
     def filter_points(self):
         # approx heuristic
@@ -49,18 +50,18 @@ class Network:
         routes = {}
         iters = 0
         cf = self.filter_points()
-        cross = cf.merge(cf[self.point_info.index_col], how='cross')
+        cross = cf.merge(cf[self.point_index], how='cross')
         inputs = []
         for _, row in cross.iterrows():
-            rx = row[f'{self.point_info.index_col}_x']
-            ry = row[f'{self.point_info.index_col}_y']
+            rx = row[f'{self.point_index}_x']
+            ry = row[f'{self.point_index}_y']
             if rx == ry:
                 continue
             iters += 1
             if limit and iters > limit:
                 break
             inputs.append((rx, ry))
-        paths = self.finder.route_edges(self.point_info.index_col, inputs)
+        paths = self.finder.route_edges(self.point_index, inputs)
         for path, rt in paths:
             #print(f'debug path: {path} {rt}')
             for p in path:
@@ -81,6 +82,40 @@ class Network:
         new_df['rtraw'] = new_df.apply(lambda x: segcounts.get(x.trans_id, -1), axis=1)
         df2 = new_df.drop(columns=[x for x in new_df.columns if new_df[x].dtype.name.startswith('datetime')])
         return df2
+
+
+class NetworkStage(PipelineInterface):
+
+    def run_stage(self) -> PipelineResult:
+        rv = PipelineResult()
+        business_points = self.get_dependency('business_preprocess').get()
+        area = self.get_dependency('community_area_filter').get()
+        sample = self.stage_info['parameters']['sample_size']
+        nxfinder = graphexplore.NxFinder2(area, business_points, silent=False, sample=sample)
+        network = Network(nxfinder, self.stage_info['parameters']['points_key'])
+        applied = network.apply()
+        filt = applied[applied.geometry.type == 'LineString']
+        rv.obj = filt
+        return rv
+
+
+class BusinessPreprocess(PipelineInterface):
+    def run_stage(self) -> PipelineResult:
+        rv = PipelineResult()
+        business = self.get_dependency('business_fetch').get()
+        area = self.get_dependency('community_area_filter').get()
+        business.clip(shapely.geometry.box(*list(area.total_bounds)))
+        rv.obj = business
+        return rv
+
+
+class ShapefileOutput(PipelineInterface):
+    def run_stage(self) -> PipelineResult:
+        rv = PipelineResult()
+        netfile = self.get_dependency('network_analyze').get()
+        rv.obj = netfile
+        netfile.to_file(os.path.join(DESTINATION_DIR, 'computed_bike_network.shp'))
+        return rv
 
 
 if __name__ == "__main__":

@@ -4,13 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Go away">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Store config that was used in the cache.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cafilt.py" beforeDir="false" afterPath="$PROJECT_DIR$/cafilt.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/catalogfetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/catalogfetcher.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline_interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline_interface.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bikenetwork.py" beforeDir="false" afterPath="$PROJECT_DIR$/bikenetwork.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graphexplore.py" beforeDir="false" afterPath="$PROJECT_DIR$/graphexplore.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipelineconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/pipelineconfig.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipelinerunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipelinerunner.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -155,22 +153,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1710167841513</updated>
-    </task>
-    <task id="LOCAL-00041" summary="Switch filter to use community areas instead of neighborhoods and to allow multiple to be specified.">
-      <option name="closed" value="true" />
-      <created>1712465793439</created>
-      <option name="number" value="00041" />
-      <option name="presentableId" value="LOCAL-00041" />
-      <option name="project" value="LOCAL" />
-      <updated>1712465793439</updated>
-    </task>
-    <task id="LOCAL-00042" summary="Create bike network generator and path wrapper convenience functions.">
-      <option name="closed" value="true" />
-      <created>1712508950897</created>
-      <option name="number" value="00042" />
-      <option name="presentableId" value="LOCAL-00042" />
-      <option name="project" value="LOCAL" />
-      <updated>1712508950897</updated>
     </task>
     <task id="LOCAL-00043" summary="Pipeline improvements">
       <option name="closed" value="true" />
@@ -548,7 +530,23 @@
       <option name="project" value="LOCAL" />
       <updated>1713448573760</updated>
     </task>
-    <option name="localTasksCounter" value="90" />
+    <task id="LOCAL-00090" summary="Cache results of pipeline stages">
+      <option name="closed" value="true" />
+      <created>1713454461920</created>
+      <option name="number" value="00090" />
+      <option name="presentableId" value="LOCAL-00090" />
+      <option name="project" value="LOCAL" />
+      <updated>1713454461920</updated>
+    </task>
+    <task id="LOCAL-00091" summary="Store config that was used in the cache.">
+      <option name="closed" value="true" />
+      <created>1713455071288</created>
+      <option name="number" value="00091" />
+      <option name="presentableId" value="LOCAL-00091" />
+      <option name="project" value="LOCAL" />
+      <updated>1713455071288</updated>
+    </task>
+    <option name="localTasksCounter" value="92" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -563,8 +561,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fix bug" />
-    <MESSAGE value="Add columns to keep" />
     <MESSAGE value="Implement keep column filter" />
     <MESSAGE value="Hook up keep column filter and finalize joining of off-street bike data source." />
     <MESSAGE value="Shapefile support" />
@@ -588,7 +584,9 @@
     <MESSAGE value="Add joins to pipeline" />
     <MESSAGE value="Update .gitignore" />
     <MESSAGE value="Go away" />
-    <option name="LAST_COMMIT_MESSAGE" value="Go away" />
+    <MESSAGE value="Cache results of pipeline stages" />
+    <MESSAGE value="Store config that was used in the cache." />
+    <option name="LAST_COMMIT_MESSAGE" value="Store config that was used in the cache." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -50,6 +50,19 @@
         }
       }
     },
+   {
+      "name": "business_fetch",
+      "module": "catalogfetcher",
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "PipelineFetcher",
+      "parameters": {
+        "datasource": {
+          "domain": "chicago",
+          "feed_id": "e4sp-itvq",
+          "name": "Business Licenses - Current Active - Map.geojson"
+        }
+      }
+    },
     {
       "name": "off_street_fetch",
       "module": "catalogfetcher",
@@ -90,6 +103,12 @@
       "output_class": "StreetsPreprocess"
     },
     {
+      "name": "business_preprocess",
+      "module": "bikenetwork",
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "BusinessPreprocess"
+    },
+    {
       "name": "bike_routes_preprocess",
       "module": "map_processor",
       "output_type": "geopandas.GeoDataFrame",
@@ -123,8 +142,22 @@
                    "WEST TOWN", "LOGAN SQUARE"]
       }
     },
-    { "name": "network_analyze" },
-    { "name": "bikestreets_output"}
+    {
+      "name": "network_analyze",
+      "module": "bikenetwork",
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "NetworkStage",
+      "parameters": {
+        "sample_size": 300,
+        "points_key": "license_id"
+      }
+    },
+    {
+      "name": "bikestreets_output",
+      "module": "bikenetwork",
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "ShapefileOutput"
+    }
   ],
   "workflows": [
     {
@@ -137,7 +170,10 @@
         },
         {
           "stage": "network_analyze",
-          "dependencies": ["community_area_filter"]
+          "dependencies": [
+            "community_area_filter",
+            "business_preprocess"
+          ]
         },
         {
           "stage": "community_area_filter",
@@ -177,6 +213,13 @@
           "dependencies": ["bike_routes_fetch"]
         },
         {
+          "stage": "business_preprocess",
+          "dependencies": [
+            "business_fetch",
+            "community_area_filter"
+          ]
+        },
+        {
           "stage": "streets_fetch",
           "dependencies": []
         },
@@ -186,6 +229,10 @@
         },
         {
           "stage": "community_areas_fetch",
+          "dependencies": []
+        },
+        {
+          "stage": "business_fetch",
           "dependencies": []
         }
       ]

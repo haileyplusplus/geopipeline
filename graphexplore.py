@@ -61,15 +61,13 @@ def subgraph_analyze(g):
             print(f' {sn.trans_id}: {sn.street_nam} {gdflen} {c} {sn.suitability}')
 
 
-class NxFinder:
+class NxFinder2:
     # big weight meaning don't use this edge
     MAX = 1000000000
 
-    def __init__(self, filename, points_filename, silent=False, sample=None):
-        self.network_filename = filename
-        self.points_filename = points_filename
-        self.gdf = gpd.read_file(self.network_filename)
-        self.points_df = gpd.read_file(self.points_filename)
+    def __init__(self, network_gdf, points_gdf, silent=False, sample=None):
+        self.gdf = network_gdf
+        self.points_df = points_gdf
         self.gdf_alt = self.gdf.to_crs(constants.CHICAGO_DATUM)
         if sample and sample < len(self.points_df):
             print(f'Sampling original size {len(self.points_df)} to {sample}')
@@ -147,6 +145,14 @@ class NxFinder:
                 yield [list(x.values())[0] for x in self.edge_datas(path)], count
             else:
                 yield [list(x.values())[0]['trans_id'] for x in self.edge_datas(path)], count
+
+
+class NxFinder(NxFinder2):
+    # big weight meaning don't use this edge
+    MAX = 1000000000
+
+    def __init__(self, network_filename, points_filename, silent=False, sample=None):
+        super().__init__(gpd.read_file(network_filename), gpd.read_file(points_filename), silent, sample)
 
 
 def schooltest():
