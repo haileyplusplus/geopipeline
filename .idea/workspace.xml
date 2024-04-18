@@ -4,9 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Add joins to pipeline">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Go away">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cafilt.py" beforeDir="false" afterPath="$PROJECT_DIR$/cafilt.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/catalogfetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/catalogfetcher.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipeline_interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline_interface.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipelineconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/pipelineconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipelinerunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipelinerunner.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,6 +26,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/pipelineconfig.json" root0="SKIP_INSPECTION" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -148,22 +155,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1710167841513</updated>
-    </task>
-    <task id="LOCAL-00039" summary="Add debugging text">
-      <option name="closed" value="true" />
-      <created>1712464189288</created>
-      <option name="number" value="00039" />
-      <option name="presentableId" value="LOCAL-00039" />
-      <option name="project" value="LOCAL" />
-      <updated>1712464189288</updated>
-    </task>
-    <task id="LOCAL-00040" summary="Update processor to reclassify some street types for suitability. Update wrapper to directly load processed filtered file and to make a geodataframe from the routed path.">
-      <option name="closed" value="true" />
-      <created>1712465335611</created>
-      <option name="number" value="00040" />
-      <option name="presentableId" value="LOCAL-00040" />
-      <option name="project" value="LOCAL" />
-      <updated>1712465335611</updated>
     </task>
     <task id="LOCAL-00041" summary="Switch filter to use community areas instead of neighborhoods and to allow multiple to be specified.">
       <option name="closed" value="true" />
@@ -541,7 +532,23 @@
       <option name="project" value="LOCAL" />
       <updated>1713413043284</updated>
     </task>
-    <option name="localTasksCounter" value="88" />
+    <task id="LOCAL-00088" summary="Update .gitignore">
+      <option name="closed" value="true" />
+      <created>1713448565842</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1713448565842</updated>
+    </task>
+    <task id="LOCAL-00089" summary="Go away">
+      <option name="closed" value="true" />
+      <created>1713448573760</created>
+      <option name="number" value="00089" />
+      <option name="presentableId" value="LOCAL-00089" />
+      <option name="project" value="LOCAL" />
+      <updated>1713448573760</updated>
+    </task>
+    <option name="localTasksCounter" value="90" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -556,8 +563,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Database proxy fixes things" />
-    <MESSAGE value="Fetcher print cleanup" />
     <MESSAGE value="Fix bug" />
     <MESSAGE value="Add columns to keep" />
     <MESSAGE value="Implement keep column filter" />
@@ -581,6 +586,19 @@
     <MESSAGE value="Implement filtering" />
     <MESSAGE value="Add next stages with dependencies" />
     <MESSAGE value="Add joins to pipeline" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add joins to pipeline" />
+    <MESSAGE value="Update .gitignore" />
+    <MESSAGE value="Go away" />
+    <option name="LAST_COMMIT_MESSAGE" value="Go away" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/cafilt.py</url>
+          <line>70</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

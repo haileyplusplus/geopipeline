@@ -382,6 +382,7 @@ class CookGISManager(ManagerBase):
         return True
 
     # need to refactor and combine this
+    # This could return a filename or a live object
     def fetch_resource(self, id_):
         self.rebind()
         dataset: DataSet | None = DataSet.get_or_none(DataSet.id_ == id_)

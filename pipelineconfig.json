@@ -37,6 +37,19 @@
         }
       }
     },
+   {
+      "name": "community_areas_fetch",
+      "module": "catalogfetcher",
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "PipelineFetcher",
+      "parameters": {
+        "datasource": {
+          "domain": "chicago",
+          "feed_id": "cauq-8yn6",
+          "name": "Boundaries - Community Areas (current)"
+        }
+      }
+    },
     {
       "name": "off_street_fetch",
       "module": "catalogfetcher",
@@ -99,7 +112,17 @@
       "output_type": "geopandas.GeoDataFrame",
       "output_class": "BikeStreetsOffJoin"
     },
-    { "name": "community_area_filter" },
+    {
+      "name": "community_area_filter",
+      "module": "cafilt",
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "BoundaryFilter",
+      "parameters": {
+        "field": "community",
+        "values": ["LINCOLN PARK", "LAKE VIEW", "NEAR NORTH SIDE",
+                   "WEST TOWN", "LOGAN SQUARE"]
+      }
+    },
     { "name": "network_analyze" },
     { "name": "bikestreets_output"}
   ],
@@ -118,7 +141,10 @@
         },
         {
           "stage": "community_area_filter",
-          "dependencies": ["bikestreets_off_join"]
+          "dependencies": [
+            "bikestreets_off_join",
+            "community_areas_fetch"
+          ]
         },
         {
           "stage": "bikestreets_off_join",
@@ -156,6 +182,10 @@
         },
         {
           "stage": "bike_routes_fetch",
+          "dependencies": []
+        },
+        {
+          "stage": "community_areas_fetch",
           "dependencies": []
         }
       ]

@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
+import geopandas as gpd
+import os
+import uuid
 
 @dataclass
 class PipelineResult:
@@ -19,10 +22,24 @@ class PipelineResult:
         else:
             return 'Empty PipelineResult'
 
+    def empty(self):
+        return self.obj is None and self.filename is None
+
     def get(self):
+        if self.empty():
+            raise ValueError
         if self.obj is None:
-            raise NotImplementedError
+            # handle other types
+            return gpd.read_file(self.filename)
         return self.obj
+
+    def serialize(self, dir_):
+        assert self.filename is None
+        assert not self.empty()
+        filename = str(uuid.uuid1())
+        filepath = os.path.join(dir_, filename)
+        self.obj.to_file(filepath, driver='GeoJSON')
+        return filename
 
 
 class PipelineInterface(ABC):

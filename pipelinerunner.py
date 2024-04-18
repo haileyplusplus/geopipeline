@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import datetime
 import os
 import json
 import importlib
@@ -7,22 +8,35 @@ import sys
 from enum import Enum
 from typing import List
 
-from peewee import SqliteDatabase, Model, CharField
+from peewee import SqliteDatabase, Model, CharField, DateTimeField
+
+from pipeline_interface import PipelineResult
 
 db = SqliteDatabase('/Users/hailey/datasets/pipeline.sqlite3')
 
+
+PIPELINE_STAGE_FILES = '/Users/hailey/tmp/pipelinecache'
+
+"""
+Improvements
+- store stages in database
+- merge workflow stages
+- no-op dep config unnecessary?
+- error reporting
+"""
 
 class BaseModel(Model):
     class Meta:
         database = db
 
 
-class Stage(BaseModel):
-    name = CharField()
-
-
 class StageExecution(BaseModel):
     name = CharField()
+    executed = DateTimeField()
+    status = CharField()
+    # relative to stage file directory
+    filename = CharField()
+    module_updated = DateTimeField()
 
 
 class WorkState(Enum):
@@ -47,6 +61,7 @@ class WorkContext:
         if self.state == WorkState.DONE:
             return
         for d in self.dependencies:
+            # need a better done bit; if the stage does nothing, it runs forever
             if not self.results.get(d):
                 return
         self.state = WorkState.READY
@@ -62,9 +77,45 @@ class WorkContext:
             module = importlib.import_module(m)
             inst = getattr(module, oc)(stage_info)
             inst.set_results(self.results)
-            rv = inst.run_stage()
-            if rv.obj is not None:
+            # get stage info
+            module_updated = os.stat(module.__file__).st_mtime
+            previous_runs = StageExecution().select().where(StageExecution.name == self.stage_name).order_by(StageExecution.executed.desc())
+            cached_filename = None
+            last_executed = None
+            if len(previous_runs) > 0:
+                latest: StageExecution = previous_runs[0]
+                if module_updated > latest.module_updated:
+                    print(f'Previous execution on {latest.executed} has older module version.')
+                else:
+                    cached_filename = os.path.join(PIPELINE_STAGE_FILES, latest.filename)
+                    last_executed = latest.executed
+            if cached_filename:
+                # implement type-specific loader
+                # also check config
+                # maybe store config in a deterministic form
+                print(f'Using cached result for stage {self.stage_name} from run at {last_executed}')
+                rv = PipelineResult(filename=cached_filename)
                 self.results[self.stage_name] = rv
+            else:
+                rv = inst.run_stage()
+                if not rv.empty():
+                    self.results[self.stage_name] = rv
+                    status = 'ok'
+                else:
+                    self.results[self.stage_name] = 'error'
+                    status = 'error'
+                if rv.filename:
+                    filename = rv.filename
+                else:
+                    filename = rv.serialize(PIPELINE_STAGE_FILES)
+                execstage = StageExecution(
+                    name=self.stage_name,
+                    executed=datetime.datetime.now(),
+                    status=status,
+                    filename=filename,
+                    module_updated=module_updated
+                )
+                execstage.save()
         else:
             self.results[self.stage_name] = 'results'
         self.state = WorkState.DONE
@@ -143,7 +194,13 @@ class Runner:
                 raise KeyError
 
 
+def db_initialize():
+    db.connect()
+    db.create_tables([StageExecution])
+
+
 if __name__ == "__main__":
+    db_initialize()
     wp = WorkflowParser()
     r = Runner(wp.get_workflow('bikemap'))
     r.process()
