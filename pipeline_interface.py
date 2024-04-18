@@ -7,6 +7,10 @@ class PipelineResult:
     obj = None
     filename: str = None
 
+    def __init__(self, obj=None, filename=None):
+        self.obj = obj
+        self.filename = filename
+
     def __str__(self):
         if self.obj is not None:
             return f'obj {self.obj}'
@@ -14,6 +18,11 @@ class PipelineResult:
             return f'fn {self.filename}'
         else:
             return 'Empty PipelineResult'
+
+    def get(self):
+        if self.obj is None:
+            raise NotImplementedError
+        return self.obj
 
 
 class PipelineInterface(ABC):
@@ -23,8 +32,14 @@ class PipelineInterface(ABC):
         :type stage_info: dict
         """
         self.stage_info: dict = stage_info
+        self.depend_results = {}
 
     @abstractmethod
     def run_stage(self) -> PipelineResult:
         pass
 
+    def set_results(self, results):
+        self.depend_results = results
+
+    def get_dependency(self, name):
+        return self.depend_results[name]

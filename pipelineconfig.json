@@ -70,9 +70,23 @@
         }
       }
     },
-    { "name": "streets_preprocess" },
-    { "name": "bike_routes_preprocess" },
-    { "name": "off_street_preprocess" },
+    {
+      "name": "streets_preprocess",
+      "module": "map_processor",
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "StreetsPreprocess"
+    },
+    {
+      "name": "bike_routes_preprocess",
+      "module": "map_processor",
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "BikeRoutesPreprocess"
+    },
+    { "name": "off_street_preprocess",
+      "module": "map_processor",
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "OffStreetPreprocess"
+    },
     { "name": "streets_bike_join" },
     { "name": "bikestreets_off_join" },
     { "name": "community_area_filter" },

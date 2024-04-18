@@ -22,6 +22,7 @@ import tqdm
 import catalogfetcher
 import cafilt
 import constants
+from pipeline_interface import PipelineInterface, PipelineResult
 
 """
  Todo:
@@ -530,6 +531,118 @@ class BikeStreets(ProcessorInterface):
         print(result)
         print(result.columns)
         return result
+
+
+class StreetsPreprocess(PipelineInterface):
+    def __init__(self, stage_info):
+        super().__init__(stage_info)
+
+    def run_stage(self) -> PipelineResult:
+        centerlines = self.get_dependency('streets_fetch').get()
+        centerlines['trans_id'] = centerlines['trans_id'].apply(lambda x: f'A{x}')
+        rv = PipelineResult()
+        rv.obj = centerlines
+        return rv
+
+
+class BikeRoutesPreprocess(PipelineInterface):
+    def __init__(self, stage_info):
+        super().__init__(stage_info)
+
+    @staticmethod
+    def fix_bool(x):
+        if x and x.upper() == 'Y':
+            return 'Y'
+        return 'N'
+
+    @staticmethod
+    def bike_ow(x):
+        if x.contraflow == 'N' and x.br_oneway == 'Y':
+            return 'Y'
+        return 'N'
+
+    @staticmethod
+    def fix_street_name(street_name):
+        """
+        Converts bike lane street names to normalized Street Center Lines names
+        """
+        return {'AVENUE': 'AVENUE L',
+                'PLLYMOUTH': 'PLYMOUTH',
+                'MARTIN LUTHER KING JR': 'DR MARTIN LUTHER KING JR',
+                }.get(street_name, street_name).upper()
+
+    def run_stage(self) -> PipelineResult:
+        df = self.get_dependency('bike_routes_fetch').get()
+        print(f'Processing with {df} src 0 (bike routes)')
+        for c in ['contraflow', 'br_oneway']:
+            df[c] = df[c].apply(self.fix_bool)
+        df['bike_ow'] = df.apply(self.bike_ow, axis=1)
+        df.st_name = df.st_name.apply(self.fix_street_name)
+        return PipelineResult(obj=df)
+
+
+class OffStreetPreprocess(PipelineInterface):
+    def __init__(self, stage_info):
+        super().__init__(stage_info)
+
+    @staticmethod
+    def get_dicts(rd):
+        g = rd['geometry']
+        tid = rd['trans_id']
+        assert g.geom_type == 'LineString'
+        prev = None
+        count = 0
+        for i, c in enumerate(g.coords):
+            count += 1
+            if prev is not None:
+                rd['trans_id'] = f'{tid}-{count}'
+                rd['geometry'] = shapely.LineString([prev, c])
+                rd['actual'] = rd['geometry'].length
+                yield rd
+            prev = c
+
+
+    def run_stage(self) -> PipelineResult:
+        off_street: geopandas.GeoDataFrame = self.get_dependency('off_street_fetch').get()
+        print(f'Off street {off_street}')
+        dds = []
+        off_street = off_street.to_crs(constants.CHICAGO_DATUM)
+        for _, row in off_street.iterrows():
+            if row.geometry.geom_type != 'LineString':
+                continue
+            id_ = row.FacName
+            if not id_:
+                id_ = row.Street
+            if not id_:
+                id_ = row.Sub_System
+            #rca = gpd.GeoDataFrame([row])
+            #rca.crs = 4326
+            #rc = rca.to_crs(constants.CHICAGO_DATUM)
+            rd = {'length': row.ShapeSTLength,
+                  'status': 'N',
+                  'dir_travel': 'B',
+                  'street_nam': id_,
+                  'trans_id': f'B{row.OBJECTID}',
+                  'geometry': row.geometry,
+                  'street_typ': '',
+                  'ewns_dir': '',
+                  'class': '4',
+                  'displayrou': 'OFF STREET',
+                  'st_name': id_,
+                  'br_oneway': 'N',
+                  'contraflow': 'N',
+                  'bike_ow': False,
+                  'actual': row.geometry.length}
+            if row.geometry.length > 200:
+                for d2 in self.get_dicts(rd):
+                    dds.append(copy.copy(d2))
+            else:
+                dds.append(copy.copy(rd))
+        offdf = geopandas.GeoDataFrame(dds)
+        offdf.crs = constants.CHICAGO_DATUM
+        #return offdf.to_crs(4326)
+        rv = PipelineResult()
+        return PipelineResult(obj=offdf)
 
 
 class Processor:
