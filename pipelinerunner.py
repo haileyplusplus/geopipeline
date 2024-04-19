@@ -8,7 +8,7 @@ import sys
 from enum import Enum
 from typing import List
 
-from peewee import SqliteDatabase, Model, CharField, DateTimeField
+from peewee import SqliteDatabase, Model, CharField, DateTimeField, fn
 
 from pipeline_interface import PipelineResult
 
@@ -216,6 +216,22 @@ def db_initialize():
     db.create_tables([StageExecution])
 
 
+def db_cleanup():
+    stages = StageExecution.select(StageExecution.name, fn.MAX(StageExecution.executed)).group_by(StageExecution.name).where(StageExecution.status == 'ok')
+    maxes = {}
+    for s in stages:
+        maxes[s.name] = s.executed
+    stages = StageExecution.select()
+    cleaned = 0
+    for s in stages:
+        if maxes.get(s.name) == s.executed:
+            continue
+        filename = os.path.join(PIPELINE_STAGE_FILES, s.filename)
+        os.remove(filename)
+        cleaned +=1
+    print(f'Cleaned up {cleaned} files.')
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog='PipelineRunner',
@@ -223,8 +239,12 @@ if __name__ == "__main__":
     )
     parser.add_argument('workflow_name', nargs='*')
     parser.add_argument('--cleanup', action='store_true')
+    args = parser.parse_args()
     db_initialize()
+    if args.cleanup:
+        db_cleanup()
+        sys.exit(0)
     wp = WorkflowParser()
-    r = Runner(wp.get_workflow(sys.argv[1]))
+    r = Runner(wp.get_workflow(args.workflow_name[0]))
     r.process()
     r.debug()

@@ -15,7 +15,7 @@ if __name__ == "__main__":
         f = pd.read_csv(filename)
     else:
         print(f'Filename {filename} not recognized')
-        sys.exit(1)
+        f = gpd.read_file(filename)
     print(f)
     print(f.iloc[0])
     for c in f.columns:

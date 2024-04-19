@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Remove some cruft">
-      <change afterPath="$PROJECT_DIR$/issues.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/osmfetcher.py" afterDir="false" />
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Add a new workflow to fetch and process OSM data.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipelineconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/pipelineconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/explore.py" beforeDir="false" afterPath="$PROJECT_DIR$/explore.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipelinerunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipelinerunner.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -154,14 +152,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1710167841513</updated>
-    </task>
-    <task id="LOCAL-00049" summary="Attempt second closest point algorithm; unclear why it's slower.">
-      <option name="closed" value="true" />
-      <created>1712841920682</created>
-      <option name="number" value="00049" />
-      <option name="presentableId" value="LOCAL-00049" />
-      <option name="project" value="LOCAL" />
-      <updated>1712841920682</updated>
     </task>
     <task id="LOCAL-00050" summary="Fix processor after refactoring">
       <option name="closed" value="true" />
@@ -547,7 +537,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713538519408</updated>
     </task>
-    <option name="localTasksCounter" value="98" />
+    <task id="LOCAL-00098" summary="Add a new workflow to fetch and process OSM data.">
+      <option name="closed" value="true" />
+      <created>1713553830514</created>
+      <option name="number" value="00098" />
+      <option name="presentableId" value="LOCAL-00098" />
+      <option name="project" value="LOCAL" />
+      <updated>1713553830514</updated>
+    </task>
+    <option name="localTasksCounter" value="99" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -562,7 +560,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fix bugs and make coordinate systems consistent." />
     <MESSAGE value="Switch to pure python implementation. Needs weight function." />
     <MESSAGE value="Fix bug in weight function." />
     <MESSAGE value="Refactor map processor to read sources from dict and allow preprocessing hooks." />
@@ -587,7 +584,8 @@
     <MESSAGE value="Add back overrides." />
     <MESSAGE value="Update runner to invalidate previous runs if upstream dependencies are newer." />
     <MESSAGE value="Remove some cruft" />
-    <option name="LAST_COMMIT_MESSAGE" value="Remove some cruft" />
+    <MESSAGE value="Add a new workflow to fetch and process OSM data." />
+    <option name="LAST_COMMIT_MESSAGE" value="Add a new workflow to fetch and process OSM data." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
