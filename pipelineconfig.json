@@ -21,6 +21,29 @@
       }
     },
     {
+      "name": "city_boundary_fetch",
+      "module": "catalogfetcher",
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "PipelineFetcher",
+      "parameters": {
+        "datasource": {
+          "domain": "chicago",
+          "feed_id": "ewy2-6yfk",
+          "name": "Boundaries - City"
+        }
+      }
+    },
+    {
+      "name": "osm_roads_fetch",
+      "module": "osmfetcher",
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "OsmExtractor",
+      "parameters": {
+        "filename": "gis_osm_roads_free_1",
+        "name": "OSM Roads"
+      }
+    },
+    {
       "name": "bike_routes_fetch",
       "module": "catalogfetcher",
       "output_type": "geopandas.GeoDataFrame",
@@ -157,9 +180,36 @@
       "module": "bikenetwork",
       "output_type": "geopandas.GeoDataFrame",
       "output_class": "ShapefileOutput"
+    },
+    {
+      "name": "osm_roads_preprocess",
+      "module": "osmfetcher",
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "OsmPreprocess"
     }
   ],
   "workflows": [
+    {
+      "name": "osmdev",
+      "final": "osm_roads_preprocess",
+      "stages": [
+        {
+          "stage": "osm_roads_preprocess",
+          "dependencies": [
+            "osm_roads_fetch",
+            "city_boundary_fetch"
+          ]
+        },
+        {
+          "stage": "osm_roads_fetch",
+          "dependencies": []
+        },
+        {
+          "stage": "city_boundary_fetch",
+          "dependencies": []
+        }
+      ]
+    },
     {
       "name": "bikemap",
       "final": "bikestreets_output",

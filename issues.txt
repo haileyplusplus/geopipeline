@@ -1,0 +1,4 @@
+- unreachable nodes
+- traversing of impossible paths despite weights
+- route debug: start, end, route, cost
+- decomposed steps: maybe allow load+filter

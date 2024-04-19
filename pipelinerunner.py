@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import argparse
 import datetime
 import os
 import json
@@ -217,8 +217,14 @@ def db_initialize():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        prog='PipelineRunner',
+        description='Run processing pipeline.',
+    )
+    parser.add_argument('workflow_name', nargs='*')
+    parser.add_argument('--cleanup', action='store_true')
     db_initialize()
     wp = WorkflowParser()
-    r = Runner(wp.get_workflow('bikemap'))
+    r = Runner(wp.get_workflow(sys.argv[1]))
     r.process()
     r.debug()
