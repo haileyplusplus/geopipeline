@@ -53,6 +53,7 @@ class WorkContext:
         self.dependencies = dependencies
         self.state: WorkState = WorkState.NOT_READY
         self.results = None
+        self.newest_dependency = None
 
     def set_results(self, results):
         self.results = results
@@ -61,15 +62,23 @@ class WorkContext:
         assert self.results is not None
         if self.state == WorkState.DONE:
             return
+        newest = None
         for d in self.dependencies:
             # need a better done bit; if the stage does nothing, it runs forever
             if not self.results.get(d):
                 return
+            updated = self.results[d].updated
+            if newest is None:
+                newest = updated
+            else:
+                newest = max(newest, updated)
+        self.newest_dependency = newest
         self.state = WorkState.READY
 
     def process(self):
         assert self.state == WorkState.READY
         print(f'Processing {self.stage_name}')
+        print(f'  newest dependency: {self.newest_dependency}')
         stage_info = self.stages[self.stage_name]
         m = stage_info.get('module')
         oc = stage_info.get('output_class')
@@ -88,17 +97,21 @@ class WorkContext:
                 stored_config = json.loads(latest.stage_config)
                 if module_updated > latest.module_updated:
                     print(f'Previous execution on {latest.executed} has older module version.')
+                elif self.newest_dependency and self.newest_dependency > latest.executed:
+                    print(f'Previous execution on {latest.executed} depends on newer data from {self.newest_dependency}.')
                 elif stored_config != stage_info:
                     print(f'Previous execution on {latest.executed} has a different stored configuration.')
                 else:
                     cached_filename = os.path.join(PIPELINE_STAGE_FILES, latest.filename)
                     last_executed = latest.executed
             if cached_filename:
+                # need to check whether cached data of dependencies is also too old
                 # implement type-specific loader
                 # also check config
                 # maybe store config in a deterministic form
                 print(f'Using cached result for stage {self.stage_name} from run at {last_executed}')
                 rv = PipelineResult(filename=cached_filename)
+                rv.updated = last_executed
                 self.results[self.stage_name] = rv
             else:
                 rv = inst.run_stage()

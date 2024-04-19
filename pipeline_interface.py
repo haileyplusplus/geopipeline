@@ -4,15 +4,18 @@ from dataclasses import dataclass
 import geopandas as gpd
 import os
 import uuid
+import datetime
 
 @dataclass
 class PipelineResult:
     obj = None
     filename: str = None
+    updated: datetime.datetime = None
 
     def __init__(self, obj=None, filename=None):
         self.obj = obj
         self.filename = filename
+        self.updated = datetime.datetime.now()
 
     def __str__(self):
         if self.obj is not None:

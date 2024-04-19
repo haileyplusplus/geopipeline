@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Re-run pipeline stages when config changes.">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Add back overrides.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graphexplore.py" beforeDir="false" afterPath="$PROJECT_DIR$/graphexplore.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bikenetwork.py" beforeDir="false" afterPath="$PROJECT_DIR$/bikenetwork.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipeline_interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline_interface.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipelinerunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipelinerunner.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -151,22 +153,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1710167841513</updated>
-    </task>
-    <task id="LOCAL-00045" summary="Abstract away points types and allow sampling of large datasets">
-      <option name="closed" value="true" />
-      <created>1712553358380</created>
-      <option name="number" value="00045" />
-      <option name="presentableId" value="LOCAL-00045" />
-      <option name="project" value="LOCAL" />
-      <updated>1712553358380</updated>
-    </task>
-    <task id="LOCAL-00046" summary="Quick utility to verify that lastpass stuff migrated properly to onepassword">
-      <option name="closed" value="true" />
-      <created>1712631829418</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1712631829418</updated>
     </task>
     <task id="LOCAL-00047" summary="Enable catalog fetcher to run on different domains">
       <option name="closed" value="true" />
@@ -544,7 +530,23 @@
       <option name="project" value="LOCAL" />
       <updated>1713473030263</updated>
     </task>
-    <option name="localTasksCounter" value="94" />
+    <task id="LOCAL-00094" summary="Skip inaccessible points.">
+      <option name="closed" value="true" />
+      <created>1713473277422</created>
+      <option name="number" value="00094" />
+      <option name="presentableId" value="LOCAL-00094" />
+      <option name="project" value="LOCAL" />
+      <updated>1713473277422</updated>
+    </task>
+    <task id="LOCAL-00095" summary="Add back overrides.">
+      <option name="closed" value="true" />
+      <created>1713478603774</created>
+      <option name="number" value="00095" />
+      <option name="presentableId" value="LOCAL-00095" />
+      <option name="project" value="LOCAL" />
+      <updated>1713478603774</updated>
+    </task>
+    <option name="localTasksCounter" value="96" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -559,8 +561,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Shapefile support" />
-    <MESSAGE value="Attempt to fix off-street bike trails not routing properly." />
     <MESSAGE value="Split long segments" />
     <MESSAGE value="Add route ids for debugging. Look at using native graph libraries." />
     <MESSAGE value="Fix bugs and make coordinate systems consistent." />
@@ -584,7 +584,9 @@
     <MESSAGE value="Store config that was used in the cache." />
     <MESSAGE value="Complete pipeline implementation." />
     <MESSAGE value="Re-run pipeline stages when config changes." />
-    <option name="LAST_COMMIT_MESSAGE" value="Re-run pipeline stages when config changes." />
+    <MESSAGE value="Skip inaccessible points." />
+    <MESSAGE value="Add back overrides." />
+    <option name="LAST_COMMIT_MESSAGE" value="Add back overrides." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -21,6 +21,7 @@ Add shell script to run pipeline
 
 - add debugging info: raw route count, min route #
 - output path id numbers
+- Need to pick points in graph that are reachable
 """
 
 @dataclass
