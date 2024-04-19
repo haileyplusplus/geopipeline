@@ -19,7 +19,6 @@ PIPELINE_STAGE_FILES = '/Users/hailey/tmp/pipelinecache'
 
 """
 Improvements
-- store stages in database
 - merge workflow stages
 - no-op dep config unnecessary?
 - error reporting

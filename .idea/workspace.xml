@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Add back overrides.">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Update runner to invalidate previous runs if upstream dependencies are newer.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bikenetwork.py" beforeDir="false" afterPath="$PROJECT_DIR$/bikenetwork.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline_interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline_interface.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/map_processor.py" beforeDir="false" afterPath="$PROJECT_DIR$/map_processor.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipelinerunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipelinerunner.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -153,14 +152,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1710167841513</updated>
-    </task>
-    <task id="LOCAL-00047" summary="Enable catalog fetcher to run on different domains">
-      <option name="closed" value="true" />
-      <created>1712841487915</created>
-      <option name="number" value="00047" />
-      <option name="presentableId" value="LOCAL-00047" />
-      <option name="project" value="LOCAL" />
-      <updated>1712841487915</updated>
     </task>
     <task id="LOCAL-00048" summary="Fix bug in insert when counts change.">
       <option name="closed" value="true" />
@@ -546,7 +537,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713478603774</updated>
     </task>
-    <option name="localTasksCounter" value="96" />
+    <task id="LOCAL-00096" summary="Update runner to invalidate previous runs if upstream dependencies are newer.">
+      <option name="closed" value="true" />
+      <created>1713535322279</created>
+      <option name="number" value="00096" />
+      <option name="presentableId" value="LOCAL-00096" />
+      <option name="project" value="LOCAL" />
+      <updated>1713535322279</updated>
+    </task>
+    <option name="localTasksCounter" value="97" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -561,7 +560,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Split long segments" />
     <MESSAGE value="Add route ids for debugging. Look at using native graph libraries." />
     <MESSAGE value="Fix bugs and make coordinate systems consistent." />
     <MESSAGE value="Switch to pure python implementation. Needs weight function." />
@@ -586,7 +584,8 @@
     <MESSAGE value="Re-run pipeline stages when config changes." />
     <MESSAGE value="Skip inaccessible points." />
     <MESSAGE value="Add back overrides." />
-    <option name="LAST_COMMIT_MESSAGE" value="Add back overrides." />
+    <MESSAGE value="Update runner to invalidate previous runs if upstream dependencies are newer." />
+    <option name="LAST_COMMIT_MESSAGE" value="Update runner to invalidate previous runs if upstream dependencies are newer." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
