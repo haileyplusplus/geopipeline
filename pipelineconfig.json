@@ -161,8 +161,12 @@
       "output_class": "BoundaryFilter",
       "parameters": {
         "field": "community",
-        "values": ["LINCOLN PARK", "LAKE VIEW", "NEAR NORTH SIDE",
-                   "WEST TOWN", "LOGAN SQUARE"]
+        "values": [
+          "LINCOLN PARK", "LAKE VIEW", "NEAR NORTH SIDE",
+          "WEST TOWN", "LOGAN SQUARE", "NEAR SOUTH SIDE", "LOOP",
+          "NEAR WEST SIDE", "NORTH CENTER", "LINCOLN SQUARE", "UPTOWN",
+          "EDGEWATER"
+        ]
       }
     },
     {
