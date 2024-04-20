@@ -186,13 +186,25 @@
       "module": "osmfetcher",
       "output_type": "geopandas.GeoDataFrame",
       "output_class": "OsmPreprocess"
+    },
+    {
+      "name": "osm_roads_shapefile",
+      "module": "osmmanager",
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "OsmShapefile"
     }
   ],
   "workflows": [
     {
       "name": "osmdev",
-      "final": "osm_roads_preprocess",
+      "final": "osm_roads_shapefile",
       "stages": [
+        {
+          "stage": "osm_roads_shapefile",
+          "dependencies": [
+            "osm_roads_preprocess"
+          ]
+        },
         {
           "stage": "osm_roads_preprocess",
           "dependencies": [
