@@ -17,6 +17,9 @@ Improvements
 - fix pseudo-geojson (thegeometry column)
 - infer data series over time, use metadata to coalesce same set
 - read column metadata and make accessible
+
+- look for blob_mime_type
+- https://data.cityofchicago.org/download/d5bx-dr8z/application%2Fx-zip-compressed
 """
 import argparse
 import io
@@ -28,6 +31,7 @@ import datetime
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from typing import Callable
+from ast import literal_eval
 import geopandas
 
 import sanitize_filename
@@ -297,6 +301,8 @@ class Manager(ManagerBase):
         map = dataset.resource_type == 'map'
         if map:
             ext = 'geojson'
+        if dataset.resource_type == 'file' and dataset.name.find('Shapefile') != -1:
+            ext = 'zip'
         filename = sanitize_filename.sanitize(f'{dataset.name}.{ext}')
         fullpath = os.path.join(self.catalog.destination_dir, filename)
         if os.path.exists(fullpath):
@@ -306,12 +312,17 @@ class Manager(ManagerBase):
             print(f'Updated: {dataset.updated}')
             print(f'Data updated: {dataset.data_updated}')
             print(f'Metadata updated: {dataset.metadata_updated}')
+            if ext == 'zip':
+                return open(fullpath, 'rb').read(), dataset
             return open(fullpath).read(), dataset
         dataset.retrieved = fetch_time
+        dataset.fullpath = fullpath
         # heuristic: mistrust updated too close to retrieved time?
         print(f'Fetching {filename}')
         # datasets available in csv or json
-        if map:
+        if ext == 'zip':
+            url = f'https://{self.catalog.domain}/download/{id_}/application%2Fx-zip-compressed'
+        elif map:
             url = f'https://{self.catalog.domain}/api/geospatial/{id_}?method=export&format=GeoJSON'
         else:
             url = f'https://{self.catalog.domain}/resource/{id_}.json?$limit={self.limit}'
@@ -323,9 +334,14 @@ class Manager(ManagerBase):
             print(f'short text: {req.text}')
         print(len(req.content))
         print(req.headers)
-        print(f'json: {len(req.json())}')
-        with open(fullpath, 'w') as fh:
-            fh.write(req.text)
+        opts = 'wb'
+        if ext == 'zip':
+            with open(fullpath, 'wb') as fh:
+                fh.write(req.content)
+        else:
+            # print(f'json: {len(req.json())}')
+            with open(fullpath, 'w') as fh:
+                fh.write(req.text)
         dataset.save()
         return req.text, dataset
 
@@ -483,6 +499,7 @@ if __name__ == "__main__":
     parser.add_argument('--summary', action='store_true')
     parser.add_argument('--show-deprecated', action='store_true')
     parser.add_argument('--populate', action='store_true')
+    parser.add_argument('--metadata', action='store_true')
     parser.add_argument('--series', action='store_true')
     parser.add_argument('--category', nargs=1, required=False)
     parser.add_argument('--map', action='store_true')
@@ -504,6 +521,15 @@ if __name__ == "__main__":
     #m = CookGISManager(catalog, args.limit[0])
     m = catalog.manager(catalog, args.limit[0])
     m.db_initialize()
+    if args.metadata:
+        for k in args.key:
+            print(f'Info for {k}')
+            q = DataSet.select(DataSet.raw).where(DataSet.id_ == k)
+            #print(q[0].raw)
+            j = literal_eval(q[0].raw)
+            #j = json.loads(q[0].raw.replace('\'', '"'))
+            print(json.dumps(j, indent=4))
+        sys.exit(0)
     if args.pandas:
         q = DataSet.select().join(Category)
         df = pd.read_sql(q.sql()[0], m.mydb.connection())
@@ -533,6 +559,8 @@ if __name__ == "__main__":
             if ds.resource_type == 'map':
                 import geopandas
                 gdf = geopandas.read_file(io.StringIO(r))
+            elif ds.fullpath.endswith('.zip'):
+                gdf = geopandas.read_file(f'zip:///{ds.fullpath}')
 
         #q = DataSet.select().join(Category).where(DataSet.id_ == k)
         #for ds in q:
