@@ -201,7 +201,17 @@
       "name": "transit_shapefile"
     },
     {
-      "name": "gtfs_fetch"
+      "name": "gtfs_fetch",
+      "module": "transit",
+      "output_type": "$bytesfile",
+      "output_class": "GTFSFetcher",
+      "freeze": "true"
+    },
+    {
+      "name": "feed_load",
+      "module": "transit",
+      "output_type": "$picklefile",
+      "output_class": "FeedLoader"
     },
     {
       "name": "routes_fetch"
@@ -215,9 +225,13 @@
         {
           "stage": "transit_shapefile",
           "dependencies": [
-            "gtfs_fetch",
+            "feed_load",
             "routes_fetch"
           ]
+        },
+        {
+          "stage": "feed_load",
+          "dependencies": ["gtfs_fetch"]
         },
         {
           "stage": "gtfs_fetch",

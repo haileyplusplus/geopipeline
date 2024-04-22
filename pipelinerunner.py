@@ -95,7 +95,8 @@ class WorkContext:
             if len(previous_runs) > 0:
                 latest: StageExecution = previous_runs[0]
                 stored_config = json.loads(latest.stage_config)
-                if module_updated > latest.module_updated:
+                freeze = stage_info.get('freeze', False)
+                if module_updated > latest.module_updated and not freeze:
                     print(f'Previous execution on {latest.executed} has older module version.')
                 elif self.newest_dependency and self.newest_dependency > latest.executed:
                     print(f'Previous execution on {latest.executed} depends on newer data from {self.newest_dependency}.')

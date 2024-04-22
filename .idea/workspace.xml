@@ -4,12 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Add support for pseudo shapefiles">
-      <change afterPath="$PROJECT_DIR$/transit.py" afterDir="false" />
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Start transit pipeline and built out pipeline runner support for different file types and error messages.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipeline_interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline_interface.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipelineconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/pipelineconfig.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipelinerunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipelinerunner.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/transit.py" beforeDir="false" afterPath="$PROJECT_DIR$/transit.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -154,14 +154,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1710167841513</updated>
-    </task>
-    <task id="LOCAL-00054" summary="Make explorer more robust">
-      <option name="closed" value="true" />
-      <created>1712929035004</created>
-      <option name="number" value="00054" />
-      <option name="presentableId" value="LOCAL-00054" />
-      <option name="project" value="LOCAL" />
-      <updated>1712929035004</updated>
     </task>
     <task id="LOCAL-00055" summary="Add workspace to gitignore">
       <option name="closed" value="true" />
@@ -547,7 +539,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713671264822</updated>
     </task>
-    <option name="localTasksCounter" value="103" />
+    <task id="LOCAL-00103" summary="Start transit pipeline and built out pipeline runner support for different file types and error messages.">
+      <option name="closed" value="true" />
+      <created>1713804300010</created>
+      <option name="number" value="00103" />
+      <option name="presentableId" value="LOCAL-00103" />
+      <option name="project" value="LOCAL" />
+      <updated>1713804300010</updated>
+    </task>
+    <option name="localTasksCounter" value="104" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -562,7 +562,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Todo comment" />
     <MESSAGE value="Add basic manual override functionality. Only removes are supported." />
     <MESSAGE value="Update value override" />
     <MESSAGE value="Add skeleton of basic pipeline config." />
@@ -587,7 +586,8 @@
     <MESSAGE value="Copy OSM to arcgis directory." />
     <MESSAGE value="Add more community areas" />
     <MESSAGE value="Add support for pseudo shapefiles" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add support for pseudo shapefiles" />
+    <MESSAGE value="Start transit pipeline and built out pipeline runner support for different file types and error messages." />
+    <option name="LAST_COMMIT_MESSAGE" value="Start transit pipeline and built out pipeline runner support for different file types and error messages." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

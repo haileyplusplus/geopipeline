@@ -5,7 +5,7 @@ import geopandas as gpd
 import os
 import uuid
 import datetime
-
+import pickle
 
 @dataclass
 class PipelineResult:
@@ -54,7 +54,7 @@ class PipelineResult:
 
     def __str__(self):
         if self.obj is not None:
-            return f'obj {self.obj}'
+            return f'obj of type {self.objtype}'
         elif self.filename:
             return f'fn {self.filename}'
         elif self.error:
@@ -75,6 +75,9 @@ class PipelineResult:
             assert self.valid()
             if self.objtype == 'geopandas.GeoDataFrame':
                 return gpd.read_file(self.filename)
+            elif self.objtype == '$picklefile':
+                with open(self.filename, 'rb') as fh:
+                    self.obj = pickle.load(fh)
             raise ValueError(f'Object type {self.objtype} not handled.')
         return self.obj
 
@@ -87,6 +90,12 @@ class PipelineResult:
         filepath = os.path.join(dir_, filename)
         if self.objtype == 'geopandas.GeoDataFrame':
             self.obj.to_file(filepath, driver='GeoJSON')
+        elif self.objtype == '$bytesfile':
+            with open(filepath, 'wb') as fh:
+                fh.write(self.obj)
+        elif self.objtype == '$picklefile':
+            with open(filepath, 'wb') as fh:
+                pickle.dump(self.obj, fh)
         else:
             raise ValueError(f'Object type {self.objtype} not handled.')
         return filename
