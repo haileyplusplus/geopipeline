@@ -81,8 +81,9 @@ class WorkContext:
         stage_info = self.stages[self.stage_name]
         m = stage_info.get('module')
         oc = stage_info.get('output_class')
+        ot = stage_info.get('output_type')
         if m and oc:
-            print(f'  Loading module {m}')
+            print(f'  Loading module {m} type {ot}')
             module = importlib.import_module(m)
             inst = getattr(module, oc)(stage_info)
             inst.set_results(self.results)
@@ -109,7 +110,7 @@ class WorkContext:
                 # also check config
                 # maybe store config in a deterministic form
                 print(f'Using cached result for stage {self.stage_name} from run at {last_executed}')
-                rv = PipelineResult(filename=cached_filename)
+                rv = PipelineResult.from_cached(cached_filename, ot)
                 rv.updated = last_executed
                 self.results[self.stage_name] = rv
             else:
@@ -118,12 +119,12 @@ class WorkContext:
                     self.results[self.stage_name] = rv
                     status = 'ok'
                 else:
-                    self.results[self.stage_name] = 'error'
+                    self.results[self.stage_name] = PipelineResult.as_error(f'Error running {self.stage_name}')
                     status = 'error'
                 if rv.filename:
                     filename = rv.filename
                 else:
-                    filename = rv.serialize(PIPELINE_STAGE_FILES)
+                    filename = rv.serialize(PIPELINE_STAGE_FILES, ot)
                 execstage = StageExecution(
                     name=self.stage_name,
                     executed=datetime.datetime.now(),
@@ -134,7 +135,7 @@ class WorkContext:
                 )
                 execstage.save()
         else:
-            self.results[self.stage_name] = 'results'
+            self.results[self.stage_name] = PipelineResult.mark_incomplete()
         self.state = WorkState.DONE
 
 

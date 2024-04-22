@@ -196,9 +196,39 @@
       "module": "osmmanager",
       "output_type": "geopandas.GeoDataFrame",
       "output_class": "OsmShapefile"
+    },
+    {
+      "name": "transit_shapefile"
+    },
+    {
+      "name": "gtfs_fetch"
+    },
+    {
+      "name": "routes_fetch"
     }
   ],
   "workflows": [
+    {
+      "name": "transit",
+      "final": "transit_shapefile",
+      "stages": [
+        {
+          "stage": "transit_shapefile",
+          "dependencies": [
+            "gtfs_fetch",
+            "routes_fetch"
+          ]
+        },
+        {
+          "stage": "gtfs_fetch",
+          "dependencies": []
+        },
+        {
+          "stage": "routes_fetch",
+          "dependencies": []
+        }
+      ]
+    },
     {
       "name": "osmdev",
       "final": "osm_roads_shapefile",

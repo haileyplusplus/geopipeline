@@ -6,42 +6,89 @@ import os
 import uuid
 import datetime
 
+
 @dataclass
 class PipelineResult:
     obj = None
     filename: str = None
     updated: datetime.datetime = None
+    objtype: str = None
+    error: str = None
 
-    def __init__(self, obj=None, filename=None):
+    def __init__(self, obj=None, filename=None, objtype=None, error=None):
         self.obj = obj
         self.filename = filename
         self.updated = datetime.datetime.now()
+        self.objtype = objtype
+        self.error = error
+
+
+    @classmethod
+    def from_cached(cls, filename, objtype):
+        return cls(obj=None, filename=filename, objtype=objtype)
+
+    @classmethod
+    def mark_incomplete(cls):
+        """
+        Indicate that this stage isn't implemented or cacheable.
+        :return:
+        """
+        return cls(obj='incomplete', objtype='incomplete')
+
+    @classmethod
+    def as_error(cls, error):
+        return cls(error=error)
+
+    def valid(self):
+        """
+
+        :return: Whether object is in a valid state.
+        """
+        if self.error:
+            return True
+        if self.empty():
+            return True
+        if self.filename:
+            return self.objtype is not None
+        return True
 
     def __str__(self):
         if self.obj is not None:
             return f'obj {self.obj}'
         elif self.filename:
             return f'fn {self.filename}'
+        elif self.error:
+            return f'PipelineResult has error: {self.error}'
         else:
             return 'Empty PipelineResult'
 
     def empty(self):
         return self.obj is None and self.filename is None
 
+    def has_error(self):
+        return self.error is not None
+
     def get(self):
         if self.empty():
             raise ValueError
         if self.obj is None:
-            # handle other types
-            return gpd.read_file(self.filename)
+            assert self.valid()
+            if self.objtype == 'geopandas.GeoDataFrame':
+                return gpd.read_file(self.filename)
+            raise ValueError(f'Object type {self.objtype} not handled.')
         return self.obj
 
-    def serialize(self, dir_):
+    def serialize(self, dir_, objtype):
         assert self.filename is None
         assert not self.empty()
+        assert not self.has_error()
+        self.objtype = objtype
         filename = str(uuid.uuid1())
         filepath = os.path.join(dir_, filename)
-        self.obj.to_file(filepath, driver='GeoJSON')
+        if self.objtype == 'geopandas.GeoDataFrame':
+            self.obj.to_file(filepath, driver='GeoJSON')
+        else:
+            raise ValueError(f'Object type {self.objtype} not handled.')
         return filename
 
 
