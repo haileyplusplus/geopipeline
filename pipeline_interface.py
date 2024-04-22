@@ -78,6 +78,7 @@ class PipelineResult:
             elif self.objtype == '$picklefile':
                 with open(self.filename, 'rb') as fh:
                     self.obj = pickle.load(fh)
+                    return self.obj
             raise ValueError(f'Object type {self.objtype} not handled.')
         return self.obj
 
@@ -85,7 +86,11 @@ class PipelineResult:
         assert self.filename is None
         assert not self.empty()
         assert not self.has_error()
+        if self.objtype == 'incomplete':
+            print(f'Skipping serialization of incomplete stage')
+            return None
         self.objtype = objtype
+        print(f'Serializing object of {self.objtype}')
         filename = str(uuid.uuid1())
         filepath = os.path.join(dir_, filename)
         if self.objtype == 'geopandas.GeoDataFrame':

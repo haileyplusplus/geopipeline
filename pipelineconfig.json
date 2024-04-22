@@ -198,7 +198,17 @@
       "output_class": "OsmShapefile"
     },
     {
-      "name": "transit_shapefile"
+      "name": "routes_fetch",
+      "module": "catalogfetcher",
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "PipelineFetcher",
+      "parameters": {
+        "datasource": {
+          "domain": "chicago",
+          "feed_id": "d5bx-dr8z",
+          "name": "CTA - Bus Routes - Shapefile"
+        }
+      }
     },
     {
       "name": "gtfs_fetch",
@@ -214,7 +224,10 @@
       "output_class": "FeedLoader"
     },
     {
-      "name": "routes_fetch"
+      "name": "transit_shapefile",
+      "module": "transit_merge",
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "TransitMerge"
     }
   ],
   "workflows": [

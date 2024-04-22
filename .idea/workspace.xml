@@ -4,12 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Start transit pipeline and built out pipeline runner support for different file types and error messages.">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Add feed parse stage and freeze functionality.">
+      <change afterPath="$PROJECT_DIR$/transit_merge.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/catalogfetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/catalogfetcher.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipeline_interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline_interface.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipelineconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/pipelineconfig.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipelinerunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipelinerunner.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/transit.py" beforeDir="false" afterPath="$PROJECT_DIR$/transit.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -154,14 +155,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1710167841513</updated>
-    </task>
-    <task id="LOCAL-00055" summary="Add workspace to gitignore">
-      <option name="closed" value="true" />
-      <created>1712929086067</created>
-      <option name="number" value="00055" />
-      <option name="presentableId" value="LOCAL-00055" />
-      <option name="project" value="LOCAL" />
-      <updated>1712929086067</updated>
     </task>
     <task id="LOCAL-00056" summary="Document TODOs">
       <option name="closed" value="true" />
@@ -547,7 +540,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713804300010</updated>
     </task>
-    <option name="localTasksCounter" value="104" />
+    <task id="LOCAL-00104" summary="Add feed parse stage and freeze functionality.">
+      <option name="closed" value="true" />
+      <created>1713805855535</created>
+      <option name="number" value="00104" />
+      <option name="presentableId" value="LOCAL-00104" />
+      <option name="project" value="LOCAL" />
+      <updated>1713805855535</updated>
+    </task>
+    <option name="localTasksCounter" value="105" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -562,7 +563,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Add basic manual override functionality. Only removes are supported." />
     <MESSAGE value="Update value override" />
     <MESSAGE value="Add skeleton of basic pipeline config." />
     <MESSAGE value="Implement basic no-op pipeline traversal." />
@@ -587,7 +587,8 @@
     <MESSAGE value="Add more community areas" />
     <MESSAGE value="Add support for pseudo shapefiles" />
     <MESSAGE value="Start transit pipeline and built out pipeline runner support for different file types and error messages." />
-    <option name="LAST_COMMIT_MESSAGE" value="Start transit pipeline and built out pipeline runner support for different file types and error messages." />
+    <MESSAGE value="Add feed parse stage and freeze functionality." />
+    <option name="LAST_COMMIT_MESSAGE" value="Add feed parse stage and freeze functionality." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

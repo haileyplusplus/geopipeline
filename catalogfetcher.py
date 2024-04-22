@@ -480,7 +480,10 @@ class PipelineFetcher(PipelineInterface):
         mm.db_initialize()
         tup = mm.fetch_resource(ds['feed_id'])
         rawsource, _ = tup
-        self.rv.obj = geopandas.read_file(io.StringIO(rawsource))
+        if type(rawsource) is bytes:
+            self.rv.obj = geopandas.read_file(io.BytesIO(rawsource))
+        else:
+            self.rv.obj = geopandas.read_file(io.StringIO(rawsource))
         # need to do filtering
         self.apply_filters()
         return self.rv

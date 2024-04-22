@@ -126,15 +126,16 @@ class WorkContext:
                     filename = rv.filename
                 else:
                     filename = rv.serialize(PIPELINE_STAGE_FILES, ot)
-                execstage = StageExecution(
-                    name=self.stage_name,
-                    executed=datetime.datetime.now(),
-                    status=status,
-                    filename=filename,
-                    stage_config=json.dumps(stage_info),
-                    module_updated=module_updated
-                )
-                execstage.save()
+                if filename is not None:
+                    execstage = StageExecution(
+                        name=self.stage_name,
+                        executed=datetime.datetime.now(),
+                        status=status,
+                        filename=filename,
+                        stage_config=json.dumps(stage_info),
+                        module_updated=module_updated
+                    )
+                    execstage.save()
         else:
             self.results[self.stage_name] = PipelineResult.mark_incomplete()
         self.state = WorkState.DONE
