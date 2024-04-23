@@ -4,9 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Make incomplete pipelines work.">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Join GTFS data with routes shapefile.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/transit_merge.py" beforeDir="false" afterPath="$PROJECT_DIR$/transit_merge.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/catalogfetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/catalogfetcher.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/issues.txt" beforeDir="false" afterPath="$PROJECT_DIR$/issues.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipelineconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/pipelineconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/transit.py" beforeDir="false" afterPath="$PROJECT_DIR$/transit.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -151,14 +154,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1710167841513</updated>
-    </task>
-    <task id="LOCAL-00057" summary="Pseudo stash">
-      <option name="closed" value="true" />
-      <created>1712931119023</created>
-      <option name="number" value="00057" />
-      <option name="presentableId" value="LOCAL-00057" />
-      <option name="project" value="LOCAL" />
-      <updated>1712931119023</updated>
     </task>
     <task id="LOCAL-00058" summary="Pseudo stash">
       <option name="closed" value="true" />
@@ -544,7 +539,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713810272555</updated>
     </task>
-    <option name="localTasksCounter" value="106" />
+    <task id="LOCAL-00106" summary="Join GTFS data with routes shapefile.">
+      <option name="closed" value="true" />
+      <created>1713811297495</created>
+      <option name="number" value="00106" />
+      <option name="presentableId" value="LOCAL-00106" />
+      <option name="project" value="LOCAL" />
+      <updated>1713811297495</updated>
+    </task>
+    <option name="localTasksCounter" value="107" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -559,7 +562,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Add skeleton of basic pipeline config." />
     <MESSAGE value="Implement basic no-op pipeline traversal." />
     <MESSAGE value="Hook up actual pipeline fetching" />
     <MESSAGE value="Move data source parameters into pipeline config" />
@@ -584,7 +586,8 @@
     <MESSAGE value="Start transit pipeline and built out pipeline runner support for different file types and error messages." />
     <MESSAGE value="Add feed parse stage and freeze functionality." />
     <MESSAGE value="Make incomplete pipelines work." />
-    <option name="LAST_COMMIT_MESSAGE" value="Make incomplete pipelines work." />
+    <MESSAGE value="Join GTFS data with routes shapefile." />
+    <option name="LAST_COMMIT_MESSAGE" value="Join GTFS data with routes shapefile." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

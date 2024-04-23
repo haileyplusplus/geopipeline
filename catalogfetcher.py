@@ -347,13 +347,17 @@ class Manager(ManagerBase):
 
 
 class CookGISManager(ManagerBase):
+    # Rename this to arcgis poen data
     def __init__(self, catalog: CatalogInfo, limit: int):
         super().__init__(catalog, limit)
         self.data_catalog = {}
 
     @staticmethod
     def parse_dataset(dsdict) -> DataSet:
-        category, _ = Category().get_or_create(name='CookGIS', count=-1)
+        catname = catalog.name
+        if catname == 'cookgis':
+            catname = 'CookGIS'
+        category, _ = Category().get_or_create(name=catname, count=-1)
         filtered = {k: v for k, v in dsdict.items() if k in {'identifier', 'title', 'description', 'modified', 'issued'}}
         fi = filtered['identifier'].split('=')[1]
         s2 = fi.split('&')
@@ -387,7 +391,7 @@ class CookGISManager(ManagerBase):
         return rv
 
     def populate_all(self):
-        gf = GenericFetcher('https://hub-cookcountyil.opendata.arcgis.com/api/feed/dcat-us/1.1.json')
+        gf = GenericFetcher(f'https://{self.catalog.domain}/api/feed/dcat-us/1.1.json')
         if not gf.fetch():
             return False
         self.data_catalog = gf.d
@@ -449,7 +453,10 @@ class CookGISManager(ManagerBase):
 DOMAINS = {
     'chicago': CatalogInfo('chicago', '/Users/hailey/datasets/chicago', 'data.cityofchicago.org', Manager),
     'cook': CatalogInfo('cook', '/Users/hailey/datasets/cook', 'datacatalog.cookcountyil.gov', Manager),
-    'cookgis': CatalogInfo('cookgis', '/Users/hailey/datasets/cookgis', None, CookGISManager),
+    'cookgis': CatalogInfo('cookgis', '/Users/hailey/datasets/cookgis',
+                           'hub-cookcountyil.opendata.arcgis.com', CookGISManager),
+    'ssmma': CatalogInfo('ssmma', '/Users/hailey/datasets/ssmma',
+                         'hub-ssmma-gis.opendata.arcgis.com', CookGISManager),
 }
 
 
@@ -521,6 +528,9 @@ if __name__ == "__main__":
         print(f'Domain {args.domain} not found.')
         sys.exit(1)
     print(f'Using domain {args.domain}')
+    if not os.path.exists(catalog.destination_dir):
+        print(f'Creating dir {catalog.destination_dir}')
+        os.mkdir(catalog.destination_dir)
     #m = CookGISManager(catalog, args.limit[0])
     m = catalog.manager(catalog, args.limit[0])
     m.db_initialize()

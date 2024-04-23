@@ -2,3 +2,13 @@
 - traversing of impossible paths despite weights
 - route debug: start, end, route, cost
 - decomposed steps: maybe allow load+filter
+
+Pace shapefile:
+
+https://opendata.arcgis.com/api/v3/datasets/5d4e3a3d7d5d421bb43dd320c37774fe_0/downloads/data?format=geojson&spatialRefId=4326&where=1%3D1
+https://hub-ssmma-gis.opendata.arcgis.com/
+
+
+Pace GTFS
+- https://www.pacebus.com/sites/default/files/2024-03/GTFS.zip
+- needs some indirection
