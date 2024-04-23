@@ -14,6 +14,7 @@ class PipelineResult:
     updated: datetime.datetime = None
     objtype: str = None
     error: str = None
+    serialized_filename: str = None
 
     def __init__(self, obj=None, filename=None, objtype=None, error=None):
         self.obj = obj
@@ -82,6 +83,13 @@ class PipelineResult:
             raise ValueError(f'Object type {self.objtype} not handled.')
         return self.obj
 
+    def get_filename(self):
+        if self.empty():
+            return None
+        if self.filename is not None:
+            return self.filename
+        return self.serialized_filename
+
     def serialize(self, dir_, objtype):
         assert self.filename is None
         assert not self.empty()
@@ -103,6 +111,7 @@ class PipelineResult:
                 pickle.dump(self.obj, fh)
         else:
             raise ValueError(f'Object type {self.objtype} not handled.')
+        self.serialized_filename = filepath
         return filename
 
 

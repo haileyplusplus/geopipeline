@@ -215,13 +215,44 @@
       "module": "transit",
       "output_type": "$bytesfile",
       "output_class": "GTFSFetcher",
-      "freeze": "true"
+      "freeze": "true",
+      "parameters": {
+        "url": "https://www.transitchicago.com/downloads/sch_data/google_transit.zip"
+      }
+    },
+    {
+      "name": "pace_gtfs_fetch",
+      "module": "transit",
+      "output_type": "$bytesfile",
+      "output_class": "GTFSFetcher",
+      "parameters": {
+        "url": "https://www.pacebus.com/sites/default/files/2024-03/GTFS.zip"
+      }
+    },
+    {
+      "name": "pace_routes_fetch",
+      "module": "catalogfetcher",
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "PipelineFetcher",
+      "parameters": {
+        "datasource": {
+          "domain": "ssmma",
+          "feed_id": "5d4e3a3d7d5d421bb43dd320c37774fe",
+          "name": "Pace Bus Routes (file)"
+        }
+      }
     },
     {
       "name": "feed_load",
       "module": "transit",
       "output_type": "$picklefile",
       "output_class": "FeedLoader"
+    },
+    {
+      "name": "pace_feed_load",
+      "module": "transit",
+      "output_type": "$picklefile",
+      "output_class": "PaceFeedLoader"
     },
     {
       "name": "transit_shapefile",
@@ -239,7 +270,9 @@
           "stage": "transit_shapefile",
           "dependencies": [
             "feed_load",
-            "routes_fetch"
+            "routes_fetch",
+            "pace_feed_load",
+            "pace_routes_fetch"
           ]
         },
         {
@@ -247,11 +280,23 @@
           "dependencies": ["gtfs_fetch"]
         },
         {
+          "stage": "pace_feed_load",
+          "dependencies": ["pace_gtfs_fetch"]
+        },
+        {
           "stage": "gtfs_fetch",
           "dependencies": []
         },
         {
           "stage": "routes_fetch",
+          "dependencies": []
+        },
+        {
+          "stage": "pace_gtfs_fetch",
+          "dependencies": []
+        },
+        {
+          "stage": "pace_routes_fetch",
           "dependencies": []
         }
       ]
