@@ -241,6 +241,12 @@
       }
     },
     {
+      "name": "metra_gtfs_clean",
+      "module": "transit",
+      "output_type": "$bytesfile",
+      "output_class": "GTFSClean"
+    },
+    {
       "name": "metra_routes_fetch",
       "module": "catalogfetcher",
       "output_type": "geopandas.GeoDataFrame",
@@ -297,7 +303,7 @@
             "routes_fetch",
             "pace_feed_load",
             "pace_routes_fetch",
-            "metra_gtfs_fetch",
+            "metra_gtfs_clean",
             "metra_routes_fetch"
           ]
         },
@@ -324,6 +330,10 @@
         {
           "stage": "pace_routes_fetch",
           "dependencies": []
+        },
+        {
+          "stage": "metra_gtfs_clean",
+          "dependencies": ["metra_gtfs_fetch"]
         },
         {
           "stage": "metra_gtfs_fetch",

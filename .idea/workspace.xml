@@ -4,11 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Start work on Metra stuff.">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Add ability to load dependencies by index. This will allow some generic re-use of modules without parameters.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline_interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline_interface.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/issues.txt" beforeDir="false" afterPath="$PROJECT_DIR$/issues.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipelineconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/pipelineconfig.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipelinerunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipelinerunner.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/transit.py" beforeDir="false" afterPath="$PROJECT_DIR$/transit.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/transit_merge.py" beforeDir="false" afterPath="$PROJECT_DIR$/transit_merge.py" afterDir="false" />
     </list>
@@ -155,14 +154,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1710167841513</updated>
-    </task>
-    <task id="LOCAL-00062" summary="Database proxy fixes things">
-      <option name="closed" value="true" />
-      <created>1712953005692</created>
-      <option name="number" value="00062" />
-      <option name="presentableId" value="LOCAL-00062" />
-      <option name="project" value="LOCAL" />
-      <updated>1712953005692</updated>
     </task>
     <task id="LOCAL-00063" summary="Fetcher print cleanup">
       <option name="closed" value="true" />
@@ -548,7 +539,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713965167772</updated>
     </task>
-    <option name="localTasksCounter" value="111" />
+    <task id="LOCAL-00111" summary="Add ability to load dependencies by index. This will allow some generic re-use of modules without parameters.">
+      <option name="closed" value="true" />
+      <created>1713966806178</created>
+      <option name="number" value="00111" />
+      <option name="presentableId" value="LOCAL-00111" />
+      <option name="project" value="LOCAL" />
+      <updated>1713966806178</updated>
+    </task>
+    <option name="localTasksCounter" value="112" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -563,7 +562,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Add next stages with dependencies" />
     <MESSAGE value="Add joins to pipeline" />
     <MESSAGE value="Update .gitignore" />
     <MESSAGE value="Go away" />
@@ -588,7 +586,8 @@
     <MESSAGE value="Add Pace route processing to pipeline" />
     <MESSAGE value="Narrow to a specific date to get Sunday schedules." />
     <MESSAGE value="Start work on Metra stuff." />
-    <option name="LAST_COMMIT_MESSAGE" value="Start work on Metra stuff." />
+    <MESSAGE value="Add ability to load dependencies by index. This will allow some generic re-use of modules without parameters." />
+    <option name="LAST_COMMIT_MESSAGE" value="Add ability to load dependencies by index. This will allow some generic re-use of modules without parameters." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

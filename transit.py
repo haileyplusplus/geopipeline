@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+import glob
+import io
+import os
+import tempfile
+import zipfile
+import csv
 
 import requests
 from gtfs_functions import Feed
@@ -58,7 +64,32 @@ class PaceFeedLoader(PipelineInterface):
 
 
 class GTFSClean(PipelineInterface):
+    @staticmethod
+    def clean_file(outdir, f) -> str:
+        ofn = os.path.join(outdir, f)
+        with open(f) as fh:
+            reader = csv.reader(fh, skipinitialspace=True)
+            with open(ofn, 'w') as wfh:
+                writer = csv.writer(wfh)
+                for row in reader:
+                    writer.writerow(row)
+        return ofn
+
     def run_stage(self) -> PipelineResult:
         rv = PipelineResult()
+        dep = self.get_dependency_by_index(0)
+        fn = dep.get_filename()
+        zf = zipfile.ZipFile(fn)
+        bf = io.BytesIO()
+        with tempfile.TemporaryDirectory() as td:
+            zf.extractall(td)
+            os.chdir(td)
+            with tempfile.TemporaryDirectory() as outdir:
+                with zipfile.ZipFile(bf, 'w') as outzf:
+                    for f in glob.glob('*.txt'):
+                        _, fn = os.path.split(f)
+                        ofn = self.clean_file(outdir, f)
+                        outzf.write(ofn, arcname=fn)
+        rv.obj = bf.getvalue()
         return rv
 
