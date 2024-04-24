@@ -276,13 +276,21 @@
       "name": "feed_load",
       "module": "transit",
       "output_type": "$picklefile",
-      "output_class": "FeedLoader"
+      "output_class": "FeedLoader",
+      "parameters": {
+        "schedule_date": "2024-05-26",
+        "time_windows": [0, 6, 10, 16, 19, 24]
+      }
     },
     {
       "name": "pace_feed_load",
       "module": "transit",
       "output_type": "$picklefile",
-      "output_class": "FeedLoader"
+      "output_class": "FeedLoader",
+      "parameters": {
+        "schedule_date": "2024-04-21",
+        "time_windows": [0, 6, 10, 16, 19, 24]
+      }
     },
     {
       "name": "transit_shapefile",

@@ -35,32 +35,38 @@ class FeedLoader(PipelineInterface):
         print(f'Got GTFS fetch dependency: {dep.filename}')
         # bug here - needs to work on an object as well
         print(dep)
-        assert dep.filename is not None
-        feed = Feed(dep.filename,
-                    time_windows=[0, 6, 10, 16, 19, 24],
-                    start_date='2024-05-26', end_date='2024-05-26')
-        line_freq = feed.lines_freq
-        line_freq.head()
-        rv.obj = feed
-        return rv
-
-
-class PaceFeedLoader(PipelineInterface):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def run_stage(self) -> PipelineResult:
-        rv = PipelineResult()
-        dep = self.get_dependency('pace_gtfs_fetch')
         fn = dep.get_filename()
-        print(f'Got GTFS fetch dependency: {fn}')
         assert fn is not None
-        feed = Feed(fn, time_windows=[0, 6, 10, 16, 19, 24],
-                    start_date='2024-04-21', end_date='2024-04-21')
+        params = self.stage_info['parameters']
+        feed = Feed(fn,
+                    time_windows=params['time_windows'],
+                    start_date=params['schedule_date'],
+                    end_date=params['schedule_date'])
         line_freq = feed.lines_freq
         line_freq.head()
         rv.obj = feed
         return rv
+
+
+# class PaceFeedLoader(PipelineInterface):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#
+#     def run_stage(self) -> PipelineResult:
+#         rv = PipelineResult()
+#         dep = self.get_dependency('pace_gtfs_fetch')
+#         fn = dep.get_filename()
+#         print(f'Got GTFS fetch dependency: {fn}')
+#         assert fn is not None
+#         params = self.stage_info['parameters']
+#         feed = Feed(fn,
+#                     time_windows=params['time_windows'],
+#                     start_date=params['schedule_date'],
+#                     end_date=params['schedule_date'])
+#         line_freq = feed.lines_freq
+#         line_freq.head()
+#         rv.obj = feed
+#         return rv
 
 
 class GTFSClean(PipelineInterface):
