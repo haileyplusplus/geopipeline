@@ -231,6 +231,29 @@
       }
     },
     {
+      "name": "metra_gtfs_fetch",
+      "module": "transit",
+      "output_type": "$bytesfile",
+      "output_class": "GTFSFetcher",
+      "freeze": "true",
+      "parameters": {
+        "url": "https://transitfeeds.com/p/metra/169/latest/download"
+      }
+    },
+    {
+      "name": "metra_routes_fetch",
+      "module": "catalogfetcher",
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "PipelineFetcher",
+      "parameters": {
+        "datasource": {
+          "domain": "chicago",
+          "feed_id": "q8wx-dznq",
+          "name": "Metra Lines"
+        }
+      }
+    },
+    {
       "name": "pace_routes_fetch",
       "module": "catalogfetcher",
       "output_type": "geopandas.GeoDataFrame",
@@ -273,7 +296,9 @@
             "feed_load",
             "routes_fetch",
             "pace_feed_load",
-            "pace_routes_fetch"
+            "pace_routes_fetch",
+            "metra_gtfs_fetch",
+            "metra_routes_fetch"
           ]
         },
         {
@@ -298,6 +323,14 @@
         },
         {
           "stage": "pace_routes_fetch",
+          "dependencies": []
+        },
+        {
+          "stage": "metra_gtfs_fetch",
+          "dependencies": []
+        },
+        {
+          "stage": "metra_routes_fetch",
           "dependencies": []
         }
       ]

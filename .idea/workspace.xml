@@ -4,10 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Add Pace route processing to pipeline">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Narrow to a specific date to get Sunday schedules.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/catalogfetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/catalogfetcher.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/issues.txt" beforeDir="false" afterPath="$PROJECT_DIR$/issues.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipelineconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/pipelineconfig.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/transit.py" beforeDir="false" afterPath="$PROJECT_DIR$/transit.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/transit_merge.py" beforeDir="false" afterPath="$PROJECT_DIR$/transit_merge.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -152,14 +154,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1710167841513</updated>
-    </task>
-    <task id="LOCAL-00060" summary="Add Cook County GIS fetcher">
-      <option name="closed" value="true" />
-      <created>1712939273165</created>
-      <option name="number" value="00060" />
-      <option name="presentableId" value="LOCAL-00060" />
-      <option name="project" value="LOCAL" />
-      <updated>1712939273165</updated>
     </task>
     <task id="LOCAL-00061" summary="Refactoring breaks this: need one single db">
       <option name="closed" value="true" />
@@ -545,7 +539,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713892786099</updated>
     </task>
-    <option name="localTasksCounter" value="109" />
+    <task id="LOCAL-00109" summary="Narrow to a specific date to get Sunday schedules.">
+      <option name="closed" value="true" />
+      <created>1713927875938</created>
+      <option name="number" value="00109" />
+      <option name="presentableId" value="LOCAL-00109" />
+      <option name="project" value="LOCAL" />
+      <updated>1713927875938</updated>
+    </task>
+    <option name="localTasksCounter" value="110" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -560,7 +562,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Move data source parameters into pipeline config" />
     <MESSAGE value="Implement filtering" />
     <MESSAGE value="Add next stages with dependencies" />
     <MESSAGE value="Add joins to pipeline" />
@@ -585,7 +586,8 @@
     <MESSAGE value="Join GTFS data with routes shapefile." />
     <MESSAGE value="Update catalog fetcher to support other ArcGIS domains." />
     <MESSAGE value="Add Pace route processing to pipeline" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add Pace route processing to pipeline" />
+    <MESSAGE value="Narrow to a specific date to get Sunday schedules." />
+    <option name="LAST_COMMIT_MESSAGE" value="Narrow to a specific date to get Sunday schedules." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

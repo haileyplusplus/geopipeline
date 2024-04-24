@@ -42,4 +42,9 @@ class TransitMerge(PipelineInterface):
         pace = self.process_pace()
         rv.obj = pd.concat([rv.obj, pace])
         rv.obj.to_file(os.path.join(DESTINATION_DIR, 'bus_route_frequency.shp'))
+        metra_raw = self.get_dependency('metra_gtfs_fetch')
+        metra_feed = Feed(metra_raw.get_filename(),
+                          time_windows=[0, 10, 20, 24],
+                          start_date='2023-09-17', end_date='2023-09-17')
+        print(metra_feed.lines_freq)
         return rv

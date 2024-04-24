@@ -16,3 +16,7 @@ Pace GTFS
 
 Pace
 - pulse routes not showing up on frequency map
+
+Metra
+- https://transitfeeds.com/p/metra/169/latest/download
+- https://gtfsapi.metrarail.com/gtfs/raw/schedule.zip

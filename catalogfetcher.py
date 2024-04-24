@@ -301,8 +301,9 @@ class Manager(ManagerBase):
         map = dataset.resource_type == 'map'
         if map:
             ext = 'geojson'
-        if dataset.resource_type == 'file' and dataset.name.find('Shapefile') != -1:
-            ext = 'zip'
+        if dataset.resource_type == 'file':
+            if dataset.name.find('Shapefile') != -1 or dataset.description.find('ArcGIS') != -1:
+                ext = 'zip'
         filename = sanitize_filename.sanitize(f'{dataset.name}.{ext}')
         fullpath = os.path.join(self.catalog.destination_dir, filename)
         if os.path.exists(fullpath):
