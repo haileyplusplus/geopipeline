@@ -225,6 +225,7 @@
       "module": "transit",
       "output_type": "$bytesfile",
       "output_class": "GTFSFetcher",
+      "freeze": "true",
       "parameters": {
         "url": "https://www.pacebus.com/sites/default/files/2024-03/GTFS.zip"
       }

@@ -4,13 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Update catalog fetcher to support other ArcGIS domains.">
+    <list default="true" id="7b25f9a9-c69d-45e9-9c23-ab0d5708701e" name="Changes" comment="Add Pace route processing to pipeline">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/issues.txt" beforeDir="false" afterPath="$PROJECT_DIR$/issues.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline_interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline_interface.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipelineconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/pipelineconfig.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/transit.py" beforeDir="false" afterPath="$PROJECT_DIR$/transit.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/transit_merge.py" beforeDir="false" afterPath="$PROJECT_DIR$/transit_merge.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -155,14 +152,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1710167841513</updated>
-    </task>
-    <task id="LOCAL-00059" summary="Refactor to make more generic">
-      <option name="closed" value="true" />
-      <created>1712936734818</created>
-      <option name="number" value="00059" />
-      <option name="presentableId" value="LOCAL-00059" />
-      <option name="project" value="LOCAL" />
-      <updated>1712936734818</updated>
     </task>
     <task id="LOCAL-00060" summary="Add Cook County GIS fetcher">
       <option name="closed" value="true" />
@@ -548,7 +537,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713890285479</updated>
     </task>
-    <option name="localTasksCounter" value="108" />
+    <task id="LOCAL-00108" summary="Add Pace route processing to pipeline">
+      <option name="closed" value="true" />
+      <created>1713892786099</created>
+      <option name="number" value="00108" />
+      <option name="presentableId" value="LOCAL-00108" />
+      <option name="project" value="LOCAL" />
+      <updated>1713892786099</updated>
+    </task>
+    <option name="localTasksCounter" value="109" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -563,7 +560,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Hook up actual pipeline fetching" />
     <MESSAGE value="Move data source parameters into pipeline config" />
     <MESSAGE value="Implement filtering" />
     <MESSAGE value="Add next stages with dependencies" />
@@ -588,7 +584,8 @@
     <MESSAGE value="Make incomplete pipelines work." />
     <MESSAGE value="Join GTFS data with routes shapefile." />
     <MESSAGE value="Update catalog fetcher to support other ArcGIS domains." />
-    <option name="LAST_COMMIT_MESSAGE" value="Update catalog fetcher to support other ArcGIS domains." />
+    <MESSAGE value="Add Pace route processing to pipeline" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add Pace route processing to pipeline" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

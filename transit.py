@@ -29,7 +29,9 @@ class FeedLoader(PipelineInterface):
         # bug here - needs to work on an object as well
         print(dep)
         assert dep.filename is not None
-        feed = Feed(dep.filename, time_windows=[0, 6, 10, 16, 19, 24])
+        feed = Feed(dep.filename,
+                    time_windows=[0, 6, 10, 16, 19, 24],
+                    start_date='2024-05-26', end_date='2024-05-26')
         line_freq = feed.lines_freq
         line_freq.head()
         rv.obj = feed
@@ -46,7 +48,8 @@ class PaceFeedLoader(PipelineInterface):
         fn = dep.get_filename()
         print(f'Got GTFS fetch dependency: {fn}')
         assert fn is not None
-        feed = Feed(fn, time_windows=[0, 6, 10, 16, 19, 24])
+        feed = Feed(fn, time_windows=[0, 6, 10, 16, 19, 24],
+                    start_date='2024-04-21', end_date='2024-04-21')
         line_freq = feed.lines_freq
         line_freq.head()
         rv.obj = feed
