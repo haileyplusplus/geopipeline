@@ -293,6 +293,16 @@
       }
     },
     {
+      "name": "metra_feed_load",
+      "module": "transit",
+      "output_type": "$picklefile",
+      "output_class": "FeedLoader",
+      "parameters": {
+        "schedule_date": "2023-09-17",
+        "time_windows": [0, 10, 20, 24]
+      }
+    },
+    {
       "name": "transit_shapefile",
       "module": "transit_merge",
       "output_type": "geopandas.GeoDataFrame",
@@ -311,7 +321,7 @@
             "routes_fetch",
             "pace_feed_load",
             "pace_routes_fetch",
-            "metra_gtfs_clean",
+            "metra_feed_load",
             "metra_routes_fetch"
           ]
         },
@@ -338,6 +348,10 @@
         {
           "stage": "pace_routes_fetch",
           "dependencies": []
+        },
+        {
+          "stage": "metra_feed_load",
+          "dependencies": ["metra_gtfs_clean"]
         },
         {
           "stage": "metra_gtfs_clean",
