@@ -87,6 +87,7 @@ class WorkContext:
             module = importlib.import_module(m)
             inst = getattr(module, oc)(stage_info)
             inst.set_results(self.results)
+            inst.set_dependencies(self.dependencies)
             # get stage info
             module_updated = os.stat(module.__file__).st_mtime
             previous_runs = StageExecution().select().where(StageExecution.name == self.stage_name).order_by(StageExecution.executed.desc())

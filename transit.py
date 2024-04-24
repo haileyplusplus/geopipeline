@@ -24,7 +24,8 @@ class FeedLoader(PipelineInterface):
 
     def run_stage(self) -> PipelineResult:
         rv = PipelineResult()
-        dep = self.get_dependency('gtfs_fetch')
+        #dep = self.get_dependency('gtfs_fetch')
+        dep = self.get_dependency_by_index(0)
         print(f'Got GTFS fetch dependency: {dep.filename}')
         # bug here - needs to work on an object as well
         print(dep)
@@ -54,3 +55,10 @@ class PaceFeedLoader(PipelineInterface):
         line_freq.head()
         rv.obj = feed
         return rv
+
+
+class GTFSClean(PipelineInterface):
+    def run_stage(self) -> PipelineResult:
+        rv = PipelineResult()
+        return rv
+

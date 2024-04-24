@@ -123,6 +123,7 @@ class PipelineInterface(ABC):
         """
         self.stage_info: dict = stage_info
         self.depend_results = {}
+        self.dependencies = None
 
     @abstractmethod
     def run_stage(self) -> PipelineResult:
@@ -131,6 +132,14 @@ class PipelineInterface(ABC):
     def set_results(self, results):
         self.depend_results = results
 
+    def set_dependencies(self, dependencies):
+        self.dependencies = dependencies
+
     def get_dependency(self, name):
         # need to assert that dependency is actually in config
         return self.depend_results[name]
+
+    def get_dependency_by_index(self, index):
+        assert type(self.dependencies) is list
+        depname = self.dependencies[index]
+        return self.get_dependency(depname)

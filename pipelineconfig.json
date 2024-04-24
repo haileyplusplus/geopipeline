@@ -276,7 +276,7 @@
       "name": "pace_feed_load",
       "module": "transit",
       "output_type": "$picklefile",
-      "output_class": "PaceFeedLoader"
+      "output_class": "FeedLoader"
     },
     {
       "name": "transit_shapefile",
