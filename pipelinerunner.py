@@ -231,8 +231,9 @@ def db_cleanup():
         if maxes.get(s.name) == s.executed:
             continue
         filename = os.path.join(PIPELINE_STAGE_FILES, s.filename)
-        os.remove(filename)
-        cleaned +=1
+        if os.path.exists(filename):
+            os.remove(filename)
+            cleaned +=1
     print(f'Cleaned up {cleaned} files.')
 
 
