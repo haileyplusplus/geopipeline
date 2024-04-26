@@ -46,12 +46,16 @@ class TransitMerge(PipelineInterface):
         rlf = feed.lines_freq
         routes['route_id'] = routes.apply(lambda x: self.METRA.get(x.LINES, x.LINES), axis=1)
         feed2 = rlf.drop(columns=['geometry'])
+        #maxtrips = feed2[feed2.window == '10:00-20:00'].groupby('route_name').apply(lambda x: x.loc[x.ntrips.idxmax()].drop(['route_name']))
+        #print('max trips')
+        #print(maxtrips)
         routes2 = routes[['route_id', 'DESCRIPTIO', 'geometry']]
         m = routes2.merge(feed2, left_on='route_id', right_on='route_id')
         print('metra pre-merge')
         print(m)
         print(type(m))
-        m = m[m.window == '10:00-20:00'].groupby('route_name').apply(lambda x: x.loc[x.ntrips.idxmax()].drop(['route_name']))
+        #m = m[m.window == '10:00-20:00'].groupby('route_name').apply(lambda x: x.loc[x.ntrips.idxmax()].drop(['route_name']))
+        m = m[m.window == '10:00-20:00']
         m.crs = 3435
         print('metra merge')
         print(m)
