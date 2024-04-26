@@ -137,6 +137,10 @@ class PipelineInterface(ABC):
 
     def get_dependency(self, name):
         # need to assert that dependency is actually in config
+        if name not in self.depend_results:
+            for d in self.dependencies:
+                if d.startswith(name):
+                    return self.depend_results[d]
         return self.depend_results[name]
 
     def get_dependency_by_index(self, index):

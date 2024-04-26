@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import copy
 import datetime
 import os
 import json
@@ -154,10 +155,9 @@ class WorkflowParser:
         self.workflows = {}
         for d in self.config['workflows']:
             fs = d['final']
-            self.workflows[d['name']] = {
-                'final': fs,
-                'stages': {}
-            }
+            self.workflows[d['name']] = copy.deepcopy(d)
+            del self.workflows[d['name']]['stages']
+            self.workflows[d['name']]['stages'] = {}
             ws = self.workflows[d['name']]['stages']
             final_found = False
             assert fs in self.stages
@@ -213,6 +213,16 @@ class Runner:
             work_queue.append(item)
             if max_iters < 0:
                 raise KeyError
+        return self.results[fs]
+
+    def write_to_destination(self):
+        dir_ = self.workflow.get('destination_dir')
+        if not dir_:
+            return
+        if self.workflow.get('destination_type') != 'shapefile':
+            raise NotImplementedError('Other workflow destination types not implemented')
+        fs = self.workflow['final']
+        self.results[fs].get().to_file(os.path.join(dir_, f'{fs}.shp'))
 
 
 def db_initialize():
@@ -251,5 +261,7 @@ if __name__ == "__main__":
         sys.exit(0)
     wp = WorkflowParser()
     r = Runner(wp.get_workflow(args.workflow_name[0]))
-    r.process()
+    results = r.process()
+    print(f'Pipeline results: {results}')
+    r.write_to_destination()
     r.debug()

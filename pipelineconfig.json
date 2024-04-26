@@ -303,7 +303,43 @@
       }
     },
     {
-      "name": "transit_shapefile",
+      "name": "bus_route_frequency_sunday",
+      "module": "transit_merge",
+      "output_type": "geopandas.GeoDataFrame",
+      "output_class": "TransitMerge"
+    },
+    {
+      "name": "feed_load_saturday",
+      "module": "transit",
+      "output_type": "$picklefile",
+      "output_class": "FeedLoader",
+      "parameters": {
+        "schedule_date": "2024-05-25",
+        "time_windows": [0, 6, 10, 16, 19, 24]
+      }
+    },
+    {
+      "name": "pace_feed_load_saturday",
+      "module": "transit",
+      "output_type": "$picklefile",
+      "output_class": "FeedLoader",
+      "parameters": {
+        "schedule_date": "2024-04-20",
+        "time_windows": [0, 6, 10, 16, 19, 24]
+      }
+    },
+    {
+      "name": "metra_feed_load_saturday",
+      "module": "transit",
+      "output_type": "$picklefile",
+      "output_class": "FeedLoader",
+      "parameters": {
+        "schedule_date": "2023-09-16",
+        "time_windows": [0, 10, 20, 24]
+      }
+    },
+    {
+      "name": "bus_route_frequency_saturday",
       "module": "transit_merge",
       "output_type": "geopandas.GeoDataFrame",
       "output_class": "TransitMerge"
@@ -311,11 +347,72 @@
   ],
   "workflows": [
     {
-      "name": "transit",
-      "final": "transit_shapefile",
+      "name": "transit2",
+      "final": "bus_route_frequency_saturday",
+      "destination_dir": "/Users/hailey/Documents/ArcGIS/data/chicago",
+      "destination_type": "shapefile",
       "stages": [
         {
-          "stage": "transit_shapefile",
+          "stage": "bus_route_frequency_saturday",
+          "dependencies": [
+            "feed_load_saturday",
+            "routes_fetch",
+            "pace_feed_load_saturday",
+            "pace_routes_fetch",
+            "metra_feed_load_saturday",
+            "metra_routes_fetch"
+          ]
+        },
+        {
+          "stage": "feed_load_saturday",
+          "dependencies": ["gtfs_fetch"]
+        },
+        {
+          "stage": "pace_feed_load_saturday",
+          "dependencies": ["pace_gtfs_fetch"]
+        },
+        {
+          "stage": "gtfs_fetch",
+          "dependencies": []
+        },
+        {
+          "stage": "routes_fetch",
+          "dependencies": []
+        },
+        {
+          "stage": "pace_gtfs_fetch",
+          "dependencies": []
+        },
+        {
+          "stage": "pace_routes_fetch",
+          "dependencies": []
+        },
+        {
+          "stage": "metra_feed_load_saturday",
+          "dependencies": ["metra_gtfs_clean"]
+        },
+        {
+          "stage": "metra_gtfs_clean",
+          "dependencies": ["metra_gtfs_fetch"]
+        },
+        {
+          "stage": "metra_gtfs_fetch",
+          "dependencies": []
+        },
+        {
+          "stage": "metra_routes_fetch",
+          "dependencies": []
+        }
+      ]
+    },
+    {
+      "name": "transit",
+      "final": "bus_route_frequency_sunday",
+      "destination_dir": "/Users/hailey/Documents/ArcGIS/data/chicago",
+      "destination_type": "shapefile",
+      "stages": [
+        {
+          "stage": "bus_route_frequency_sunday",
           "dependencies": [
             "feed_load",
             "routes_fetch",

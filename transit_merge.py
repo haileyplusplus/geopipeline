@@ -89,7 +89,7 @@ class TransitMerge(PipelineInterface):
         rv.obj = pd.concat([rv.obj, pace, metra])
         print('merged')
         print(rv.obj)
-        rv.obj.to_file(os.path.join(DESTINATION_DIR, 'bus_route_frequency.shp'))
+        #rv.obj.to_file(os.path.join(DESTINATION_DIR, 'bus_route_frequency.shp'))
         #metra_raw = self.get_dependency('metra_gtfs_clean')
         #print(metra_raw)
         # metra_feed = Feed(metra_raw.get_filename(),
