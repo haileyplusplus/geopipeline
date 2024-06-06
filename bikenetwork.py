@@ -9,12 +9,9 @@ import geopandas as gpd
 import shapely
 import tqdm
 
-import pathwrapper
 import graphexplore
 from pipeline_interface import PipelineInterface, PipelineResult
-
-# todo: merge all shapefile writing / processing
-DESTINATION_DIR = '/Users/hailey/Documents/ArcGIS/data/chicago'
+from constants import datasets_path, shapefile_path
 
 """
 Add shell script to run pipeline
@@ -24,14 +21,16 @@ Add shell script to run pipeline
 - Need to pick points in graph that are reachable
 """
 
+
 @dataclass
 class PointInfo:
     filename: str
     index_col: str
 
+
 class Network:
-    SCHOOL_POINTS = PointInfo('/tmp/schools.geojson', 'school_nm')
-    BUSINESS_POINTS = PointInfo('/Users/hailey/datasets/chicago/Business Licenses - Current Active - Map.geojson', 'license_id')
+    BUSINESS_POINTS = PointInfo(datasets_path() / 'chicago' / 'Business Licenses - Current Active - Map.geojson',
+                                'license_id')
 
     def __init__(self, finder: graphexplore.NxFinder2, point_index: str):
         self.finder = finder
@@ -115,25 +114,5 @@ class ShapefileOutput(PipelineInterface):
         rv = PipelineResult()
         netfile = self.get_dependency('network_analyze').get()
         rv.obj = netfile
-        netfile.to_file(os.path.join(DESTINATION_DIR, 'computed_bike_network.shp'))
+        netfile.to_file(shapefile_path() / 'computed_bike_network.shp')
         return rv
-
-
-if __name__ == "__main__":
-    # need to hook this up
-    #SAMPLE_SIZE = 2000
-    SAMPLE_SIZE = 300
-    filtered_file = open('/tmp/filterfile.txt').read().strip()
-    print(f'Reading from {filtered_file}')
-    point_info = Network.BUSINESS_POINTS
-    #point_info = Network.SCHOOL_POINTS
-    points_filename = point_info.filename
-    #f = pathwrapper.Finder(filtered_file, points_filename, silent=False, sample=SAMPLE_SIZE)
-    f = graphexplore.NxFinder(filtered_file, points_filename, silent=False, sample=SAMPLE_SIZE)
-    n = Network(f, point_info)
-    applied = n.apply()
-    filt = applied[applied.geometry.type == 'LineString']
-    #print(applied)
-    #print(filt)
-    filt.to_file('/tmp/computed_bike_network.geojson', driver='GeoJSON')
-    filt.to_file(os.path.join(DESTINATION_DIR, 'computed_bike_network.shp'))

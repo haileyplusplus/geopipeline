@@ -1,13 +1,7 @@
 #!/usr/bin/env python3
 
-import zipfile
-import geopandas as gpd
-import os
-
 from pipeline_interface import PipelineInterface, PipelineResult
-
-
-DESTINATION_DIR = '/Users/hailey/Documents/ArcGIS/data/chicago'
+from constants import shapefile_path
 
 
 class OsmShapefile(PipelineInterface):
@@ -17,5 +11,5 @@ class OsmShapefile(PipelineInterface):
     def run_stage(self) -> PipelineResult:
         rv = PipelineResult()
         rv.obj = self.get_dependency("osm_roads_preprocess").get()
-        rv.obj.to_file(os.path.join(DESTINATION_DIR, 'osm_roads.shp'))
+        rv.obj.to_file(shapefile_path() / 'osm_roads.shp')
         return rv

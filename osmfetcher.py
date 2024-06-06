@@ -4,9 +4,10 @@ import zipfile
 import geopandas as gpd
 
 from pipeline_interface import PipelineInterface, PipelineResult
+from constants import datasets_path
 
 
-OSM_SOURCE = '/Users/hailey/datasets/osm/illinois-latest-free.shp.zip'
+OSM_SOURCE = datasets_path() / 'osm' / 'illinois-latest-free.shp.zip'
 
 # gis_osm_roads_free_1
 

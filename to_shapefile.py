@@ -5,11 +5,10 @@ import sys
 
 import geopandas
 
+from constants import datasets_path, shapefile_path
+
 
 class Converter:
-    DATASET_DIR = '/Users/hailey/datasets/chicago'
-    DESTINATION_DIR = '/Users/hailey/Documents/ArcGIS/data/chicago'
-
     def __init__(self, filename):
         path, name = os.path.split(filename)
         root, ext = os.path.splitext(name)
@@ -20,10 +19,11 @@ class Converter:
 
     def convert(self):
         print(f'Converting {self.filename}')
-        if not os.path.exists(self.DESTINATION_DIR):
-            os.mkdir(self.DESTINATION_DIR)
+        if not os.path.exists(shapefile_path()):
+            os.mkdir(shapefile_path())
         gf = geopandas.read_file(self.filename)
-        gf.to_file(os.path.join(self.DESTINATION_DIR, f'{self.root}.shp'))
+        gf.to_file(shapefile_path() / f'{self.root}.shp')
+
 
 if __name__ == "__main__":
     c = Converter(sys.argv[1])

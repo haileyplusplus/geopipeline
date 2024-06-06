@@ -12,11 +12,12 @@ from typing import List
 from peewee import SqliteDatabase, Model, CharField, DateTimeField, fn
 
 from pipeline_interface import PipelineResult
+from constants import datasets_path, pipeline_cache_path, shapefile_path
 
-db = SqliteDatabase('/Users/hailey/datasets/pipeline.sqlite3')
+db = SqliteDatabase(datasets_path() / 'pipeline.sqlite3')
 
 
-PIPELINE_STAGE_FILES = '/Users/hailey/tmp/pipelinecache'
+PIPELINE_STAGE_FILES = pipeline_cache_path()
 
 """
 Improvements
@@ -216,13 +217,10 @@ class Runner:
         return self.results[fs]
 
     def write_to_destination(self):
-        dir_ = self.workflow.get('destination_dir')
-        if not dir_:
-            return
         if self.workflow.get('destination_type') != 'shapefile':
             raise NotImplementedError('Other workflow destination types not implemented')
         fs = self.workflow['final']
-        self.results[fs].get().to_file(os.path.join(dir_, f'{fs}.shp'))
+        self.results[fs].get().to_file(os.path.join(shapefile_path() / f'{fs}.shp'))
 
 
 def db_initialize():

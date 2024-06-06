@@ -349,7 +349,6 @@
     {
       "name": "transit2",
       "final": "bus_route_frequency_saturday",
-      "destination_dir": "/Users/hailey/Documents/ArcGIS/data/chicago",
       "destination_type": "shapefile",
       "stages": [
         {
@@ -408,7 +407,6 @@
     {
       "name": "transit",
       "final": "bus_route_frequency_sunday",
-      "destination_dir": "/Users/hailey/Documents/ArcGIS/data/chicago",
       "destination_type": "shapefile",
       "stages": [
         {

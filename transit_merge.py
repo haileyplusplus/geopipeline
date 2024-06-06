@@ -9,8 +9,6 @@ from gtfs_functions import Feed
 
 from pipeline_interface import PipelineInterface, PipelineResult
 
-DESTINATION_DIR = '/Users/hailey/Documents/ArcGIS/data/chicago'
-
 
 class TransitMerge(PipelineInterface):
     METRA_EXTRA = ['UP-NW',

@@ -43,6 +43,7 @@ from peewee import SqliteDatabase, Model, CharField, IntegerField, DateTimeField
 
 from interfaces import ManagerInterface
 from pipeline_interface import PipelineInterface, PipelineResult
+from constants import datasets_path
 
 
 @dataclass
@@ -53,7 +54,6 @@ class CatalogInfo:
     manager: type
 
 
-#db = SqliteDatabase(None)
 database_proxy = DatabaseProxy()
 
 class BaseModel(Model):
@@ -452,11 +452,11 @@ class CookGISManager(ManagerBase):
 
 # make this a dict
 DOMAINS = {
-    'chicago': CatalogInfo('chicago', '/Users/hailey/datasets/chicago', 'data.cityofchicago.org', Manager),
-    'cook': CatalogInfo('cook', '/Users/hailey/datasets/cook', 'datacatalog.cookcountyil.gov', Manager),
-    'cookgis': CatalogInfo('cookgis', '/Users/hailey/datasets/cookgis',
+    'chicago': CatalogInfo('chicago', datasets_path() / 'chicago', 'data.cityofchicago.org', Manager),
+    'cook': CatalogInfo('cook', datasets_path() / 'cook', 'datacatalog.cookcountyil.gov', Manager),
+    'cookgis': CatalogInfo('cookgis', datasets_path() / 'cookgis',
                            'hub-cookcountyil.opendata.arcgis.com', CookGISManager),
-    'ssmma': CatalogInfo('ssmma', '/Users/hailey/datasets/ssmma',
+    'ssmma': CatalogInfo('ssmma', datasets_path() / 'ssmma',
                          'hub-ssmma-gis.opendata.arcgis.com', CookGISManager),
 }
 

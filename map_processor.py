@@ -19,10 +19,9 @@ import geopandas as gpd
 import pandas as pd
 import tqdm
 
-import catalogfetcher
-import cafilt
 import constants
 from pipeline_interface import PipelineInterface, PipelineResult
+from constants import datasets_path, shapefile_path
 
 """
  Todo:
@@ -31,25 +30,6 @@ from pipeline_interface import PipelineInterface, PipelineResult
   - support quick shapefile passthrough for map evaluation
   - consider supporting manual tweaks (eg connect Bloomingdale Trail to routing)
 """
-
-DESTINATION_DIR = '/Users/hailey/Documents/ArcGIS/data/chicago'
-MAP_CACHE = '/Users/hailey/tmp/mapcache'
-# this is not currently being used
-db = SqliteDatabase('/Users/hailey/datasets/processed-data.sqlite3')
-SOURCE_DIRS = ['/Users/hailey/datasets/cook',
-               '/Users/hailey/datasets/chicago',
-               '/Users/hailey/datasets/chicago/manual']
-
-
-class BaseModel(Model):
-    class Meta:
-        database = db
-
-
-class Processing(BaseModel):
-    # different dbs so no fk relationship
-    name = CharField()
-    process_time = DateTimeField
 
 
 @dataclass(frozen=True)
@@ -457,10 +437,3 @@ class BikeStreetsOffJoin(PipelineInterface):
         result = self.normalize()
         self.rv.obj = result
         return self.rv
-
-
-def db_initialize():
-    db.connect()
-    db.create_tables([
-        Processing
-    ])

@@ -12,6 +12,7 @@ import shapely
 import tqdm
 
 import constants
+from constants import datasets_path
 
 
 def subgraphs(g, maxedges=0):
@@ -159,7 +160,7 @@ class NxFinder(NxFinder2):
 
 
 def schooltest():
-    schools_filename = '/Users/hailey/datasets/chicago/Chicago Public Schools - School Locations SY1819.geojson'
+    schools_filename = datasets_path() / 'Chicago Public Schools - School Locations SY1819.geojson'
     filtered_file = open('/tmp/filterfile.txt').read().strip()
     f = NxFinder(filtered_file, schools_filename)
     #rj = f.router('school_nm', 'LAKE VIEW HS', 'LASALLE')
