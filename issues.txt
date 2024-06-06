@@ -34,3 +34,8 @@ All downloads: http HEAD
 Workflow abstractions
 - differentiate stage parameters and workflow parameters
 - should stages persist across workflows?
+
+GTFS
+- CTA GTFS shapes are mostly reasonable
+- short-turns harder to map. maybe want to split overlapping geometries.
+- or merge with granular data like OSM, chicago streets, and add counts to street segs.
