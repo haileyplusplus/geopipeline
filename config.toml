@@ -1,0 +1,3 @@
+datasets_path = '~/datasets'
+shapefile_path = '~/Documents/ArcGIS/data/chicago'
+pipeline_cache_path = '~/tmp/pipelinecache'
