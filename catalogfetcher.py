@@ -123,8 +123,9 @@ class CategoryIndexFetcher(GenericFetcher):
         assert self.fetch()
         for item in self.d['results']:
             category, created = Category().get_or_create(name=item['domain_category'])
-            if not created and category.count != item['count']:
-                print(f'Item count update for {category.name}: was {category.count}, now {item['count']}')
+            itemcount = item['count']
+            if not created and category.count != itemcount:
+                print(f'Item count update for {category.name}: was {category.count}, now {itemcount}')
             category.count = item['count']
             category.save()
 
