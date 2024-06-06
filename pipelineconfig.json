@@ -492,6 +492,7 @@
     {
       "name": "bikemap",
       "final": "bikestreets_output",
+      "destination_type": "shapefile",
       "stages": [
         {
           "stage": "bikestreets_output",
